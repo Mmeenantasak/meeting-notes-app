@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แอปบันทึกการประชุม (Standalone)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f8f7f4;
+            --bg-panel: #ffffff;
+            --text-primary: #4a4a4a;
+            --text-secondary: #7a7a7a;
+            --border-color: #e5e5e5;
+            --accent-color: #84a98c;
+            --accent-hover: #6e9a78;
+            --focus-ring: rgba(132, 169, 140, 0.4);
+            
+            /* Button Colors */
+            --btn-action-item-bg: #588157;
+            --btn-save-bg: #b08968;
+            --btn-download-bg: #7f7f7f;
+            --btn-format-bg: #9a8c98;
+            --btn-copy-bg: #4a4e69;
+        }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+        }
+        .participant-box {
+            background-color: var(--bg-panel);
+            border: 2px solid var(--border-color);
+            transition: all 0.2s ease-in-out;
+            position: relative;
+            cursor: grab;
+        }
+        .participant-box:active {
+            cursor: grabbing;
+        }
+        .participant-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .participant-box.active {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #c8ebcf;
+        }
+        .sortable-drag {
+            opacity: 1 !important;
+        }
+
+        textarea {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+        }
+        textarea:focus {
+            box-shadow: 0 0 0 3px var(--focus-ring);
+            border-color: var(--accent-color);
+        }
+        .delete-icon {
+            position: absolute; top: 0.25rem; right: 0.5rem; cursor: pointer; color: #d9534f;
+            font-weight: bold; display: none; font-size: 1.25rem; line-height: 1;
+        }
+        .participant-box:hover .delete-icon { display: block; }
+        .modal-overlay { transition: opacity 0.3s ease; }
+        .tool-btn {
+            font-size: 0.875rem; padding: 0.5rem 0.75rem; border-radius: 0.5rem;
+            color: white; font-weight: 500; transition: background-color 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        #resizer {
+            width: 8px;
+            cursor: col-resize;
+            background-color: #e5e7eb;
+            transition: background-color 0.2s;
+        }
+        #resizer:hover, #resizer.resizing {
+            background-color: var(--accent-color);
+        }
+        /* Button Classes */
+        .btn-action-item { background-color: var(--btn-action-item-bg); }
+        .btn-save { background-color: var(--btn-save-bg); }
+        .btn-download { background-color: var(--btn-download-bg); }
+        .btn-format { background-color: var(--btn-format-bg); }
+        .btn-copy { background-color: var(--btn-copy-bg); }
+
+        .btn-action-item:hover { background-color: #4a6d49; }
+        .btn-save:hover { background-color: #9c7853; }
+        .btn-download:hover { background-color: #6b6b6b; }
+        .btn-format:hover { background-color: #857884; }
+        .btn-copy:hover { background-color: #3e4157; }
+
+        /* Responsive adjustments */
+        @media (max-width: 767px) {
+            html, body {
+                height: auto;
+                overflow: auto;
+            }
+            #left-panel, #right-panel {
+                flex-basis: auto !important;
+                width: 100%;
+                padding: 0;
+            }
+             #right-panel {
+                min-height: 300px;
+            }
+            #main-container {
+                 flex-direction: column;
+                 gap: 1rem;
+            }
+            #resizer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 h-screen flex flex-col">
+        <header class="text-center mb-6 flex-shrink-0">
+            <h1 class="text-3xl md:text-4xl font-bold">Meeting Notes</h1>
+            <p style="color: var(--text-secondary);" class="mt-2">ลากและวางเพื่อจัดลำดับผู้เข้าร่วม</p>
+        </header>
+
+        <!-- This container will be hidden if Firebase is configured correctly -->
+        <div id="setup-instructions-container"></div>
+
+        <main id="main-container" class="flex flex-grow min-h-0">
+
+            <!-- Left Column: Participants & AI Tools -->
+            <div id="left-panel" class="flex flex-col gap-6 md:pr-3 overflow-y-auto" style="flex-basis: 33%; min-width: 250px;">
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">ผู้เข้าร่วม</h2>
+                        <div class="flex items-center gap-2">
+                            <button id="decrease-cols-btn" class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 font-bold flex items-center justify-center transition">-</button>
+                            <span id="cols-count" class="font-bold w-4 text-center">2</span>
+                            <button id="increase-cols-btn" class="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 font-bold flex items-center justify-center transition">+</button>
+                        </div>
+                    </div>
+                    <div id="participants-grid" class="grid gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-2">
+                        <!-- JS Generated -->
+                    </div>
+                    <div class="mt-4">
+                        <button id="add-participant-btn" class="tool-btn w-full" style="background-color: var(--accent-color);">
+                            เพิ่มผู้เข้าร่วม
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold mb-4">เครื่องมือ</h2>
+                    <div class="grid grid-cols-2 gap-2">
+                         <button id="action-items-btn" class="tool-btn btn-action-item col-span-2">
+                            📋 สรุป Action Items
+                        </button>
+                        <button id="save-btn" class="tool-btn btn-save">
+                            💾 บันทึก
+                        </button>
+                        <button id="download-btn" class="tool-btn btn-download">
+                            📥 ดาวน์โหลด
+                        </button>
+                        <button id="format-text-btn" class="tool-btn btn-format">
+                            ✍️ จัดรูปแบบ
+                         </button>
+                         <button id="copy-all-btn" class="tool-btn btn-copy">
+                            📋 คัดลอกทั้งหมด
+                         </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resizer"></div>
+
+            <!-- Right Column: Transcript Area -->
+            <div id="right-panel" class="flex flex-col md:pl-3" style="flex-basis: 67%; min-width: 0;">
+                 <div class="bg-white p-6 rounded-xl shadow-sm h-full flex flex-col">
+                    <h2 class="text-xl font-bold mb-4 flex-shrink-0">บันทึกการประชุมทั้งหมด</h2>
+                    <textarea id="transcript-textarea" class="w-full flex-grow p-4 rounded-lg focus:outline-none" placeholder="กำลังเชื่อมต่อกับฐานข้อมูล..."></textarea>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="edit-name-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="p-4 border-b flex justify-between items-center"><h3 class="text-xl font-bold">แก้ไขชื่อผู้เข้าร่วม</h3><button class="modal-close text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button></div>
+            <div class="p-6"><label for="edit-name-input" class="block mb-2">ชื่อใหม่:</label><input type="text" id="edit-name-input" class="w-full p-2 border border-gray-300 rounded-lg"></div>
+            <div class="p-4 border-t flex justify-end gap-2"><button id="edit-name-cancel" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg">ยกเลิก</button><button id="edit-name-save" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">บันทึก</button></div>
+        </div>
+    </div>
+    <div id="summary-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div class="p-4 border-b flex justify-between items-center"><h3 id="summary-modal-title" class="text-xl font-bold">สรุป Action Items</h3><button class="modal-close text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button></div>
+            <div id="summary-modal-content" class="p-6 overflow-y-auto"></div>
+            <div class="p-4 border-t flex justify-end gap-2"><button id="summary-modal-copy" class="tool-btn bg-gray-600 hover:bg-gray-700">คัดลอก</button></div>
+        </div>
+    </div>
+    <div id="confirm-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="p-4 border-b"><h3 class="text-xl font-bold">ยืนยันการลบ</h3></div>
+            <div class="p-6"><p id="confirm-modal-message"></p></div>
+            <div class="p-4 border-t flex justify-end gap-2"><button id="confirm-cancel" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded-lg">ยกเลิก</button><button id="confirm-ok" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg">ยืนยัน</button></div>
+        </div>
+    </div>
+    <div id="alert-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div class="p-4 border-b"><h3 class="text-xl font-bold">แจ้งเตือน</h3></div>
+            <div class="p-6"><p id="alert-modal-message"></p></div>
+            <div class="p-4 border-t flex justify-end gap-2"><button id="alert-ok" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg">ตกลง</button></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- ขั้นตอนที่ 1: วาง firebaseConfig ของคุณที่นี่ ---
+        // คัดลอกจากหน้า Firebase Console (ดูขั้นตอนในคู่มือ)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBe1IRZCwUy-1TlP97RRp5biHCu-surkao",
+            authDomain: "my-meeting-notes-dbcb4.firebaseapp.com",
+            projectId: "my-meeting-notes-dbcb4",
+            storageBucket: "my-meeting-notes-dbcb4.firebasestorage.app",
+            messagingSenderId: "518603776860",
+            appId: "1:518603776860:web:0c1297f45a3a8c75809799"
+        };
+        // ----------------------------------------------------
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- FIXED: Check for valid Firebase config before doing anything else ---
+            if (firebaseConfig.apiKey === "YOUR_API_KEY" || !firebaseConfig.apiKey) {
+                document.getElementById('main-container').style.display = 'none';
+                const setupContainer = document.getElementById('setup-instructions-container');
+                setupContainer.innerHTML = `
+                    <div class="text-center p-8 bg-red-100 border-2 border-red-500 rounded-lg max-w-3xl mx-auto mt-8">
+                        <h2 class="text-2xl font-bold text-red-700 mb-4">⚠️ การตั้งค่ายังไม่สมบูรณ์</h2>
+                        <p class="text-red-800">คุณยังไม่ได้ตั้งค่า Firebase Configuration (firebaseConfig) ในไฟล์ HTML</p>
+                        <p class="mt-2 text-gray-700">กรุณาคัดลอกค่า <code>firebaseConfig</code> จากโปรเจกต์ Firebase ของคุณมาวางในโค้ดตามคู่มือที่ให้ไว้ก่อนหน้านี้ เพื่อให้แอปพลิเคชันสามารถทำงานได้</p>
+                    </div>
+                `;
+                return; // Stop script execution
+            }
+
+            // DOM Elements
+            const participantsGrid = document.getElementById('participants-grid');
+            const transcriptTextarea = document.getElementById('transcript-textarea');
+            const addParticipantBtn = document.getElementById('add-participant-btn');
+            const actionItemsBtn = document.getElementById('action-items-btn');
+            const decreaseColsBtn = document.getElementById('decrease-cols-btn');
+            const increaseColsBtn = document.getElementById('increase-cols-btn');
+            const colsCountSpan = document.getElementById('cols-count');
+            const saveBtn = document.getElementById('save-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const resizer = document.getElementById('resizer');
+            const leftPanel = document.getElementById('left-panel');
+            const rightPanel = document.getElementById('right-panel');
+            const formatTextBtn = document.getElementById('format-text-btn');
+            const copyAllBtn = document.getElementById('copy-all-btn');
+
+            // Modal Elements
+            const allModals = document.querySelectorAll('.modal-overlay');
+            const summaryModal = document.getElementById('summary-modal');
+            const summaryModalContent = document.getElementById('summary-modal-content');
+            const summaryModalCopyBtn = document.getElementById('summary-modal-copy');
+            const editNameModal = document.getElementById('edit-name-modal');
+            const editNameInput = document.getElementById('edit-name-input');
+            const editNameSaveBtn = document.getElementById('edit-name-save');
+            const editNameCancelBtn = document.getElementById('edit-name-cancel');
+            const confirmModal = document.getElementById('confirm-modal');
+            const confirmOkBtn = document.getElementById('confirm-ok');
+            const confirmCancelBtn = document.getElementById('confirm-cancel');
+            const alertModal = document.getElementById('alert-modal');
+            const alertOkBtn = document.getElementById('alert-ok');
+            
+            // --- Firebase Setup ---
+            let app, auth, db, userId, meetingDocRef;
+            
+            try {
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                setLogLevel('debug'); 
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                showAlert("การตั้งค่า Firebase ไม่ถูกต้อง กรุณาตรวจสอบค่า firebaseConfig");
+                return;
+            }
+
+            // Application State
+            let participants = [];
+            let activeParticipantId = null;
+            let nextId = 1;
+            let columnCount = 2;
+            let sortableInstance = null;
+
+
+            // --- Authentication ---
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    console.log("User signed in with UID:", userId);
+                    initializeLogic();
+                } else {
+                    console.log("No user signed in, attempting anonymous sign-in.");
+                    try {
+                        await signInAnonymously(auth);
+                    } catch (error) {
+                        console.error("Authentication Error:", error);
+                        showAlert("ไม่สามารถเชื่อมต่อระบบยืนยันตัวตนได้", "error");
+                    }
+                }
+            });
+
+            // --- Core Logic ---
+            function initializeLogic() {
+                const docId = 'shared_meeting_notes'; // You can change this to have multiple separate meeting notes
+                meetingDocRef = doc(db, 'meetings', docId);
+
+                initSortable();
+
+                onSnapshot(meetingDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        console.log("Received data from Firestore:", data);
+                        
+                        if (JSON.stringify(participants) !== JSON.stringify(data.participants)) {
+                            participants = data.participants || [];
+                            renderParticipants();
+                        }
+                        
+                        const maxId = participants.reduce((max, p) => p.id > max ? p.id : max, 0);
+                        nextId = maxId + 1;
+                        
+                        const serverTranscript = data.transcript || '';
+                        if (document.activeElement !== transcriptTextarea) {
+                             transcriptTextarea.value = serverTranscript;
+                        }
+                        
+                        transcriptTextarea.placeholder = "คลิกชื่อผู้เข้าร่วมทางซ้ายเพื่อเริ่มบันทึก...";
+
+                    } else {
+                        console.log("Document does not exist. Creating a new one.");
+                        participants = [
+                            { id: 1, name: 'ประธาน' }, { id: 2, name: 'ฝ่ายการตลาด' },
+                        ];
+                        nextId = 3;
+                        transcriptTextarea.value = '';
+                        transcriptTextarea.placeholder = "คลิกชื่อผู้เข้าร่วมทางซ้ายเพื่อเริ่มบันทึก...";
+                        renderParticipants();
+                        saveStateToFirestore();
+                    }
+                }, (error) => {
+                    console.error("Firestore Snapshot Error: ", error);
+                    showAlert("เกิดข้อผิดพลาดในการเชื่อมต่อกับฐานข้อมูล", "error");
+                });
+
+                updateColumnLayout(getInitialColumnCount());
+            }
+            
+            function getInitialColumnCount(){
+                 if (window.innerWidth < 640) return 2;
+                 if (window.innerWidth < 768) return 3;
+                 return 2;
+            }
+
+            function initSortable() {
+                if (sortableInstance) {
+                    sortableInstance.destroy();
+                }
+                sortableInstance = new Sortable(participantsGrid, {
+                    animation: 150,
+                    ghostClass: 'sortable-ghost',
+                    dragClass: 'sortable-drag',
+                    onEnd: function (evt) {
+                        const { oldIndex, newIndex } = evt;
+                        const [movedItem] = participants.splice(oldIndex, 1);
+                        participants.splice(newIndex, 0, movedItem);
+                        saveStateToFirestore();
+                    },
+                });
+            }
+
+            async function saveStateToFirestore() {
+                if (!meetingDocRef) {
+                    console.warn("Firestore document reference not ready.");
+                    return;
+                }
+                try {
+                    await setDoc(meetingDocRef, {
+                        participants: participants,
+                        transcript: transcriptTextarea.value,
+                        lastUpdatedBy: userId,
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+                    console.log("State saved to Firestore.");
+                } catch (error) {
+                    console.error("Error saving state to Firestore: ", error);
+                    showAlert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                }
+            }
+            
+            const debounce = (func, wait) => {
+                let timeout;
+                return (...args) => {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            };
+            const debouncedSave = debounce(saveStateToFirestore, 1500);
+            
+            function renderParticipants() {
+                participantsGrid.innerHTML = '';
+                if (participants.length === 0) {
+                    participantsGrid.innerHTML = `<p class="col-span-full text-center" style="color: var(--text-secondary);">ไม่มีผู้เข้าร่วมประชุม</p>`;
+                    return;
+                }
+                participants.forEach(p => {
+                    const box = document.createElement('div');
+                    box.className = 'participant-box p-3 rounded-lg text-center';
+                    box.dataset.id = p.id;
+                    if (p.id === activeParticipantId) box.classList.add('active');
+
+                    const nameElement = document.createElement('h3');
+                    nameElement.className = 'font-bold text-sm truncate';
+                    nameElement.textContent = p.name;
+                    
+                    const editButton = document.createElement('button');
+                    editButton.textContent = 'แก้ไข';
+                    editButton.className = 'text-xs w-full mt-1 hover:underline';
+                    editButton.style.color = 'var(--text-secondary)';
+                    
+                    const deleteIcon = document.createElement('span');
+                    deleteIcon.className = 'delete-icon';
+                    deleteIcon.innerHTML = '&times;';
+                    
+                    box.appendChild(deleteIcon);
+                    box.appendChild(nameElement);
+                    box.appendChild(editButton);
+                    
+                    box.addEventListener('click', () => handleParticipantSelect(p.id));
+                    editButton.addEventListener('click', (e) => { e.stopPropagation(); handleNameEdit(p.id); });
+                    deleteIcon.addEventListener('click', (e) => { e.stopPropagation(); handleDeleteParticipant(p.id); });
+                    
+                    participantsGrid.appendChild(box);
+                });
+            }
+            
+            function updateColumnLayout(newCount) {
+                columnCount = newCount;
+                participantsGrid.className = `grid gap-4 grid-cols-${columnCount}`;
+                colsCountSpan.textContent = columnCount;
+            }
+            
+            function hideAllModals() {
+                allModals.forEach(modal => modal.classList.add('hidden'));
+            }
+            
+            function showAlert(message) {
+                const alertModal = document.getElementById('alert-modal');
+                document.getElementById('alert-modal-message').textContent = message;
+                alertModal.classList.remove('hidden');
+            }
+
+            function handleParticipantSelect(id) {
+                activeParticipantId = id;
+                renderParticipants();
+                const participant = participants.find(p => p.id === id);
+                if (!participant) return;
+                
+                const currentText = transcriptTextarea.value;
+                const textToInsert = `\t${participant.name}  :  `;
+                
+                const newText = (currentText.length > 0 && !currentText.endsWith('\n')) 
+                    ? `${currentText}\n${textToInsert}` 
+                    : `${currentText}${textToInsert}`;
+
+                transcriptTextarea.value = newText;
+                transcriptTextarea.focus();
+                
+                transcriptTextarea.setSelectionRange(transcriptTextarea.value.length, transcriptTextarea.value.length);
+                transcriptTextarea.scrollTop = transcriptTextarea.scrollHeight;
+                
+                debouncedSave();
+            }
+
+            function handleNameEdit(id) {
+                const input = editNameInput;
+                const participant = participants.find(p => p.id === id);
+                if (participant) { 
+                    input.dataset.id = id;
+                    input.value = participant.name;
+                    editNameModal.classList.remove('hidden'); 
+                    input.focus();
+                }
+            }
+
+            editNameSaveBtn.addEventListener('click', () => {
+                const newName = editNameInput.value.trim();
+                const id = parseInt(editNameInput.dataset.id);
+                if (newName && id) {
+                    const participant = participants.find(p => p.id === id);
+                    if (participant) { 
+                        participant.name = newName; 
+                        hideAllModals(); 
+                        renderParticipants();
+                        saveStateToFirestore();
+                    }
+                }
+            });
+            
+            function handleDeleteParticipant(id) {
+                const message = document.getElementById('confirm-modal-message');
+                const participant = participants.find(p => p.id === id);
+                if (participant) {
+                    message.textContent = `คุณแน่ใจหรือไม่ว่าต้องการลบ "${participant.name}" ออกจากรายชื่อ?`;
+                    confirmModal.dataset.id = id;
+                    confirmModal.classList.remove('hidden');
+                }
+            }
+
+            confirmOkBtn.addEventListener('click', () => {
+                const id = parseInt(confirmModal.dataset.id);
+                if(id) {
+                    participants = participants.filter(p => p.id !== id);
+                    renderParticipants();
+                    saveStateToFirestore();
+                    hideAllModals();
+                }
+            });
+            
+            transcriptTextarea.addEventListener('input', debouncedSave);
+            
+            addParticipantBtn.addEventListener('click', () => {
+                const newParticipant = { id: nextId, name: `ผู้เข้าร่วม ${nextId}` };
+                nextId++;
+                participants.push(newParticipant);
+                renderParticipants();
+                saveStateToFirestore();
+            });
+
+            increaseColsBtn.addEventListener('click', () => { if (columnCount < 4) updateColumnLayout(columnCount + 1); });
+            decreaseColsBtn.addEventListener('click', () => { if (columnCount > 1) updateColumnLayout(columnCount - 1); });
+
+            saveBtn.addEventListener('click', () => {
+                saveStateToFirestore();
+                const originalText = saveBtn.innerHTML;
+                saveBtn.innerHTML = '✅ บันทึกแล้ว!';
+                setTimeout(() => { saveBtn.innerHTML = originalText; }, 2000);
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                const text = transcriptTextarea.value;
+                if (text.trim() === '') { showAlert('ไม่มีเนื้อหาให้ดาวน์โหลด'); return; }
+                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `meeting-notes-${new Date().toISOString().slice(0,10)}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            copyAllBtn.addEventListener('click', () => {
+                const textToCopy = transcriptTextarea.value;
+                if (textToCopy.trim() === '') {
+                    showAlert('ไม่มีเนื้อหาให้คัดลอก');
+                    return;
+                }
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.value = textToCopy;
+                document.body.appendChild(tempTextarea);
+                tempTextarea.select();
+                tempTextarea.setSelectionRange(0, 99999);
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showAlert('คัดลอกบันทึกทั้งหมดแล้ว');
+                    } else {
+                        showAlert('เกิดข้อผิดพลาดในการคัดลอก');
+                    }
+                } catch (err) {
+                    showAlert('เกิดข้อผิดพลาดในการคัดลอก');
+                    console.error('Copy command failed', err);
+                }
+                document.body.removeChild(tempTextarea);
+            });
+
+            formatTextBtn.addEventListener('click', () => {
+                const originalText = transcriptTextarea.value;
+                if (originalText.trim() === '') {
+                    showAlert('ไม่มีเนื้อหาให้จัดรูปแบบ');
+                    return;
+                }
+                const lines = originalText.split('\n');
+                const formattedLines = lines.map(line => {
+                    const separator = '  :  ';
+                    if (line.includes(separator)) {
+                        const parts = line.split(separator);
+                        let speakerPart = parts[0];
+                        let speechPart = parts.slice(1).join(separator);
+                        const thaiNumerals = ['๐', '๑', '๒', '๓', '๔', '๕', '๖', '๗', '๘', '๙'];
+                        speechPart = speechPart.replace(/[0-9]/g, d => thaiNumerals[d]);
+                        const fillerWords = /ครับผม|นะครับ|ครับ|ค่ะ|คะ/g;
+                        speechPart = speechPart.replace(fillerWords, '');
+                        speechPart = speechPart.replace(/ไหม/g, 'หรือไม่');
+                        speechPart = speechPart.replace(/ยังไง/g, 'อย่างไร');
+                        speechPart = speechPart.replace(/เมื่อกี้/g, 'เมื่อสักครู่');
+                        speechPart = speechPart.replace(/ +/g, ' ').trim();
+                        return `${speakerPart}${separator}${speechPart}`;
+                    }
+                    return line; 
+                });
+                const newText = formattedLines.join('\n');
+                transcriptTextarea.value = newText;
+                saveStateToFirestore();
+                showAlert('จัดรูปแบบข้อความเรียบร้อยแล้ว');
+            });
+            
+            actionItemsBtn.addEventListener('click', () => {
+                const fullNotes = transcriptTextarea.value;
+                if (fullNotes.trim() === '') {
+                    showAlert('ไม่มีเนื้อหาสำหรับสรุป');
+                    return;
+                }
+                const keywords = ["มอบหมาย", "ต้องทำ", "รับผิดชอบ", "ฝาก", "ติดตาม", "ดำเนินการ"];
+                const lines = fullNotes.split('\n');
+                const actionItems = lines.filter(line => {
+                    const parts = line.split(' : ');
+                    if (parts.length > 1) {
+                        const speechPart = parts[1];
+                        return keywords.some(keyword => speechPart.includes(keyword));
+                    }
+                    return false;
+                });
+                summaryModal.classList.remove('hidden');
+                if (actionItems.length > 0) {
+                    summaryModalContent.innerHTML = actionItems.map(item => `<div>${item.trim()}</div>`).join('');
+                } else {
+                    summaryModalContent.innerHTML = `<p class="text-gray-500">ไม่พบ Action Items ในบันทึกการประชุม</p>`;
+                }
+            });
+
+            summaryModalCopyBtn.addEventListener('click', () => {
+                const content = summaryModalContent.innerText;
+                 if (content.trim() === '' || content.includes("ไม่พบ Action Items")) {
+                    showAlert('ไม่มีเนื้อหาให้คัดลอก');
+                    return;
+                }
+                navigator.clipboard.writeText(content).then(() => {
+                    showAlert('คัดลอกสรุป Action Items แล้ว');
+                }, () => {
+                    showAlert('เกิดข้อผิดพลาดในการคัดลอก');
+                });
+            });
+
+            let isResizing = false;
+            const handleMouseMove = (e) => {
+                if (!isResizing) return;
+                const container = document.getElementById('main-container');
+                const containerRect = container.getBoundingClientRect();
+                const resizerWidth = resizer.offsetWidth;
+                let newLeftWidth = e.clientX - containerRect.left;
+                const minWidth = 250;
+                if (newLeftWidth < minWidth) newLeftWidth = minWidth;
+                if (newLeftWidth > containerRect.width - minWidth - resizerWidth) {
+                    newLeftWidth = containerRect.width - minWidth - resizerWidth;
+                }
+                leftPanel.style.flexBasis = `${newLeftWidth}px`;
+            };
+            const stopResizing = () => {
+                isResizing = false;
+                resizer.classList.remove('resizing');
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', stopResizing);
+            };
+            resizer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isResizing = true;
+                resizer.classList.add('resizing');
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', stopResizing);
+            });
+
+            document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', hideAllModals));
+            allModals.forEach(modal => modal.addEventListener('click', (e) => { if(e.target === modal) hideAllModals(); }));
+            editNameCancelBtn.addEventListener('click', hideAllModals);
+            confirmCancelBtn.addEventListener('click', hideAllModals);
+            alertOkBtn.addEventListener('click', hideAllModals);
+        });
+    </script>
+</body>
+</html>
