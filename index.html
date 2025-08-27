@@ -581,15 +581,28 @@
 
             downloadBtn.addEventListener('click', () => {
                 const text = transcriptTextarea.value;
-                if (text.trim() === '') { showAlert('ไม่มีเนื้อหาให้ดาวน์โหลด'); return; }
-                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.download = `meeting-notes-${new Date().toISOString().slice(0,10)}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                if (text.trim() === '') {
+                    showAlert('ไม่มีเนื้อหาให้ดาวน์โหลด');
+                    return;
+                }
+
+                // Create HTML content for Word document
+                const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+                    "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+                    "xmlns='http://www.w3.org/TR/REC-html40'>"+
+                    "<head><meta charset='utf-8'><title>Meeting Notes</title></head><body>";
+                const footer = "</body></html>";
+                // Use <pre> tag to preserve whitespace and newlines
+                const content = `<pre>${text.replace(/\t/g, '&#9;')}</pre>`;
+                const sourceHTML = header + content + footer;
+
+                const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+                const fileDownload = document.createElement("a");
+                document.body.appendChild(fileDownload);
+                fileDownload.href = source;
+                fileDownload.download = `meeting-notes-${new Date().toISOString().slice(0,10)}.doc`;
+                fileDownload.click();
+                document.body.removeChild(fileDownload);
             });
             
             copyAllBtn.addEventListener('click', () => {
