@@ -307,10 +307,13 @@
                         <button id="add-participant-btn" class="tool-btn">
                             ADD
                         </button>
-                        <button id="import-excel-btn" class="tool-btn">
-                            IMPORT
+                        <button id="bulk-add-btn" class="tool-btn">
+                            PASTE LIST
                         </button>
-                         <button id="clear-all-btn" class="tool-btn col-span-2">
+                        <button id="import-excel-btn" class="tool-btn">
+                            IMPORT XLS
+                        </button>
+                         <button id="clear-all-btn" class="tool-btn">
                             CLEAR ALL
                         </button>
                         <button id="save-list-btn" class="tool-btn">
@@ -340,6 +343,7 @@
                         <button id="copy-all-btn" class="tool-btn">COPY</button>
                         <button id="save-btn" class="tool-btn">SAVE</button>
                         <button id="download-btn" class="tool-btn">DOWNLOAD</button>
+                        <button id="clear-text-btn" class="tool-btn col-span-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-900/30">CLEAR TEXT</button>
                     </div>
                 </div>
             </div>
@@ -386,6 +390,21 @@
             <div class="p-5 border-t flex justify-end gap-3" style="border-color: var(--border-color);">
                 <button id="save-list-cancel" class="tool-btn">Cancel</button>
                 <button id="save-list-confirm" class="tool-btn bg-white text-black dark:bg-white dark:text-black">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bulk Add Modal -->
+    <div id="bulk-add-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
+            <div class="p-5 border-b" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Paste List</h3></div>
+            <div class="p-6">
+                <p class="text-xs text-gray-500 mb-2 font-mono">Enter names (one per line):</p>
+                <textarea id="bulk-add-textarea" class="w-full p-3 border rounded-lg bg-transparent h-48 focus:ring-1 resize-none font-mono text-sm" style="border-color: var(--border-color);" placeholder="Name Surname&#10;Name Surname"></textarea>
+            </div>
+            <div class="p-5 border-t flex justify-end gap-3" style="border-color: var(--border-color);">
+                <button id="bulk-add-cancel" class="tool-btn">Cancel</button>
+                <button id="bulk-add-confirm" class="tool-btn bg-white text-black dark:bg-white dark:text-black">Import</button>
             </div>
         </div>
     </div>
@@ -484,6 +503,14 @@
             const saveSpinner = document.getElementById('save-spinner');
             const saveText = document.getElementById('save-text');
             const toastContainer = document.getElementById('toast-container');
+            const clearTextBtn = document.getElementById('clear-text-btn');
+            
+            // Bulk Add Elements
+            const bulkAddBtn = document.getElementById('bulk-add-btn');
+            const bulkAddModal = document.getElementById('bulk-add-modal');
+            const bulkAddTextarea = document.getElementById('bulk-add-textarea');
+            const bulkAddConfirmBtn = document.getElementById('bulk-add-confirm');
+            const bulkAddCancelBtn = document.getElementById('bulk-add-cancel');
 
             // Modal Elements
             const allModals = document.querySelectorAll('.modal-overlay');
@@ -669,6 +696,26 @@
                     updateUndoRedoButtons();
                     debouncedSave();
                 }
+            });
+            
+            clearTextBtn.addEventListener('click', () => {
+                if (transcriptTextarea.value.trim() === '') {
+                    showToast("Transcript is already empty", "info");
+                    return;
+                }
+                
+                confirmTitle.textContent = "Clear Transcript";
+                confirmMessage.textContent = "Delete all text in the transcript? You can Undo this action.";
+                confirmOkBtn.onclick = () => {
+                    saveToHistory(transcriptTextarea.value); // Save current state for undo
+                    transcriptTextarea.value = '';
+                    saveToHistory(''); // Save empty state
+                    
+                    debouncedSave();
+                    hideAllModals();
+                    showToast("Transcript cleared", "success");
+                };
+                confirmModal.classList.remove('hidden');
             });
 
             let historyTimeout;
@@ -1005,6 +1052,37 @@
                 renderParticipants();
                 saveStateToFirestore();
             });
+            
+            // Bulk Add Logic
+            bulkAddBtn.addEventListener('click', () => {
+                bulkAddTextarea.value = '';
+                bulkAddModal.classList.remove('hidden');
+                bulkAddTextarea.focus();
+            });
+
+            bulkAddConfirmBtn.addEventListener('click', () => {
+                const text = bulkAddTextarea.value;
+                const names = text.split('\n').map(n => n.trim()).filter(n => n);
+                
+                if (names.length === 0) {
+                    showToast("No names entered", "info");
+                    return;
+                }
+
+                let addedCount = 0;
+                names.forEach(name => {
+                    participants.push({ id: nextId, name: name });
+                    nextId++;
+                    addedCount++;
+                });
+
+                renderParticipants();
+                saveStateToFirestore();
+                hideAllModals();
+                showToast(`Added ${addedCount} participants`, "success");
+            });
+            
+            bulkAddCancelBtn.addEventListener('click', hideAllModals);
 
             importExcelBtn.addEventListener('click', () => {
                 excelInput.click();
