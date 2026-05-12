@@ -779,7 +779,9 @@
                 recognition.interimResults = true; // เปิดใช้งาน interim results (Real-time)
                 
                 recognition.onstart = () => {
-                    sttStableText = transcriptTextarea.value;
+                    if (!sttRestarting) {
+                        sttStableText = transcriptTextarea.value;
+                    }
                     lastProcessedResultIndex = 0;
                     isInterimActive = false;
                 };
@@ -788,60 +790,53 @@
                     let finalTranscript = '';
                     let interimTranscript = '';
 
-                    // ป้องกันบั๊ก Android ส่งผลลัพธ์ index 0 ซ้ำๆ ด้วยการนับ index เอง
-                    let startIndex = Math.max(e.resultIndex, lastProcessedResultIndex);
-
-                    for (let i = startIndex; i < e.results.length; ++i) {
+                    // ใช้ e.resultIndex ตรงๆ ไม่ต้อง Math.max
+                    // เพราะบน Chrome Android e.resultIndex คือ index ที่ changed จริงๆ
+                    for (let i = e.resultIndex; i < e.results.length; ++i) {
+                        const t = e.results[i][0].transcript;
                         if (e.results[i].isFinal) {
-                            let t = e.results[i][0].transcript.trim();
-                            if (t) finalTranscript += (finalTranscript ? ' ' : '') + t;
-                            lastProcessedResultIndex = i + 1; // อัปเดต index ที่ประมวลผลแล้ว
+                            finalTranscript += t;
+                            lastProcessedResultIndex = i + 1;
                         } else {
-                            let t = e.results[i][0].transcript.trim();
-                            if (t) interimTranscript += (interimTranscript ? ' ' : '') + t;
+                            interimTranscript += t;
                         }
                     }
 
                     if (finalTranscript) {
-                        // ต่อท้ายข้อความที่ยืนยันแล้ว
-                        const space = (sttStableText.endsWith(' ') || sttStableText === '' || sttStableText.endsWith('\n')) ? '' : ' ';
-                        sttStableText = sttStableText + space + finalTranscript + ' ';
-                        
-                        transcriptTextarea.value = sttStableText;
-                        
+                        const trimmed = finalTranscript.trim();
+                        const space = (sttStableText === '' || sttStableText.endsWith('\n') || sttStableText.endsWith(' ')) ? '' : ' ';
+                        sttStableText = sttStableText + space + trimmed + ' ';
                         saveToHistory(sttStableText);
                         debouncedSave();
                     }
 
-                    // แสดงข้อความที่กำลังพูด (ยังไม่สิ้นสุด) แบบ Real-time
-                    if (interimTranscript) {
-                        isInterimActive = true;
-                        const space = (sttStableText.endsWith(' ') || sttStableText === '' || sttStableText.endsWith('\n')) ? '' : ' ';
-                        transcriptTextarea.value = sttStableText + space + interimTranscript;
-                    } else {
-                        isInterimActive = false;
-                        transcriptTextarea.value = sttStableText;
-                    }
+                    // แสดงผล realtime ทั้ง interim และ final
+                    const displayText = interimTranscript
+                        ? sttStableText + (sttStableText.endsWith(' ') || sttStableText === '' ? '' : ' ') + interimTranscript
+                        : sttStableText;
 
+                    transcriptTextarea.value = displayText;
+                    isInterimActive = !!interimTranscript;
                     transcriptTextarea.scrollTop = transcriptTextarea.scrollHeight;
-                    updateTranscriptHighlight(); // Update highlight
+                    updateTranscriptHighlight();
                 };
                 
                 recognition.onend = () => {
-                    // ลบข้อความที่ค้างอยู่ (interim) ถ้ามันจบไปเฉยๆ
                     if (isInterimActive) {
                         transcriptTextarea.value = sttStableText;
                         isInterimActive = false;
                         updateTranscriptHighlight();
                     }
 
-                    // auto-restart ถ้ายังเปิดอยู่ (Android หยุดเองหลัง silence)
                     if (sttActive && !sttRestarting) {
                         sttRestarting = true;
                         setTimeout(() => {
-                            if (sttActive) recognition.start();
+                            if (sttActive) {
+                                lastProcessedResultIndex = 0; // reset ตอน restart เท่านั้น
+                                recognition.start();
+                            }
                             sttRestarting = false;
-                        }, 300);
+                        }, 100); // ลดจาก 300 → 100ms ให้ต่อเนื่องขึ้น
                     }
                 };
                 
@@ -849,6 +844,15 @@
                     if (e.error === 'not-allowed') {
                         showToast("ไม่ได้รับอนุญาตใช้ไมค์", "error");
                         setSttState(false);
+                    } else if (e.error === 'network') {
+                        // network error — รอแล้ว restart
+                        if (sttActive && !sttRestarting) {
+                            sttRestarting = true;
+                            setTimeout(() => {
+                                if (sttActive) recognition.start();
+                                sttRestarting = false;
+                            }, 1000);
+                        }
                     } else if (e.error !== 'no-speech') {
                         console.error("STT Error:", e.error);
                     }
