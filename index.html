@@ -301,6 +301,11 @@
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
+        #transcript-overlay {
+            will-change: contents;
+            contain: content;
+        }
+
         /* จุดที่ 1: แก้ไข Highlight ใน Transcript ให้แสดงสีถูกต้อง */
         #transcript-overlay span { color: transparent; }
         #transcript-overlay span[style*="color:"] { 
@@ -367,12 +372,6 @@
                 </button>
                 <div id="clock" class="text-lg font-mono tracking-tight" style="color: var(--text-secondary);"></div>
                 <span id="user-display" style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text-secondary);letter-spacing:0.03em;"></span>
-                
-                <!-- STT Indicator -->
-                <button id="stt-toggle-btn" class="tool-btn bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 transition rounded-full" style="display:flex;align-items:center;gap:0.4rem; padding: 0.3rem 0.6rem;">
-                    <span id="stt-dot" style="width:8px;height:8px;border-radius:50%;background:var(--text-secondary);transition:background 0.3s;"></span>
-                    <span id="stt-label" class="text-xs font-bold" style="color:var(--text-secondary);">STT</span>
-                </button>
             </div>
 
             <!-- จุดที่ 3: Meeting Title แบบแก้ไขได้ -->
@@ -732,13 +731,8 @@
             // Cache ชื่อ
             let allNamesCache = []; // cache ชื่อทุกกรุ๊ป
 
-            // ── SPEECH TO TEXT ──
-            let recognition = null;
-            let sttActive = false;
-            let sttRestarting = false;
             let sttStableText = ''; // เก็บข้อความหลักที่แน่นอนแล้ว
             let isInterimActive = false; // สถานะว่ากำลังพูดแทรกอยู่หรือไม่
-            let lastProcessedResultIndex = 0; // ป้องกันบั๊ก Android ส่งข้อความเก่ามาซ้ำ
 
             // จุดที่ 4: Update Transcript Highlight
             function updateTranscriptHighlight() {
@@ -762,134 +756,15 @@
                     );
                 });
                 
-                // จุดที่ 1: เปลี่ยนมาใช้ display:block เพื่อแก้บั๊กการซ้อนทับของ text
-                transcriptOverlay.innerHTML = `<span style="color:transparent;white-space:pre-wrap;word-break:break-word;display:block;">${html}</span>`;
+                const newHTML = `<span style="color:transparent;white-space:pre-wrap;word-break:break-word;display:block;">${html}</span>`;
+                
+                // ✅ อัปเดตเฉพาะเมื่อ HTML เปลี่ยนจริงๆ
+                if (transcriptOverlay.innerHTML !== newHTML) {
+                    transcriptOverlay.innerHTML = newHTML;
+                }
+                
                 transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
             }
-
-            function initSTT() {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                if (!SpeechRecognition) {
-                    showToast("STT ไม่รองรับบราวเซอร์นี้", "error");
-                    return false;
-                }
-                recognition = new SpeechRecognition();
-                recognition.lang = 'th-TH'; // เปลี่ยนได้ตามต้องการ
-                recognition.continuous = true;
-                recognition.interimResults = true; // เปิดใช้งาน interim results (Real-time)
-                
-                recognition.onstart = () => {
-                    if (!sttRestarting) {
-                        sttStableText = transcriptTextarea.value;
-                    }
-                    lastProcessedResultIndex = 0;
-                    isInterimActive = false;
-                };
-
-                recognition.onresult = (e) => {
-                    let finalTranscript = '';
-                    let interimTranscript = '';
-
-                    // ใช้ e.resultIndex ตรงๆ ไม่ต้อง Math.max
-                    // เพราะบน Chrome Android e.resultIndex คือ index ที่ changed จริงๆ
-                    for (let i = e.resultIndex; i < e.results.length; ++i) {
-                        const t = e.results[i][0].transcript;
-                        if (e.results[i].isFinal) {
-                            finalTranscript += t;
-                            lastProcessedResultIndex = i + 1;
-                        } else {
-                            interimTranscript += t;
-                        }
-                    }
-
-                    if (finalTranscript) {
-                        const trimmed = finalTranscript.trim();
-                        const space = (sttStableText === '' || sttStableText.endsWith('\n') || sttStableText.endsWith(' ')) ? '' : ' ';
-                        sttStableText = sttStableText + space + trimmed + ' ';
-                        saveToHistory(sttStableText);
-                        debouncedSave();
-                    }
-
-                    // แสดงผล realtime ทั้ง interim และ final
-                    const displayText = interimTranscript
-                        ? sttStableText + (sttStableText.endsWith(' ') || sttStableText === '' ? '' : ' ') + interimTranscript
-                        : sttStableText;
-
-                    transcriptTextarea.value = displayText;
-                    isInterimActive = !!interimTranscript;
-                    transcriptTextarea.scrollTop = transcriptTextarea.scrollHeight;
-                    updateTranscriptHighlight();
-                };
-                
-                recognition.onend = () => {
-                    if (isInterimActive) {
-                        transcriptTextarea.value = sttStableText;
-                        isInterimActive = false;
-                        updateTranscriptHighlight();
-                    }
-
-                    if (sttActive && !sttRestarting) {
-                        sttRestarting = true;
-                        setTimeout(() => {
-                            if (sttActive) {
-                                lastProcessedResultIndex = 0; // reset ตอน restart เท่านั้น
-                                recognition.start();
-                            }
-                            sttRestarting = false;
-                        }, 100); // ลดจาก 300 → 100ms ให้ต่อเนื่องขึ้น
-                    }
-                };
-                
-                recognition.onerror = (e) => {
-                    if (e.error === 'not-allowed') {
-                        showToast("ไม่ได้รับอนุญาตใช้ไมค์", "error");
-                        setSttState(false);
-                    } else if (e.error === 'network') {
-                        // network error — รอแล้ว restart
-                        if (sttActive && !sttRestarting) {
-                            sttRestarting = true;
-                            setTimeout(() => {
-                                if (sttActive) recognition.start();
-                                sttRestarting = false;
-                            }, 1000);
-                        }
-                    } else if (e.error !== 'no-speech') {
-                        console.error("STT Error:", e.error);
-                    }
-                };
-                return true;
-            }
-
-            function setSttState(active) {
-                sttActive = active;
-                const dot = document.getElementById('stt-dot');
-                const label = document.getElementById('stt-label');
-                if (active) {
-                    dot.style.background = '#ff4444'; // สีแดงเมื่อกำลังอัด
-                    label.textContent = 'REC';
-                    label.style.color = '#ff4444';
-                } else {
-                    dot.style.background = 'var(--text-secondary)';
-                    label.textContent = 'STT';
-                    label.style.color = 'var(--text-secondary)';
-                }
-            }
-
-            document.getElementById('stt-toggle-btn').addEventListener('click', () => {
-                if (!recognition && !initSTT()) return;
-                
-                if (sttActive) {
-                    sttActive = false;
-                    recognition.stop();
-                    setSttState(false);
-                    showToast("หยุดรับเสียงแล้ว", "info");
-                } else {
-                    sttActive = true;
-                    recognition.start();
-                    setSttState(true);
-                    showToast("เริ่มรับเสียงแล้ว", "success");
-                }
-            });
 
             try {
                 app = initializeApp(firebaseConfig);
@@ -1198,7 +1073,6 @@
 
             let historyTimeout;
             transcriptTextarea.addEventListener('input', () => {
-                isInterimActive = false; // รีเซ็ตเมื่อพิมพ์เอง
                 sttStableText = transcriptTextarea.value; // ยึดข้อความที่พิมพ์เป็นหลัก
 
                 clearTimeout(historyTimeout);
@@ -1461,7 +1335,12 @@
                 }
 
                 activeParticipantId = id;
-                renderParticipants();
+                
+                // ✅ แทน renderParticipants() ด้วยการ swap class เฉยๆ เพื่อป้องกัน DOM re-render
+                document.querySelectorAll('.participant-box').forEach(box => {
+                    box.classList.toggle('active', parseInt(box.dataset.id) === id);
+                });
+
                 const participant = participants.find(p => p.id === id);
                 if (!participant) return;
                 
@@ -1477,22 +1356,13 @@
                 sttStableText = newText; // อัปเดต text หลัก
                 
                 saveToHistory(newText);
-                
-                transcriptTextarea.focus();
-                transcriptTextarea.setSelectionRange(transcriptTextarea.value.length, transcriptTextarea.value.length);
-                transcriptTextarea.scrollTop = transcriptTextarea.scrollHeight;
                 debouncedSave();
                 updateTranscriptHighlight(); // Update highlight
 
-                // restart STT หลังเปลี่ยนคน
-                if (sttActive && recognition) {
-                    sttRestarting = true;
-                    recognition.stop();
-                    setTimeout(() => {
-                        if (sttActive) recognition.start();
-                        sttRestarting = false;
-                    }, 200);
-                }
+                // คืน focus ให้ textarea และเลื่อนลงล่างสุดเพื่อให้แป้นพิมพ์ค้างอยู่
+                transcriptTextarea.focus();
+                transcriptTextarea.setSelectionRange(transcriptTextarea.value.length, transcriptTextarea.value.length);
+                transcriptTextarea.scrollTop = transcriptTextarea.scrollHeight;
             }
 
             function handleNameEdit(id) {
