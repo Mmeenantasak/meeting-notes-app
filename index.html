@@ -812,7 +812,6 @@
                 }
             });
 
-
             try {
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
@@ -869,7 +868,7 @@
                 }
             });
 
-            // ปุ่ม Guest สำหรับเข้าใช้งานเมื่อ Google Sign-in ติดปัญหา Domain 
+            // ปุ่ม Guest สำหรับเข้าใช้งานเมื่อ Google Sign-in ติดปัญหา Domain 
             document.getElementById('login-guest-btn').addEventListener('click', async () => {
                 try {
                     document.getElementById('domain-error-msg').style.display = 'none';
@@ -1293,18 +1292,31 @@
                         }, 0);
                     });
                     
-                    // Box click handles selection with drag detection
-                    let pointerMoved = false;
+                    // Box click handles selection with drag detection + Touch Threshold Fix
+                    let startX = 0;
+                    let startY = 0;
+                    let isDragging = false;
+                    const dragThreshold = 10; // พิกเซลที่ยอมรับให้ขยับได้ (ระยะเผื่อ)
+
                     box.addEventListener('pointerdown', (e) => {
-                        pointerMoved = false;
+                        startX = e.clientX;
+                        startY = e.clientY;
+                        isDragging = false;
                     });
                     
                     box.addEventListener('pointermove', (e) => {
-                        pointerMoved = true;
+                        if (!isDragging) {
+                            const dx = Math.abs(e.clientX - startX);
+                            const dy = Math.abs(e.clientY - startY);
+                            // ถ้านิ้วขยับเกิน threshold ให้ถือว่าเป็นการลาก (Drag)
+                            if (dx > dragThreshold || dy > dragThreshold) {
+                                isDragging = true;
+                            }
+                        }
                     });
                     
                     box.addEventListener('pointerup', (e) => {
-                        if (pointerMoved) return; // ถ้าลากอยู่ไม่ต้องทำอะไร
+                        if (isDragging) return; // ถ้าเป็นการลาก ไม่ต้องทำฟังก์ชันเลือกชื่อ
                         e.preventDefault();
                         // Prevent selection if clicking icons
                         if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
