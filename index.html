@@ -736,7 +736,9 @@
             let recognition = null;
             let sttActive = false;
             let sttRestarting = false;
-            let interimStartIndex = -1; // ใช้จำตำแหน่งข้อความที่กำลังพูดชั่วคราว
+            let sttStableText = ''; // เก็บข้อความหลักที่แน่นอนแล้ว
+            let isInterimActive = false; // สถานะว่ากำลังพูดแทรกอยู่หรือไม่
+            let lastProcessedResultIndex = 0; // ป้องกันบั๊ก Android ส่งข้อความเก่ามาซ้ำ
 
             // จุดที่ 4: Update Transcript Highlight
             function updateTranscriptHighlight() {
@@ -776,45 +778,49 @@
                 recognition.continuous = true;
                 recognition.interimResults = true; // เปิดใช้งาน interim results (Real-time)
                 
+                recognition.onstart = () => {
+                    sttStableText = transcriptTextarea.value;
+                    lastProcessedResultIndex = 0;
+                    isInterimActive = false;
+                };
+
                 recognition.onresult = (e) => {
                     let finalTranscript = '';
                     let interimTranscript = '';
 
-                    for (let i = e.resultIndex; i < e.results.length; ++i) {
-                        if (e.results[i].isFinal) {
-                            finalTranscript += e.results[i][0].transcript;
-                        } else {
-                            interimTranscript += e.results[i][0].transcript;
-                        }
-                    }
+                    // ป้องกันบั๊ก Android ส่งผลลัพธ์ index 0 ซ้ำๆ ด้วยการนับ index เอง
+                    let startIndex = Math.max(e.resultIndex, lastProcessedResultIndex);
 
-                    let currentVal = transcriptTextarea.value;
-                    
-                    // ลบข้อความ interim เดิมออกก่อนเพื่อเตรียมใส่ค่าใหม่
-                    if (interimStartIndex !== -1) {
-                        if (currentVal.length >= interimStartIndex) {
-                            currentVal = currentVal.substring(0, interimStartIndex);
+                    for (let i = startIndex; i < e.results.length; ++i) {
+                        if (e.results[i].isFinal) {
+                            let t = e.results[i][0].transcript.trim();
+                            if (t) finalTranscript += (finalTranscript ? ' ' : '') + t;
+                            lastProcessedResultIndex = i + 1; // อัปเดต index ที่ประมวลผลแล้ว
+                        } else {
+                            let t = e.results[i][0].transcript.trim();
+                            if (t) interimTranscript += (interimTranscript ? ' ' : '') + t;
                         }
-                        interimStartIndex = -1;
                     }
 
                     if (finalTranscript) {
-                        const space = (currentVal.endsWith(' ') || currentVal === '' || currentVal.endsWith('\n')) ? '' : ' ';
-                        currentVal = currentVal + space + finalTranscript.trim() + ' ';
+                        // ต่อท้ายข้อความที่ยืนยันแล้ว
+                        const space = (sttStableText.endsWith(' ') || sttStableText === '' || sttStableText.endsWith('\n')) ? '' : ' ';
+                        sttStableText = sttStableText + space + finalTranscript + ' ';
                         
-                        transcriptTextarea.value = currentVal;
+                        transcriptTextarea.value = sttStableText;
                         
-                        saveToHistory(currentVal);
+                        saveToHistory(sttStableText);
                         debouncedSave();
                     }
 
-                    // แทรกข้อความที่กำลังพูดเข้าไปใน textarea สดๆ
+                    // แสดงข้อความที่กำลังพูด (ยังไม่สิ้นสุด) แบบ Real-time
                     if (interimTranscript) {
-                        const space = (currentVal.endsWith(' ') || currentVal === '' || currentVal.endsWith('\n')) ? '' : ' ';
-                        interimStartIndex = currentVal.length + space.length;
-                        transcriptTextarea.value = currentVal + space + interimTranscript;
-                    } else if (!finalTranscript) {
-                        transcriptTextarea.value = currentVal;
+                        isInterimActive = true;
+                        const space = (sttStableText.endsWith(' ') || sttStableText === '' || sttStableText.endsWith('\n')) ? '' : ' ';
+                        transcriptTextarea.value = sttStableText + space + interimTranscript;
+                    } else {
+                        isInterimActive = false;
+                        transcriptTextarea.value = sttStableText;
                     }
 
                     transcriptTextarea.scrollTop = transcriptTextarea.scrollHeight;
@@ -822,10 +828,10 @@
                 };
                 
                 recognition.onend = () => {
-                    // เคลียร์ interim text ทิ้งถ้าหยุดรับเสียงแล้ว
-                    if (interimStartIndex !== -1) {
-                        transcriptTextarea.value = transcriptTextarea.value.substring(0, interimStartIndex);
-                        interimStartIndex = -1;
+                    // ลบข้อความที่ค้างอยู่ (interim) ถ้ามันจบไปเฉยๆ
+                    if (isInterimActive) {
+                        transcriptTextarea.value = sttStableText;
+                        isInterimActive = false;
                         updateTranscriptHighlight();
                     }
 
@@ -1028,6 +1034,7 @@
                         if (document.activeElement !== transcriptTextarea) {
                              if(transcriptTextarea.value !== serverTranscript) {
                                  transcriptTextarea.value = serverTranscript;
+                                 sttStableText = serverTranscript; // Sync กับข้อมูล Server
                                  if (textHistory.length === 0) {
                                      saveToHistory(serverTranscript);
                                  }
@@ -1139,10 +1146,11 @@
 
             undoBtn.addEventListener('click', () => {
                 if (historyIndex > 0) {
-                    interimStartIndex = -1;
+                    isInterimActive = false;
                     historyIndex--;
                     const prevText = textHistory[historyIndex];
                     transcriptTextarea.value = prevText;
+                    sttStableText = prevText;
                     updateUndoRedoButtons();
                     debouncedSave(); 
                     updateTranscriptHighlight(); // Update highlight
@@ -1151,10 +1159,11 @@
 
             redoBtn.addEventListener('click', () => {
                 if (historyIndex < textHistory.length - 1) {
-                    interimStartIndex = -1;
+                    isInterimActive = false;
                     historyIndex++;
                     const nextText = textHistory[historyIndex];
                     transcriptTextarea.value = nextText;
+                    sttStableText = nextText;
                     updateUndoRedoButtons();
                     debouncedSave();
                     updateTranscriptHighlight(); // Update highlight
@@ -1170,9 +1179,9 @@
                 confirmTitle.textContent = "Clear Transcript";
                 confirmMessage.textContent = "Delete all text in the transcript? You can Undo this action.";
                 confirmOkBtn.onclick = () => {
-                    interimStartIndex = -1;
-                    saveToHistory(transcriptTextarea.value); // Save current state for undo
+                    isInterimActive = false;
                     transcriptTextarea.value = '';
+                    sttStableText = '';
                     saveToHistory(''); // Save empty state
                     
                     debouncedSave();
@@ -1185,7 +1194,8 @@
 
             let historyTimeout;
             transcriptTextarea.addEventListener('input', () => {
-                interimStartIndex = -1; // รีเซ็ตเมื่อพิมพ์เอง
+                isInterimActive = false; // รีเซ็ตเมื่อพิมพ์เอง
+                sttStableText = transcriptTextarea.value; // ยึดข้อความที่พิมพ์เป็นหลัก
 
                 clearTimeout(historyTimeout);
                 historyTimeout = setTimeout(() => {
@@ -1210,7 +1220,7 @@
                     console.error("Sortable library not loaded.");
                     return;
                 }
-                if (sortableInstance) sortableInstance.destroy();
+                if (sortableInstance) return;
                 sortableInstance = new Sortable(participantsGrid, {
                     animation: 150,
                     ghostClass: 'sortable-ghost',
@@ -1238,7 +1248,8 @@
                 try {
                     await updateDoc(meetingDocRef, {
                         participants: participants,
-                        transcript: transcriptTextarea.value
+                        transcript: transcriptTextarea.value,
+                        meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes'
                     });
                     
                     setTimeout(() => {
@@ -1251,7 +1262,8 @@
                     if (error.code === 'not-found') {
                         await setDoc(meetingDocRef, {
                             participants: participants,
-                            transcript: transcriptTextarea.value
+                            transcript: transcriptTextarea.value,
+                            meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes'
                         }, { merge: true });
                     } else {
                         console.error("Error saving state to Firestore: ", error);
@@ -1421,7 +1433,7 @@
 
                     participantsGrid.appendChild(box);
                 });
-                initSortable();
+                if (!sortableInstance) initSortable();
                 
                 // จุดที่ 4: เรียกหลัง renderParticipants
                 updateTranscriptHighlight();
@@ -1439,9 +1451,9 @@
             
             function handleParticipantSelect(id) {
                 // เคลียร์ interim ก่อนแทรกชื่อ
-                if (interimStartIndex !== -1) {
-                    transcriptTextarea.value = transcriptTextarea.value.substring(0, interimStartIndex);
-                    interimStartIndex = -1;
+                if (isInterimActive) {
+                    transcriptTextarea.value = sttStableText;
+                    isInterimActive = false;
                 }
 
                 activeParticipantId = id;
@@ -1458,6 +1470,7 @@
                     : `${currentText}${textToInsert.trimStart()}`;
                 
                 transcriptTextarea.value = newText;
+                sttStableText = newText; // อัปเดต text หลัก
                 
                 saveToHistory(newText);
                 
@@ -1872,9 +1885,9 @@
 
             timestampBtn.addEventListener('click', insertTimestamp);
             function insertTimestamp() {
-                if (interimStartIndex !== -1) {
-                    transcriptTextarea.value = transcriptTextarea.value.substring(0, interimStartIndex);
-                    interimStartIndex = -1;
+                if (isInterimActive) {
+                    transcriptTextarea.value = sttStableText;
+                    isInterimActive = false;
                 }
 
                 saveToHistory(transcriptTextarea.value); 
@@ -1884,6 +1897,7 @@
                 const end = transcriptTextarea.selectionEnd;
                 transcriptTextarea.value = transcriptTextarea.value.substring(0, start) + timeString + transcriptTextarea.value.substring(end);
                 
+                sttStableText = transcriptTextarea.value; // อัปเดต text หลัก
                 saveToHistory(transcriptTextarea.value);
 
                 transcriptTextarea.selectionStart = transcriptTextarea.selectionEnd = start + timeString.length;
@@ -1897,12 +1911,12 @@
                 resizer.classList.toggle('hidden');
                 if (leftPanel.classList.contains('hidden')) {
                      rightPanel.style.flexBasis = '100%';
-                     if(window.innerWidth < 768) {
+                     if(window.innerWidth < 1024) {
                         leftPanel.style.display = 'none'; 
                      }
                 } else {
                      rightPanel.style.flexBasis = '67%'; 
-                     if(window.innerWidth < 768) {
+                     if(window.innerWidth < 1024) {
                         leftPanel.style.display = 'flex';
                      }
                 }
@@ -2074,6 +2088,8 @@
                 await saveCurrentMeetingToHistory(title);
                 
                 transcriptTextarea.value = '';
+                sttStableText = '';
+                isInterimActive = false;
                 participants = [];
                 activeParticipantId = null;
                 nextId = 1;
@@ -2147,6 +2163,8 @@
                             confirmMessage.textContent = `โหลด "${data.title}" กลับมา? ข้อมูลปัจจุบันจะถูกแทนที่`;
                             confirmOkBtn.onclick = async () => {
                                 transcriptTextarea.value = data.transcript || '';
+                                sttStableText = transcriptTextarea.value;
+                                isInterimActive = false;
                                 participants = JSON.parse(JSON.stringify(data.participants || []));
                                 nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1;
                                 textHistory = [];
