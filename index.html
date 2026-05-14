@@ -306,6 +306,7 @@
             border-radius: 99px;
             position: relative;
             z-index: 10;
+            touch-action: none;
         }
         .dark #resizer {
             background-color: rgba(255, 255, 255, 0.15);
@@ -330,6 +331,7 @@
             z-index: 10;
             display: none; /* ซ่อนไว้ก่อน แสดงเฉพาะโหมดประชุม */
             transition: background-color 0.2s;
+            touch-action: none;
         }
         .dark #horizontal-resizer {
             background-color: rgba(255, 255, 255, 0.15);
@@ -1390,7 +1392,7 @@
                     box.appendChild(colorBtn);
 
                     // Color picker popup
-                    colorBtn.addEventListener('pointerdown', (e) => {
+                    colorBtn.addEventListener('click', (e) => {
                         e.preventDefault();
                         e.stopPropagation();
                         
@@ -1412,7 +1414,7 @@
                             dot.className = 'color-dot';
                             if (p.color === color) dot.classList.add('selected');
                             dot.style.background = color;
-                            dot.addEventListener('pointerdown', (ev) => {
+                            dot.addEventListener('click', (ev) => {
                                 ev.preventDefault();
                                 ev.stopPropagation();
                                 p.color = color;
@@ -1427,7 +1429,7 @@
                         clearDot.className = 'color-dot';
                         clearDot.style.cssText = 'background:transparent;border:2px dashed var(--text-secondary);';
                         clearDot.title = 'ล้างสี';
-                        clearDot.addEventListener('pointerdown', (ev) => {
+                        clearDot.addEventListener('click', (ev) => {
                             ev.preventDefault();
                             ev.stopPropagation();
                             delete p.color;
@@ -1440,7 +1442,7 @@
                         document.body.appendChild(popup);
                         
                         setTimeout(() => {
-                            document.addEventListener('pointerdown', () => popup.remove(), { once: true });
+                            document.addEventListener('click', () => popup.remove(), { once: true });
                         }, 0);
                     });
                     
@@ -1465,20 +1467,29 @@
                         }
                     });
                     
-                    box.addEventListener('pointerup', (e) => {
+                    // ใช้ click แทน pointerup เพราะเบราว์เซอร์มือถือ (โดยเฉพาะ Android) มองว่า click 
+                    // เป็น User Gesture ที่ปลอดภัยสำหรับการสั่ง .focus() เพื่อเรียกคีย์บอร์ด
+                    box.addEventListener('click', (e) => {
                         if (isDragging) return;
                         if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
                         handleParticipantSelect(p.id);
                     });
 
-                    // Icon clicks handle actions
-                    editIcon.addEventListener('pointerdown', (e) => { 
+                    // เสริมการโฟกัสล่วงหน้าใน touchend เพื่อให้คีย์บอร์ดเด้งไวขึ้นบนแท็บเล็ตบางรุ่น
+                    box.addEventListener('touchend', (e) => {
+                        if (isDragging) return;
+                        if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
+                        transcriptTextarea.focus();
+                    }, { passive: true });
+
+                    // Icon clicks handle actions (เปลี่ยนจาก pointerdown เป็น click ทั้งหมด)
+                    editIcon.addEventListener('click', (e) => { 
                         e.preventDefault();
                         e.stopPropagation(); 
                         handleNameEdit(p.id); 
                     });
                     
-                    deleteIcon.addEventListener('pointerdown', (e) => { 
+                    deleteIcon.addEventListener('click', (e) => { 
                         e.preventDefault();
                         e.stopPropagation(); 
                         handleDeleteParticipant(p.id); 
@@ -1567,7 +1578,7 @@
                     const item = document.createElement('div');
                     item.textContent = name;
                     item.style.cssText = 'padding:0.6rem 1rem;cursor:pointer;font-size:0.82rem;border-bottom:1px solid var(--border-color);';
-                    item.addEventListener('pointerdown', (e) => {
+                    item.addEventListener('click', (e) => { // เปลี่ยนเป็น click
                         e.preventDefault();
                         document.getElementById('edit-name-input').value = name;
                         list.style.display = 'none';
@@ -1580,7 +1591,7 @@
             });
 
             // ปิด dropdown เมื่อคลิกที่อื่น
-            document.addEventListener('pointerdown', (e) => {
+            document.addEventListener('click', (e) => { // เปลี่ยนเป็น click
                 if (!e.target.closest('#edit-name-modal')) {
                     const list = document.getElementById('autocomplete-list');
                     if (list) list.style.display = 'none';
@@ -1899,19 +1910,13 @@
             let isHResizing = false;
             const hResizer = document.getElementById('horizontal-resizer');
 
-            hResizer.addEventListener('pointerdown', (e) => {
-                e.preventDefault();
-                isHResizing = true;
-                hResizer.classList.add('resizing');
-                hResizer.setPointerCapture(e.pointerId);
-            });
-
-            hResizer.addEventListener('pointermove', (e) => {
+            const handleHMouseMove = (e) => {
                 if (!isHResizing) return;
+                const event = e.touches ? e.touches[0] : e;
                 const container = document.getElementById('main-container');
                 const containerRect = container.getBoundingClientRect();
                 
-                let newTopHeight = e.clientY - containerRect.top;
+                let newTopHeight = event.clientY - containerRect.top;
                 
                 const minTop = 80;
                 const minBottom = 120;
@@ -1920,13 +1925,34 @@
                 newTopHeight = Math.max(minTop, Math.min(newTopHeight, maxTop));
                 leftPanel.style.height = `${newTopHeight}px`;
                 leftPanel.style.flexBasis = `${newTopHeight}px`;
-            });
+                leftPanel.style.flexGrow = '0';
+                leftPanel.style.flexShrink = '0';
+            };
 
-            hResizer.addEventListener('pointerup', (e) => {
+            const stopHResizing = () => {
                 isHResizing = false;
                 hResizer.classList.remove('resizing');
-                hResizer.releasePointerCapture(e.pointerId);
+                document.removeEventListener('mousemove', handleHMouseMove);
+                document.removeEventListener('mouseup', stopHResizing);
+                document.removeEventListener('touchmove', handleHMouseMove);
+                document.removeEventListener('touchend', stopHResizing);
+            };
+
+            hResizer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isHResizing = true;
+                hResizer.classList.add('resizing');
+                document.addEventListener('mousemove', handleHMouseMove);
+                document.addEventListener('mouseup', stopHResizing);
             });
+
+            hResizer.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isHResizing = true;
+                hResizer.classList.add('resizing');
+                document.addEventListener('touchmove', handleHMouseMove, { passive: false });
+                document.addEventListener('touchend', stopHResizing);
+            }, { passive: false });
 
             layoutToggleBtn.addEventListener('click', () => {
                 isMeetingMode = !isMeetingMode;
