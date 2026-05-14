@@ -13,40 +13,90 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Light Theme */
-            --bg-gradient-start: #f9fafb;
-            --bg-gradient-end: #f3f4f6;
-            --bg-panel: rgba(255, 255, 255, 0.8);
-            --bg-panel-solid: #ffffff;
-            --text-primary: #111827;
-            --text-secondary: #6b7280;
-            --border-color: rgba(209, 213, 219, 0.6);
-            --accent-color: #374151;
-            --focus-ring: rgba(55, 65, 81, 0.2);
-            --btn-base-bg: #4b5563;
-            --btn-base-hover: #1f2937;
-            --btn-text: #ffffff;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+            --bg-gradient-start: #faf8f5;
+            --bg-gradient-end:   #f2ede6;
+            --bg-panel:          rgba(255, 252, 247, 0.75);
+            --bg-panel-solid:    rgba(255, 252, 247, 0.9);
+            --text-primary:      #1c1917;
+            --text-secondary:    #78716c;
+            --border-color:      rgba(168, 155, 138, 0.3);
+            --accent-color:      #44403c;
+            --focus-ring:        rgba(68, 64, 60, 0.15);
+            --btn-base-bg:       #44403c;
+            --btn-base-hover:    #1c1917;
+            --btn-text:          #faf8f5;
+            --card-shadow:       0 2px 12px rgba(28, 25, 23, 0.08);
+            --card-shadow-hover: 0 8px 32px rgba(28, 25, 23, 0.12);
+            --radius-card:       16px;
+            --radius-btn:        12px;
         }
 
         .dark {
-            /* Dark Theme - Warm Tint */
-            --bg-gradient-start: #0d0d0f; 
-            --bg-gradient-end: #111115;   
-            --bg-panel: rgba(20, 20, 24, 0.6);
-            --bg-panel-solid: #14141a;
-            --text-primary: #e4e4e7;
-            --text-secondary: #71717a;
-            --border-color: rgba(63, 63, 70, 0.4);
-            --accent-color: #a1a1aa;
-            --focus-ring: rgba(161, 161, 170, 0.2);
-            --btn-base-bg: #27272a;
-            --btn-base-hover: #3f3f46;
-            --btn-text: #e4e4e7;
-            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.7);
+            --bg-gradient-start: #141210;
+            --bg-gradient-end:   #1a1815;
+            --bg-panel:          rgba(30, 27, 24, 0.65);
+            --bg-panel-solid:    rgba(36, 33, 29, 0.9);
+            --text-primary:      #e8e3dc;
+            --text-secondary:    #8a8278;
+            --border-color:      rgba(138, 130, 120, 0.18);
+            --accent-color:      #b8a898;
+            --focus-ring:        rgba(184, 168, 152, 0.2);
+            --btn-base-bg:       rgba(50, 46, 42, 0.8);
+            --btn-base-hover:    rgba(65, 60, 55, 0.9);
+            --btn-text:          #e8e3dc;
+            --card-shadow:       0 2px 12px rgba(0, 0, 0, 0.5);
+            --card-shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.7);
+            --radius-card:       16px;
+            --radius-btn:        12px;
         }
+
+        /* ── AURORA BACKGROUND ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Dark aurora blobs */
+        .dark body::before,
+        .dark::before {
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 55%),
+                radial-gradient(ellipse 70% 60% at 10% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 90% 85%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse 90% 70% at 50% 50%, rgba(30, 27, 24, 0) 0%, transparent 100%);
+            animation: aurora-shift 20s ease-in-out infinite alternate;
+        }
+
+        /* Light aurora blobs */
+        body:not(.dark)::before {
+            background:
+                radial-gradient(ellipse 80% 60% at 15% 10%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 85% 15%, rgba(236, 72, 153, 0.06) 0%, transparent 55%),
+                radial-gradient(ellipse 70% 60% at 10% 85%, rgba(20, 184, 166, 0.07) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 88% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
+            animation: aurora-shift 25s ease-in-out infinite alternate;
+        }
+
+        @keyframes aurora-shift {
+            0%   { transform: scale(1)    translate(0px, 0px); }
+            33%  { transform: scale(1.05) translate(-15px, 10px); }
+            66%  { transform: scale(0.98) translate(10px, -8px); }
+            100% { transform: scale(1.03) translate(-8px, 15px); }
+        }
+
+        /* ── ROUNDED EVERYTHING ── */
+        .participant-box     { border-radius: 16px !important; }
+        .bg-panel            { border-radius: 16px !important; }
+        .tool-btn            { border-radius: 12px !important; }
+        .modal-box,
+        .bg-panel.rounded-lg { border-radius: 20px !important; }
+        #resizer             { border-radius: 99px; }
+        #horizontal-resizer  { border-radius: 99px; }
+        .toast               { border-radius: 999px; }
 
         html, body {
             height: 100%;
@@ -135,8 +185,8 @@
         /* Glass Panel */
         .bg-panel {
             background-color: var(--bg-panel);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            backdrop-filter: blur(24px) saturate(160%);
+            -webkit-backdrop-filter: blur(24px) saturate(160%);
             border: 1px solid var(--border-color);
             transition: background-color 0.3s, border-color 0.3s;
         }
@@ -390,25 +440,6 @@
             overflow: hidden;
         }
 
-        #line-numbers {
-            width: 36px;
-            flex-shrink: 0;
-            padding: 1rem 0;
-            text-align: right;
-            font-family: 'DM Mono', monospace;
-            font-size: 0.7rem;
-            line-height: 26px; /* แมตช์กับ text-base leading-relaxed (16px * 1.625) ของ Tailwind เพื่อให้ตรงกันทุกบรรทัด */
-            color: var(--text-secondary);
-            opacity: 0.25;
-            user-select: none;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        #transcript-textarea, #transcript-overlay {
-            padding-left: 0.75rem !important;
-        }
-
         #transcript-overlay {
             will-change: contents;
             contain: content;
@@ -508,7 +539,7 @@
 </head>
 <body class="dark">
 
-    <div id="login-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem; background:#0d0d0f;">
+    <div id="login-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem; background:#141210;">
         <h1 style="color:#fff; font-size:2rem; font-weight:bold; font-family:'Sarabun',sans-serif;">Meeting Notes</h1>
         <div style="display:flex; flex-direction:column; gap:1rem; align-items:center;">
             <button id="login-btn" style="display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1.5rem; background:#fff; color:#000; font-weight:bold; border:none; border-radius:8px; font-size:1rem; cursor:pointer; width:100%; justify-content:center;">
@@ -524,9 +555,9 @@
         </p>
     </div>
 
-    <div id="app-container" style="display:none;" class="container mx-auto p-4 md:p-6 flex-col transition-all duration-300">
+    <div id="app-container" style="display:none;" class="container mx-auto p-2 md:p-3 flex-col transition-all duration-300">
         <!-- Header -->
-        <header class="flex-shrink-0 relative flex justify-between items-center mb-6 px-2">
+        <header class="flex-shrink-0 relative flex justify-between items-center mb-3 px-1">
             <div class="flex items-center gap-3">
                 <div class="relative">
                     <button id="tools-menu-btn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition text-gray-500 dark:text-gray-400">
@@ -590,7 +621,7 @@
                     <svg id="theme-icon-light" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                 </button>
-                <button id="signout-btn" class="tool-btn" style="font-size:0.75rem; padding:0.4rem 0.75rem; border: 1px solid var(--border-color); color: #ef4444;">SIGN OUT</button>
+                <button id="signout-btn" class="tool-btn" style="font-size:0.75rem; padding:0.4rem 0.75rem; border: 1px solid rgba(168,130,120,0.3); color: #c08070;">SIGN OUT</button>
             </div>
         </header>
 
@@ -630,7 +661,6 @@
                     </div>
 
                     <div id="transcript-wrapper">
-                        <div id="line-numbers">1</div>
                         <div style="position:relative;flex:1;min-width:0;">
                             <textarea id="transcript-textarea" class="w-full h-full p-4 rounded-lg focus:outline-none resize-none absolute top-0 left-0 text-base leading-relaxed font-mono z-10 bg-transparent" placeholder="Start typing..."></textarea>
                             <div id="transcript-overlay" class="w-full h-full p-4 rounded-lg pointer-events-none overflow-y-auto absolute top-0 left-0 text-transparent whitespace-pre-wrap break-words text-base leading-relaxed font-mono z-0"></div>
@@ -785,16 +815,16 @@
         };
 
         const PRESET_COLORS = [
-            '#ef4444', // แดง
-            '#f97316', // ส้ม
-            '#eab308', // เหลือง
-            '#22c55e', // เขียว
-            '#14b8a6', // เขียวมิ้นต์
-            '#3b82f6', // ฟ้า
-            '#8b5cf6', // ม่วง
-            '#ec4899', // ชมพู
-            '#a1a1aa', // เทา
-            '#ffffff', // ขาว
+            '#f4a7b9', // pastel pink
+            '#f9c784', // pastel orange  
+            '#fdf08a', // pastel yellow
+            '#a8d8a8', // pastel green
+            '#80cbc4', // pastel teal
+            '#90caf9', // pastel blue
+            '#b39ddb', // pastel purple
+            '#f48fb1', // pastel rose
+            '#bcaaa4', // pastel brown/warm gray
+            '#e0e0e0', // pastel white gray
         ];
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -898,17 +928,6 @@
 
             function hideAllModals() {
                 allModals.forEach(modal => modal.classList.add('hidden'));
-            }
-
-            // --- ฟังก์ชันอัปเดตบรรทัดของ Line Numbers ---
-            function updateLineNumbers() {
-                const lines = transcriptTextarea.value.split('\n').length || 1;
-                const lineEl = document.getElementById('line-numbers');
-                if (!lineEl) return;
-                lineEl.innerHTML = Array.from(
-                    {length: lines}, (_, i) => i + 1
-                ).join('<br>');
-                lineEl.scrollTop = transcriptTextarea.scrollTop;
             }
 
             // Update Transcript Highlight
@@ -1097,7 +1116,6 @@
                                      saveToHistory(serverTranscript);
                                  }
                                  updateTranscriptHighlight(); // Update highlight
-                                 updateLineNumbers();
                              }
                         } else if (textHistory.length === 0 && serverTranscript) {
                              saveToHistory(serverTranscript);
@@ -1133,7 +1151,6 @@
                 
                 // โหลด cache เมื่อเริ่มต้นการทำงาน
                 loadAllNamesCache();
-                updateLineNumbers(); // Call initially
             }
             
             // โหลดและแคชชื่อทั้งหมด
@@ -1210,7 +1227,6 @@
                     updateUndoRedoButtons();
                     debouncedSave(); 
                     updateTranscriptHighlight(); // Update highlight
-                    updateLineNumbers();
                 }
             });
 
@@ -1224,7 +1240,6 @@
                     updateUndoRedoButtons();
                     debouncedSave();
                     updateTranscriptHighlight(); // Update highlight
-                    updateLineNumbers();
                 }
             });
             
@@ -1244,7 +1259,6 @@
                     
                     debouncedSave();
                     updateTranscriptHighlight(); // Update highlight
-                    updateLineNumbers();
                     hideAllModals();
                     showToast("Transcript cleared", "success");
                 };
@@ -1254,8 +1268,6 @@
             let historyTimeout;
             transcriptTextarea.addEventListener('input', () => {
                 sttStableText = transcriptTextarea.value; // ยึดข้อความที่พิมพ์เป็นหลัก
-                
-                updateLineNumbers();
 
                 clearTimeout(historyTimeout);
                 historyTimeout = setTimeout(() => {
@@ -1764,9 +1776,7 @@
 
 
             transcriptTextarea.addEventListener('scroll', () => {
-                // Sync ทั้ง Overlay และตัวเลขบรรทัด
-                const lineEl = document.getElementById('line-numbers');
-                if (lineEl) lineEl.scrollTop = transcriptTextarea.scrollTop;
+                // Sync Overlay
                 transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
             });
             
@@ -2030,10 +2040,15 @@
                 saveToHistory(transcriptTextarea.value); 
                 const now = new Date();
                 const timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}] `;
-                const start = transcriptTextarea.selectionStart;
-                const end = transcriptTextarea.selectionEnd;
-                transcriptTextarea.value = transcriptTextarea.value.substring(0, start) + timeString + transcriptTextarea.value.substring(end);
+                transcriptTextarea.value = newText;
+                sttStableText = newText; // อัปเดต text หลัก
                 
+                saveToHistory(newText);
+                debouncedSave();
+                updateTranscriptHighlight(); // Update highlight
+
+                // คืน focus ให้ textarea และเลื่อนลงล่างสุดเพื่อให้แป้นพิมพ์ค้างอยู่
+                transcriptTextarea.focus();
                 sttStableText = transcriptTextarea.value; // อัปเดต text หลัก
                 saveToHistory(transcriptTextarea.value);
 
@@ -2041,7 +2056,6 @@
                 transcriptTextarea.focus();
                 saveStateToFirestore();
                 updateTranscriptHighlight(); // Update highlight
-                updateLineNumbers();
             }
             
             // Toggle Tools Dropdown Menu
@@ -2237,7 +2251,6 @@
                 updateUndoRedoButtons();
                 renderParticipants();
                 updateTranscriptHighlight(); // Reset Highlight
-                updateLineNumbers();
                 
                 // Set default meeting title
                 const titleEl = document.getElementById('meeting-title');
@@ -2317,7 +2330,6 @@
                                 saveToHistory(transcriptTextarea.value);
                                 renderParticipants();
                                 updateTranscriptHighlight(); // Highlight the loaded text
-                                updateLineNumbers();
                                 
                                 const titleEl = document.getElementById('meeting-title');
                                 if (titleEl && titleEl.tagName === 'H1') {
@@ -2357,9 +2369,13 @@
             document.getElementById('history-close-btn').addEventListener('click', hideAllModals);
 
             document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible') {
+                if (document.visibilityState === 'visible' && userId) {
                     if (unsubscribeMeeting) unsubscribeMeeting();
-                    if (userId) initializeLogic(); 
+                    if (sortableInstance) {
+                        sortableInstance.destroy();
+                        sortableInstance = null;
+                    }
+                    initializeLogic(); 
                 }
             });
         });
