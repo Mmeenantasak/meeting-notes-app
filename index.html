@@ -1557,7 +1557,6 @@
                 saveToHistory(newText);
                 debouncedSave();
                 updateTranscriptHighlight(); // Update highlight
-                updateLineNumbers();
 
                 // คืน focus ให้ textarea และเลื่อนลงล่างสุดเพื่อให้แป้นพิมพ์ค้างอยู่
                 transcriptTextarea.focus();
@@ -1659,6 +1658,7 @@
             });
             
             saveListBtn.addEventListener('click', () => {
+                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
                 if (participants.length === 0) {
                     showToast("No participants to save", "info");
                     return;
@@ -1690,6 +1690,7 @@
             });
 
             loadListBtn.addEventListener('click', async () => {
+                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
                 loadListModal.classList.remove('hidden');
                 savedListsContainer.innerHTML = '<p class="text-center text-gray-500 font-mono text-sm">Loading...</p>';
                 
@@ -1790,6 +1791,7 @@
             
             // Bulk Add Logic
             bulkAddBtn.addEventListener('click', () => {
+                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
                 bulkAddTextarea.value = '';
                 bulkAddModal.classList.remove('hidden');
                 bulkAddTextarea.focus();
@@ -2040,15 +2042,10 @@
                 saveToHistory(transcriptTextarea.value); 
                 const now = new Date();
                 const timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}] `;
-                transcriptTextarea.value = newText;
-                sttStableText = newText; // อัปเดต text หลัก
+                const start = transcriptTextarea.selectionStart;
+                const end = transcriptTextarea.selectionEnd;
+                transcriptTextarea.value = transcriptTextarea.value.substring(0, start) + timeString + transcriptTextarea.value.substring(end);
                 
-                saveToHistory(newText);
-                debouncedSave();
-                updateTranscriptHighlight(); // Update highlight
-
-                // คืน focus ให้ textarea และเลื่อนลงล่างสุดเพื่อให้แป้นพิมพ์ค้างอยู่
-                transcriptTextarea.focus();
                 sttStableText = transcriptTextarea.value; // อัปเดต text หลัก
                 saveToHistory(transcriptTextarea.value);
 
