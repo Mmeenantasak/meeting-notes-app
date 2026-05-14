@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             /* Light Theme */
@@ -31,11 +31,11 @@
         }
 
         .dark {
-            /* Dark Theme */
-            --bg-gradient-start: #000000;
-            --bg-gradient-end: #18181b;
-            --bg-panel: rgba(24, 24, 27, 0.6);
-            --bg-panel-solid: #18181b;
+            /* Dark Theme - Warm Tint */
+            --bg-gradient-start: #0d0d0f; 
+            --bg-gradient-end: #111115;   
+            --bg-panel: rgba(20, 20, 24, 0.6);
+            --bg-panel-solid: #14141a;
             --text-primary: #e4e4e7;
             --text-secondary: #71717a;
             --border-color: rgba(63, 63, 70, 0.4);
@@ -63,9 +63,36 @@
 
         body {
             font-family: 'Sarabun', sans-serif;
+            font-weight: 300;
+            letter-spacing: 0.01em;
             background: linear-gradient(180deg, var(--bg-gradient-start), var(--bg-gradient-end));
             color: var(--text-primary);
             transition: color 0.3s, background 0.3s;
+        }
+
+        /* Header title บางและ wide */
+        #meeting-title {
+            font-weight: 200 !important;
+            letter-spacing: 0.2em !important;
+        }
+
+        /* ชื่อในการ์ดหนักขึ้น */
+        .participant-box h3 {
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        /* Tool buttons และ labels ใช้ mono */
+        .tool-btn, #clock, #save-status, #user-display,
+        #cols-count, .panel-label, #duration-timer {
+            font-family: 'DM Mono', monospace;
+            font-weight: 300;
+        }
+
+        /* Section headers */
+        h2.text-sm {
+            font-weight: 300;
+            letter-spacing: 0.15em;
         }
 
         /* --- FIXED: Custom Line Clamp Class --- */
@@ -146,6 +173,29 @@
              background-color: rgba(255, 255, 255, 0.05);
         }
 
+        /* Participant Avatars */
+        .participant-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 600;
+            font-family: 'DM Mono', monospace;
+            margin-bottom: 0.35rem;
+            flex-shrink: 0;
+            opacity: 0.9;
+        }
+        .participant-box.has-color {
+            background-image: linear-gradient(
+                135deg,
+                var(--card-color-bg, transparent) 0%,
+                transparent 60%
+            );
+        }
+
         .sortable-ghost { opacity: 0.3; background: var(--accent-color); }
         .sortable-drag { opacity: 1 !important; cursor: grabbing; }
 
@@ -187,13 +237,7 @@
         .edit-icon { bottom: 2px; right: 2px; }
         .delete-icon:hover { color: #ef4444; background-color: rgba(239, 68, 68, 0.1); }
         
-        /* จุดที่ 1: CSS สำหรับ Color Picker & Accent */
-        .participant-box .color-accent {
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 3px;
-            border-radius: 0.5rem 0 0 0.5rem;
-        }
+        /* CSS สำหรับ Color Picker */
         .color-picker-popup {
             position: fixed;
             z-index: 999;
@@ -248,13 +292,20 @@
         .tool-btn:active { transform: translateY(0); }
         .tool-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
+        /* Vertical Resizer */
         #resizer {
-            width: 5px; 
+            width: 15px; 
+            min-width: 15px;
+            flex-shrink: 0;
             cursor: col-resize; 
             background-color: rgba(0, 0, 0, 0.15);
+            background-clip: content-box; 
+            padding: 0 6px; 
             transition: background-color 0.2s; 
-            margin: 0 3px;
+            margin: 0;
             border-radius: 99px;
+            position: relative;
+            z-index: 10;
         }
         .dark #resizer {
             background-color: rgba(255, 255, 255, 0.15);
@@ -264,6 +315,33 @@
             opacity: 1;
         }
         
+        /* Horizontal Resizer */
+        #horizontal-resizer {
+            height: 12px;
+            min-height: 12px;
+            flex-shrink: 0;
+            cursor: row-resize;
+            background-color: rgba(0, 0, 0, 0.15);
+            background-clip: content-box;
+            padding: 4px 0;
+            margin: 0;
+            border-radius: 99px;
+            position: relative;
+            z-index: 10;
+            display: none; /* ซ่อนไว้ก่อน แสดงเฉพาะโหมดประชุม */
+            transition: background-color 0.2s;
+        }
+        .dark #horizontal-resizer {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        #horizontal-resizer:hover, #horizontal-resizer.resizing {
+            background-color: var(--accent-color);
+            opacity: 1;
+        }
+        #app-container.meeting-mode #horizontal-resizer {
+            display: block;
+        }
+
         /* Saved List Item */
         .saved-list-item {
             border: 1px solid var(--border-color);
@@ -301,23 +379,105 @@
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
+        /* Transcript & Line Numbers */
+        #transcript-wrapper {
+            position: relative;
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        #line-numbers {
+            width: 36px;
+            flex-shrink: 0;
+            padding: 1rem 0;
+            text-align: right;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.7rem;
+            line-height: 26px; /* แมตช์กับ text-base leading-relaxed (16px * 1.625) ของ Tailwind เพื่อให้ตรงกันทุกบรรทัด */
+            color: var(--text-secondary);
+            opacity: 0.25;
+            user-select: none;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        #transcript-textarea, #transcript-overlay {
+            padding-left: 0.75rem !important;
+        }
+
         #transcript-overlay {
             will-change: contents;
             contain: content;
+            pointer-events: none;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
-        /* จุดที่ 1: แก้ไข Highlight ใน Transcript ให้แสดงสีถูกต้อง */
+        #transcript-textarea:focus {
+            outline: none !important;
+            box-shadow: none !important;
+            border-color: transparent !important;
+            background-color: transparent !important;
+        }
+
+        /* แก้ไข Highlight ใน Transcript ให้แสดงสีถูกต้อง */
         #transcript-overlay span { color: transparent; }
         #transcript-overlay span[style*="color:"] { 
              color: revert !important; 
              -webkit-text-fill-color: revert !important;
         }
 
+        /* --- Meeting Mode (โหมดประชุม/โฟกัส) --- */
+        #app-container.meeting-mode #main-container {
+            flex-direction: column;
+        }
+        #app-container.meeting-mode #left-panel {
+            overflow-y: hidden;
+            overflow-x: hidden;
+            flex-shrink: 0;
+            flex-grow: 0;
+            width: 100%;
+            padding-right: 0; 
+        }
+        #app-container.meeting-mode #left-panel > div:first-child {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        #app-container.meeting-mode #participants-grid {
+            display: grid !important;
+            grid-template-columns: repeat(var(--meeting-cols, 4), minmax(0, 1fr)) !important;
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1; 
+            min-height: 0; 
+            max-height: none;
+            gap: 0.5rem;
+            padding-right: 0.25rem; 
+            padding-bottom: 0.5rem;
+            margin-bottom: 0;
+        }
+        #app-container.meeting-mode .participant-box {
+            min-width: unset; 
+            flex-shrink: 0;
+            min-height: 65px;
+        }
+        #app-container.meeting-mode #right-panel {
+            flex: 1 1 0 !important;
+            min-height: 0;
+        }
+        #app-container.meeting-mode #resizer {
+            display: none !important;
+        }
+
         /* --- UPDATED MEDIA QUERY FOR TABLET VERTICAL --- */
         @media (max-width: 1024px) {
             html, body { 
                 height: 100dvh; 
-                overflow: hidden; /* ล็อก body ไม่ให้เด้งทั้งหน้าเว็บ */
+                overflow: hidden; 
             }
             #app-container { 
                 height: 100dvh; 
@@ -326,10 +486,10 @@
             #main-container { 
                 flex-direction: column; 
                 gap: 1rem; 
-                overflow-y: auto; /* ย้าย Scroll มาไว้ในคอนเทนเนอร์แทน */
+                overflow-y: auto; 
                 overflow-x: hidden;
-                -webkit-overflow-scrolling: touch; /* เพิ่มความลื่นไหลในการเลื่อนบน iOS */
-                padding-bottom: 2rem; /* เผื่อที่ว่างด้านล่าง */
+                -webkit-overflow-scrolling: touch; 
+                padding-bottom: 2rem; 
             }
             #left-panel, #right-panel { 
                 flex-basis: auto !important; 
@@ -338,7 +498,7 @@
                 flex-shrink: 0;
             }
             #right-panel { 
-                min-height: 50vh; /* ยืดกล่องจดให้สัมพันธ์กับความสูงจอ */
+                min-height: 50vh; 
             }
             #resizer { display: none; }
         }
@@ -346,7 +506,7 @@
 </head>
 <body class="dark">
 
-    <div id="login-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem; background:#000;">
+    <div id="login-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem; background:#0d0d0f;">
         <h1 style="color:#fff; font-size:2rem; font-weight:bold; font-family:'Sarabun',sans-serif;">Meeting Notes</h1>
         <div style="display:flex; flex-direction:column; gap:1rem; align-items:center;">
             <button id="login-btn" style="display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1.5rem; background:#fff; color:#000; font-weight:bold; border:none; border-radius:8px; font-size:1rem; cursor:pointer; width:100%; justify-content:center;">
@@ -362,19 +522,52 @@
         </p>
     </div>
 
-    <!-- เปลี่ยน style display เริ่มต้นให้เป็น none จนกว่าจะเช็คสถานะล็อกอินเสร็จ เอาคลาส h-screen ออกเพื่อใช้ CSS แทน -->
     <div id="app-container" style="display:none;" class="container mx-auto p-4 md:p-6 flex-col transition-all duration-300">
         <!-- Header -->
         <header class="flex-shrink-0 relative flex justify-between items-center mb-6 px-2">
             <div class="flex items-center gap-3">
-                <button id="toggle-sidebar-btn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition text-gray-500 dark:text-gray-400">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </button>
-                <div id="clock" class="text-lg font-mono tracking-tight" style="color: var(--text-secondary);"></div>
+                <div class="relative">
+                    <button id="tools-menu-btn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-zinc-800 transition text-gray-500 dark:text-gray-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <!-- Tools Dropdown Menu -->
+                    <div id="tools-dropdown" class="hidden absolute top-full left-0 mt-2 w-72 bg-panel p-4 rounded-lg shadow-xl z-[100] border" style="border-color: var(--border-color);">
+                        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3 text-center">Tools</h3>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="add-participant-btn" class="tool-btn">ADD</button>
+                            <button id="bulk-add-btn" class="tool-btn">PASTE LIST</button>
+                            <button id="import-excel-btn" class="tool-btn">IMPORT XLS</button>
+                            <button id="clear-all-btn" class="tool-btn">CLEAR ALL</button>
+                            <button id="save-list-btn" class="tool-btn">SAVE GROUP</button>
+                            <button id="load-list-btn" class="tool-btn">LOAD GROUP</button>
+                            
+                            <div class="col-span-2 h-px bg-gray-200 dark:bg-zinc-700/50 my-1"></div>
+                            
+                            <button id="undo-btn" class="tool-btn" disabled>UNDO</button>
+                            <button id="redo-btn" class="tool-btn" disabled>REDO</button>
+                            <button id="timestamp-btn" class="tool-btn">TIME</button>
+                            <button id="copy-all-btn" class="tool-btn">COPY</button>
+                            <button id="save-btn" class="tool-btn">SAVE DOC</button>
+                            <button id="download-btn" class="tool-btn">DOWNLOAD</button>
+                            
+                            <div class="col-span-2 h-px bg-gray-200 dark:bg-zinc-700/50 my-1"></div>
+                            <button id="new-meeting-btn" class="tool-btn">NEW MEETING</button>
+                            <button id="history-btn" class="tool-btn">HISTORY</button>
+
+                            <button id="clear-text-btn" class="tool-btn col-span-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-900/30">CLEAR TEXT</button>
+                            
+                            <input type="file" id="excel-input" accept=".xlsx, .xls" class="hidden" />
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;flex-direction:column;line-height:1;">
+                    <div id="clock" style="font-family:'DM Mono',monospace;font-size:1rem;font-weight:300;letter-spacing:0.08em;color:var(--text-primary);"></div>
+                    <div id="duration-timer" style="font-family:'DM Mono',monospace;font-size:0.6rem;font-weight:300;letter-spacing:0.06em;color:var(--text-secondary);margin-top:1px;">00:00:00</div>
+                </div>
                 <span id="user-display" style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text-secondary);letter-spacing:0.03em;"></span>
             </div>
 
-            <!-- จุดที่ 3: Meeting Title แบบแก้ไขได้ -->
+            <!-- Meeting Title -->
             <div class="absolute left-1/2 transform -translate-x-1/2 text-center">
                 <h1 id="meeting-title"
                     class="text-xl md:text-2xl font-semibold tracking-wide uppercase cursor-pointer hover:opacity-70 transition"
@@ -385,6 +578,9 @@
             </div>
             
             <div class="flex items-center gap-3">
+                <button id="layout-toggle-btn" class="px-3 py-1 text-xs font-mono border rounded hover:bg-white dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);" title="สลับ Layout">
+                    LAYOUT
+                </button>
                 <button id="ratio-toggle" class="px-3 py-1 text-xs font-mono border rounded hover:bg-white dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);">
                     AUTO
                 </button>
@@ -392,7 +588,6 @@
                     <svg id="theme-icon-light" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                 </button>
-                <!-- ปุ่ม Sign Out -->
                 <button id="signout-btn" class="tool-btn" style="font-size:0.75rem; padding:0.4rem 0.75rem; border: 1px solid var(--border-color); color: #ef4444;">SIGN OUT</button>
             </div>
         </header>
@@ -400,7 +595,6 @@
         <div id="setup-instructions-container"></div>
 
         <main id="main-container" class="flex flex-grow min-h-0 gap-4">
-
             <!-- Left Column: Participants & AI Tools -->
             <div id="left-panel" class="flex flex-col gap-4 overflow-y-auto pr-1" style="flex-basis: 33%; min-width: 280px;">
                 <!-- Participants Panel -->
@@ -409,75 +603,38 @@
                         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
                             Participants
                         </h2>
-                        <div class="flex items-center gap-1">
+                        <div class="flex items-center gap-1 grid-controls">
                             <button id="decrease-cols-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500">-</button>
                             <span id="cols-count" class="font-mono text-xs w-6 text-center text-gray-500">2</span>
                             <button id="increase-cols-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500">+</button>
                         </div>
                     </div>
                     
-                    <div id="participants-grid" class="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-2">
+                    <div id="participants-grid" class="grid gap-3 grid-cols-2 mb-4">
                         <!-- JS Generated -->
-                    </div>
-                </div>
-
-                <!-- Tools Panel -->
-                <div class="bg-panel p-5 rounded-lg shadow-sm transition-all duration-300">
-                    <div class="flex justify-between items-center cursor-pointer mb-2" id="tools-header">
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                            Tools
-                        </h2>
-                        <button class="p-1 rounded hover:bg-gray-200 dark:hover:bg-zinc-800 transition transform duration-300 text-gray-500" id="tools-chevron">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                    </div>
-                    <div id="tools-content" class="grid grid-cols-2 gap-2 overflow-hidden transition-all duration-300">
-                        <!-- เครื่องมือจัดการรายชื่อ -->
-                        <button id="add-participant-btn" class="tool-btn">ADD</button>
-                        <button id="bulk-add-btn" class="tool-btn">PASTE LIST</button>
-                        <button id="import-excel-btn" class="tool-btn">IMPORT XLS</button>
-                        <button id="clear-all-btn" class="tool-btn">CLEAR ALL</button>
-                        <button id="save-list-btn" class="tool-btn">SAVE GROUP</button>
-                        <button id="load-list-btn" class="tool-btn">LOAD GROUP</button>
-                        
-                        <!-- เส้นคั่นบางๆ -->
-                        <div class="col-span-2 h-px bg-gray-200 dark:bg-zinc-700/50 my-1"></div>
-                        
-                        <!-- เครื่องมือจัดการข้อความ -->
-                        <button id="undo-btn" class="tool-btn" disabled>UNDO</button>
-                        <button id="redo-btn" class="tool-btn" disabled>REDO</button>
-                        <button id="timestamp-btn" class="tool-btn">TIME</button>
-                        <button id="copy-all-btn" class="tool-btn">COPY</button>
-                        <button id="save-btn" class="tool-btn">SAVE DOC</button>
-                        <button id="download-btn" class="tool-btn">DOWNLOAD</button>
-                        
-                        <!-- ปุ่ม NEW MEETING และ HISTORY -->
-                        <div class="col-span-2 h-px bg-gray-200 dark:bg-zinc-700/50 my-1"></div>
-                        <button id="new-meeting-btn" class="tool-btn">NEW MEETING</button>
-                        <button id="history-btn" class="tool-btn">HISTORY</button>
-
-                        <button id="clear-text-btn" class="tool-btn col-span-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-900/30">CLEAR TEXT</button>
-                        
-                        <input type="file" id="excel-input" accept=".xlsx, .xls" class="hidden" />
                     </div>
                 </div>
             </div>
 
             <div id="resizer"></div>
+            <div id="horizontal-resizer"></div>
 
             <!-- Right Column: Transcript Area -->
-            <div id="right-panel" class="flex flex-col flex-grow" style="flex-basis: 67%; min-width: 80px;">
-                 <div class="bg-panel p-6 rounded-lg shadow-sm h-full flex flex-col relative overflow-hidden">
-                    <!-- Save Status Indicator -->
+            <div id="right-panel" class="flex flex-col" style="flex: 1 1 0; min-width: 80px;">
+                 <div style="border: 1px solid var(--border-color); border-radius:0.5rem;" class="p-6 h-full flex flex-col relative overflow-hidden">
                     <div id="save-status" class="absolute bottom-4 right-6 z-10 select-none">
                          <svg class="w-3 h-3 animate-spin hidden" id="save-spinner" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                          <span id="save-text">READY</span>
                     </div>
 
-                    <div class="relative w-full flex-grow">
-                        <textarea id="transcript-textarea" class="w-full h-full p-4 rounded-lg focus:outline-none resize-none absolute top-0 left-0 text-base leading-relaxed font-mono z-10 bg-transparent" placeholder="Start typing..."></textarea>
-                        <div id="transcript-overlay" class="w-full h-full p-4 rounded-lg pointer-events-none overflow-y-auto absolute top-0 left-0 text-transparent whitespace-pre-wrap break-words text-base leading-relaxed font-mono z-0"></div>
+                    <div id="transcript-wrapper">
+                        <div id="line-numbers">1</div>
+                        <div style="position:relative;flex:1;min-width:0;">
+                            <textarea id="transcript-textarea" class="w-full h-full p-4 rounded-lg focus:outline-none resize-none absolute top-0 left-0 text-base leading-relaxed font-mono z-10 bg-transparent" placeholder="Start typing..."></textarea>
+                            <div id="transcript-overlay" class="w-full h-full p-4 rounded-lg pointer-events-none overflow-y-auto absolute top-0 left-0 text-transparent whitespace-pre-wrap break-words text-base leading-relaxed font-mono z-0"></div>
+                        </div>
                     </div>
+
                 </div>
             </div>
         </main>
@@ -625,7 +782,6 @@
             appId: "1:518603776860:web:0c1297f45a3a8c75809799"
         };
 
-        // จุดที่ 2: เพิ่มตัวแปร PRESET_COLORS
         const PRESET_COLORS = [
             '#ef4444', // แดง
             '#f97316', // ส้ม
@@ -650,6 +806,7 @@
 
             // DOM Elements
             const appContainer = document.getElementById('app-container');
+            const layoutToggleBtn = document.getElementById('layout-toggle-btn');
             const ratioToggleBtn = document.getElementById('ratio-toggle');
             const participantsGrid = document.getElementById('participants-grid');
             const transcriptTextarea = document.getElementById('transcript-textarea');
@@ -670,10 +827,8 @@
             const timestampBtn = document.getElementById('timestamp-btn');
             
             const clockDiv = document.getElementById('clock');
-            const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
-            const toolsHeader = document.getElementById('tools-header');
-            const toolsContent = document.getElementById('tools-content');
-            const toolsChevron = document.getElementById('tools-chevron');
+            const toolsMenuBtn = document.getElementById('tools-menu-btn');
+            const toolsDropdown = document.getElementById('tools-dropdown');
             const importExcelBtn = document.getElementById('import-excel-btn');
             const excelInput = document.getElementById('excel-input');
             const clearAllBtn = document.getElementById('clear-all-btn');
@@ -723,6 +878,9 @@
             const ratios = ['Auto', '16:9', '4:3'];
             let currentRatioIndex = 0;
 
+            // Layout State
+            let isMeetingMode = false;
+
             // Undo/Redo State
             let textHistory = [];
             let historyIndex = -1;
@@ -734,31 +892,50 @@
             let sttStableText = ''; // เก็บข้อความหลักที่แน่นอนแล้ว
             let isInterimActive = false; // สถานะว่ากำลังพูดแทรกอยู่หรือไม่
 
-            // จุดที่ 4: Update Transcript Highlight
+            let meetingStartTime = Date.now(); // เวลาเริ่มสำหรับ Duration Timer
+
+            function hideAllModals() {
+                allModals.forEach(modal => modal.classList.add('hidden'));
+            }
+
+            // --- ฟังก์ชันอัปเดตบรรทัดของ Line Numbers ---
+            function updateLineNumbers() {
+                const lines = transcriptTextarea.value.split('\n').length || 1;
+                const lineEl = document.getElementById('line-numbers');
+                if (!lineEl) return;
+                lineEl.innerHTML = Array.from(
+                    {length: lines}, (_, i) => i + 1
+                ).join('<br>');
+                lineEl.scrollTop = transcriptTextarea.scrollTop;
+            }
+
+            // Update Transcript Highlight
             function updateTranscriptHighlight() {
                 if (!transcriptOverlay) return;
-                let text = transcriptTextarea.value;
                 
-                // escape HTML ก่อน
+                // ถ้าไม่มีคนที่มีสีเลย ไม่ต้องทำอะไร
+                const coloredParticipants = participants.filter(p => p.name && p.color);
+                if (coloredParticipants.length === 0) {
+                    if (transcriptOverlay.innerHTML !== '') transcriptOverlay.innerHTML = '';
+                    return;
+                }
+                
+                let text = transcriptTextarea.value;
                 let html = text
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;');
                 
-                // highlight ชื่อแต่ละคน
-                participants.forEach(p => {
-                    if (!p.name || !p.color) return;
+                coloredParticipants.forEach(p => {
                     const escaped = p.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                     const regex = new RegExp(`(${escaped})(\\s*:\\s*)`, 'g');
-                    const color = p.color || 'var(--accent-color)';
-                    html = html.replace(regex, 
-                        `<span style="color:${color};font-weight:600;">$1</span><span style="color:${color};opacity:0.7;">$2</span>`
+                    html = html.replace(regex,
+                        `<span style="color:${p.color};font-weight:600;">$1</span><span style="color:${p.color};opacity:0.7;">$2</span>`
                     );
                 });
                 
                 const newHTML = `<span style="color:transparent;white-space:pre-wrap;word-break:break-word;display:block;">${html}</span>`;
                 
-                // ✅ อัปเดตเฉพาะเมื่อ HTML เปลี่ยนจริงๆ
                 if (transcriptOverlay.innerHTML !== newHTML) {
                     transcriptOverlay.innerHTML = newHTML;
                 }
@@ -837,7 +1014,7 @@
                 signOut(auth);
             });
 
-            // จุดที่ 3: Meeting title แก้ได้
+            // Meeting title แก้ได้
             function attachTitleEditListener(element) {
                 element.addEventListener('click', function() {
                     const current = this.textContent;
@@ -918,6 +1095,7 @@
                                      saveToHistory(serverTranscript);
                                  }
                                  updateTranscriptHighlight(); // Update highlight
+                                 updateLineNumbers();
                              }
                         } else if (textHistory.length === 0 && serverTranscript) {
                              saveToHistory(serverTranscript);
@@ -936,15 +1114,12 @@
                             transcript: ''
                         };
                         setDoc(meetingDocRef, defaultData).catch(e => {
-                            if (e.code === 'permission-denied') handlePermissionError();
+                            if (e.code === 'permission-denied') console.error("Permission error");
                         });
                     }
                 }, (error) => {
                     console.error("Firestore Snapshot Error: ", error);
-                    if (error.code === 'permission-denied') {
-                        handlePermissionError();
-                        return; // Stop the retry loop
-                    }
+                    if (error.code === 'permission-denied') return; // Stop the retry loop
                     showToast("Connection lost — reconnecting…", "error");
                     setTimeout(() => {
                         if (unsubscribeMeeting) unsubscribeMeeting();
@@ -956,6 +1131,7 @@
                 
                 // โหลด cache เมื่อเริ่มต้นการทำงาน
                 loadAllNamesCache();
+                updateLineNumbers(); // Call initially
             }
             
             // โหลดและแคชชื่อทั้งหมด
@@ -969,7 +1145,6 @@
                     allNamesCache = [...nameSet].sort();
                 } catch(e) { 
                     console.error('Cache load error', e); 
-                    if (e.code === 'permission-denied') handlePermissionError();
                 }
             }
             
@@ -1033,6 +1208,7 @@
                     updateUndoRedoButtons();
                     debouncedSave(); 
                     updateTranscriptHighlight(); // Update highlight
+                    updateLineNumbers();
                 }
             });
 
@@ -1046,6 +1222,7 @@
                     updateUndoRedoButtons();
                     debouncedSave();
                     updateTranscriptHighlight(); // Update highlight
+                    updateLineNumbers();
                 }
             });
             
@@ -1065,6 +1242,7 @@
                     
                     debouncedSave();
                     updateTranscriptHighlight(); // Update highlight
+                    updateLineNumbers();
                     hideAllModals();
                     showToast("Transcript cleared", "success");
                 };
@@ -1074,6 +1252,8 @@
             let historyTimeout;
             transcriptTextarea.addEventListener('input', () => {
                 sttStableText = transcriptTextarea.value; // ยึดข้อความที่พิมพ์เป็นหลัก
+                
+                updateLineNumbers();
 
                 clearTimeout(historyTimeout);
                 historyTimeout = setTimeout(() => {
@@ -1103,7 +1283,6 @@
                     animation: 150,
                     ghostClass: 'sortable-ghost',
                     dragClass: 'sortable-drag',
-                    // จุดที่ 2: เพิ่ม delay และ touchStartThreshold กันชนกับ pointerdown
                     delay: 200,
                     delayOnTouchOnly: true,
                     touchStartThreshold: 8,
@@ -1191,13 +1370,18 @@
                     box.appendChild(nameElement);
                     box.appendChild(editIcon);
 
-                    // จุดที่ 2: Color accent bar
-                    const accent = document.createElement('div');
-                    accent.className = 'color-accent';
-                    accent.style.background = p.color || 'transparent';
-                    box.appendChild(accent);
+                    // สีของการ์ด: กรอบทั้งหมด + สีจางในการ์ด
+                    if (p.color) {
+                        box.style.borderColor = p.color;
+                        box.style.boxShadow = `inset 0 0 0 1px ${p.color}`;
+                        box.style.background = `${p.color}0A`; // เปลี่ยนจาก 18 เป็น 0A เพื่อให้จางลงอีก (~4% opacity)
+                    } else {
+                        box.style.borderColor = '';
+                        box.style.boxShadow = '';
+                        box.style.background = '';
+                    }
 
-                    // Color picker button (ที่ bottom-left)
+                    // Color picker button
                     const colorBtn = document.createElement('div');
                     colorBtn.className = 'card-action-icon';
                     colorBtn.style.cssText = 'bottom:2px;left:2px;top:auto;right:auto;';
@@ -1210,17 +1394,14 @@
                         e.preventDefault();
                         e.stopPropagation();
                         
-                        // ลบ popup เก่าถ้ามี
                         document.querySelectorAll('.color-picker-popup').forEach(el => el.remove());
                         
                         const popup = document.createElement('div');
                         popup.className = 'color-picker-popup';
 
-                        // คำนวณตำแหน่งจาก button
                         const btnRect = colorBtn.getBoundingClientRect();
-                        const popupTop = btnRect.top - 90; // ขึ้นไปเหนือปุ่ม
+                        const popupTop = btnRect.top - 90;
                         const popupLeft = btnRect.left - 50;
-                        // ถ้าขึ้นไปแล้วจะเกินหน้าจอด้านบน ให้แสดงด้านล่างแทน
                         const finalTop = popupTop < 60 ? btnRect.bottom + 8 : popupTop;
                         
                         popup.style.top = `${finalTop}px`;
@@ -1242,7 +1423,6 @@
                             popup.appendChild(dot);
                         });
                         
-                        // ปุ่มล้างสี
                         const clearDot = document.createElement('div');
                         clearDot.className = 'color-dot';
                         clearDot.style.cssText = 'background:transparent;border:2px dashed var(--text-secondary);';
@@ -1257,19 +1437,17 @@
                         });
                         popup.appendChild(clearDot);
                         
-                        document.body.appendChild(popup); // เปลี่ยนจาก box.appendChild เป็น body
+                        document.body.appendChild(popup);
                         
-                        // ปิด popup เมื่อคลิกที่อื่น
                         setTimeout(() => {
                             document.addEventListener('pointerdown', () => popup.remove(), { once: true });
                         }, 0);
                     });
                     
-                    // Box click handles selection with drag detection + Touch Threshold Fix
                     let startX = 0;
                     let startY = 0;
                     let isDragging = false;
-                    const dragThreshold = 10; // พิกเซลที่ยอมรับให้ขยับได้ (ระยะเผื่อ)
+                    const dragThreshold = 10;
 
                     box.addEventListener('pointerdown', (e) => {
                         startX = e.clientX;
@@ -1281,7 +1459,6 @@
                         if (!isDragging) {
                             const dx = Math.abs(e.clientX - startX);
                             const dy = Math.abs(e.clientY - startY);
-                            // ถ้านิ้วขยับเกิน threshold ให้ถือว่าเป็นการลาก (Drag)
                             if (dx > dragThreshold || dy > dragThreshold) {
                                 isDragging = true;
                             }
@@ -1289,9 +1466,7 @@
                     });
                     
                     box.addEventListener('pointerup', (e) => {
-                        if (isDragging) return; // ถ้าเป็นการลาก ไม่ต้องทำฟังก์ชันเลือกชื่อ
-                        e.preventDefault();
-                        // Prevent selection if clicking icons
+                        if (isDragging) return;
                         if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
                         handleParticipantSelect(p.id);
                     });
@@ -1319,12 +1494,13 @@
             
             function updateColumnLayout(newCount) {
                 columnCount = newCount;
-                participantsGrid.className = `grid gap-3 grid-cols-${columnCount} mb-4`;
                 colsCountSpan.textContent = columnCount;
-            }
-            
-            function hideAllModals() {
-                allModals.forEach(modal => modal.classList.add('hidden'));
+                
+                // สำหรับโหมดปกติ
+                participantsGrid.className = `grid gap-3 grid-cols-${columnCount} mb-4`;
+                
+                // สำหรับโหมดประชุม (Meeting Mode)
+                document.documentElement.style.setProperty('--meeting-cols', columnCount);
             }
             
             function handleParticipantSelect(id) {
@@ -1336,7 +1512,7 @@
 
                 activeParticipantId = id;
                 
-                // ✅ แทน renderParticipants() ด้วยการ swap class เฉยๆ เพื่อป้องกัน DOM re-render
+                // แทน renderParticipants() ด้วยการ swap class เฉยๆ เพื่อป้องกัน DOM re-render
                 document.querySelectorAll('.participant-box').forEach(box => {
                     box.classList.toggle('active', parseInt(box.dataset.id) === id);
                 });
@@ -1358,6 +1534,7 @@
                 saveToHistory(newText);
                 debouncedSave();
                 updateTranscriptHighlight(); // Update highlight
+                updateLineNumbers();
 
                 // คืน focus ให้ textarea และเลื่อนลงล่างสุดเพื่อให้แป้นพิมพ์ค้างอยู่
                 transcriptTextarea.focus();
@@ -1576,6 +1753,9 @@
 
 
             transcriptTextarea.addEventListener('scroll', () => {
+                // Sync ทั้ง Overlay และตัวเลขบรรทัด
+                const lineEl = document.getElementById('line-numbers');
+                if (lineEl) lineEl.scrollTop = transcriptTextarea.scrollTop;
                 transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
             });
             
@@ -1668,7 +1848,7 @@
                 reader.readAsArrayBuffer(file);
             });
 
-            increaseColsBtn.addEventListener('click', () => { if (columnCount < 6) updateColumnLayout(columnCount + 1); });
+            increaseColsBtn.addEventListener('click', () => { if (columnCount < 10) updateColumnLayout(columnCount + 1); });
             decreaseColsBtn.addEventListener('click', () => { if (columnCount > 1) updateColumnLayout(columnCount - 1); });
 
             saveBtn.addEventListener('click', () => {
@@ -1715,6 +1895,64 @@
                 });
             });
 
+            // ── HORIZONTAL RESIZER (Meeting Mode) ──
+            let isHResizing = false;
+            const hResizer = document.getElementById('horizontal-resizer');
+
+            hResizer.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                isHResizing = true;
+                hResizer.classList.add('resizing');
+                hResizer.setPointerCapture(e.pointerId);
+            });
+
+            hResizer.addEventListener('pointermove', (e) => {
+                if (!isHResizing) return;
+                const container = document.getElementById('main-container');
+                const containerRect = container.getBoundingClientRect();
+                
+                let newTopHeight = e.clientY - containerRect.top;
+                
+                const minTop = 80;
+                const minBottom = 120;
+                const maxTop = containerRect.height - minBottom;
+                
+                newTopHeight = Math.max(minTop, Math.min(newTopHeight, maxTop));
+                leftPanel.style.height = `${newTopHeight}px`;
+                leftPanel.style.flexBasis = `${newTopHeight}px`;
+            });
+
+            hResizer.addEventListener('pointerup', (e) => {
+                isHResizing = false;
+                hResizer.classList.remove('resizing');
+                hResizer.releasePointerCapture(e.pointerId);
+            });
+
+            layoutToggleBtn.addEventListener('click', () => {
+                isMeetingMode = !isMeetingMode;
+                appContainer.classList.toggle('meeting-mode', isMeetingMode);
+                layoutToggleBtn.textContent = isMeetingMode ? 'NORMAL' : 'LAYOUT';
+                
+                if (isMeetingMode) {
+                    // คำนวณความสูงให้พอดี 4 แถว
+                    // การ์ดสูงประมาณ 65px + gap 8px = ~73px ต่อแถว
+                    const rowHeight = 73;
+                    const rows = 4;
+                    const padding = 65; // header + padding ของ panel
+                    leftPanel.style.height = `${rowHeight * rows + padding}px`;
+                    leftPanel.style.flexBasis = `${rowHeight * rows + padding}px`;
+                } else {
+                    // รีเซ็ตกลับโหมดปกติ
+                    leftPanel.style.height = '';
+                    leftPanel.style.flexBasis = '33%'; // รีเซ็ตให้กลับมาขนาดปกติ
+                }
+
+                showToast(isMeetingMode ? 'โหมดโฟกัส' : 'โหมดปกติ', 'info');
+                
+                // บังคับให้เบราว์เซอร์คำนวณขนาดและเลื่อนแถบข้อความลงล่างสุดใหม่ เพื่อป้องกันอาการแปลกๆ ของ Flexbox
+                setTimeout(() => { transcriptTextarea.scrollTop = transcriptTextarea.scrollHeight; }, 100);
+            });
+
             ratioToggleBtn.addEventListener('click', () => {
                 currentRatioIndex = (currentRatioIndex + 1) % ratios.length;
                 const newRatio = ratios[currentRatioIndex];
@@ -1738,7 +1976,6 @@
                     }
                 }
             });
-
 
             themeToggle.addEventListener('click', () => {
                 document.body.classList.toggle('dark');
@@ -1778,31 +2015,19 @@
                 transcriptTextarea.focus();
                 saveStateToFirestore();
                 updateTranscriptHighlight(); // Update highlight
+                updateLineNumbers();
             }
             
-            toggleSidebarBtn.addEventListener('click', () => {
-                leftPanel.classList.toggle('hidden');
-                resizer.classList.toggle('hidden');
-                if (leftPanel.classList.contains('hidden')) {
-                     rightPanel.style.flexBasis = '100%';
-                     if(window.innerWidth < 1024) {
-                        leftPanel.style.display = 'none'; 
-                     }
-                } else {
-                     rightPanel.style.flexBasis = '67%'; 
-                     if(window.innerWidth < 1024) {
-                        leftPanel.style.display = 'flex';
-                     }
-                }
+            // Toggle Tools Dropdown Menu
+            toolsMenuBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toolsDropdown.classList.toggle('hidden');
             });
-            
-            toolsHeader.addEventListener('click', () => {
-                toolsContent.classList.toggle('hidden');
-                toolsChevron.classList.toggle('rotate-180');
-                if (toolsContent.classList.contains('hidden')) {
-                    toolsContent.style.marginTop = '0';
-                } else {
-                     toolsContent.style.marginTop = '0.5rem';
+
+            // Close Tools Dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!toolsDropdown.classList.contains('hidden') && !toolsDropdown.contains(e.target) && !toolsMenuBtn.contains(e.target)) {
+                    toolsDropdown.classList.add('hidden');
                 }
             });
 
@@ -1879,13 +2104,18 @@
                 const event = e.touches ? e.touches[0] : e;
                 const container = document.getElementById('main-container');
                 const containerRect = container.getBoundingClientRect();
+                
                 let newLeftWidth = event.clientX - containerRect.left;
-                const minWidth = 80; 
-                if (newLeftWidth < minWidth) newLeftWidth = minWidth;
-                if (newLeftWidth > containerRect.width - minWidth - resizer.offsetWidth) {
-                    newLeftWidth = containerRect.width - minWidth - resizer.offsetWidth;
-                }
+                
+                const minLeft = 80;
+                const minRight = 80;
+                const maxLeft = containerRect.width - minRight - resizer.offsetWidth;
+                
+                newLeftWidth = Math.max(minLeft, Math.min(newLeftWidth, maxLeft));
+                
                 leftPanel.style.flexBasis = `${newLeftWidth}px`;
+                leftPanel.style.flexGrow = '0';    // ป้องกันการเด้ง
+                leftPanel.style.flexShrink = '0'; // ป้องกันการเด้ง
             };
             const stopResizing = () => {
                 isResizing = false;
@@ -1913,6 +2143,13 @@
             setInterval(() => {
                 const now = new Date();
                 clockDiv.textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                
+                // Duration Timer Update
+                const elapsed = Date.now() - meetingStartTime;
+                const h = Math.floor(elapsed / 3600000).toString().padStart(2, '0');
+                const m = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0');
+                const s = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
+                document.getElementById('duration-timer').textContent = `${h}:${m}:${s}`;
             }, 1000);
 
             document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', hideAllModals));
@@ -1946,6 +2183,8 @@
             }
 
             document.getElementById('new-meeting-btn').addEventListener('click', () => {
+                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
+                
                 if (!transcriptTextarea.value.trim() && participants.length === 0) {
                     showToast('ไม่มีข้อมูลการประชุม', 'info');
                     return;
@@ -1972,12 +2211,16 @@
                 updateUndoRedoButtons();
                 renderParticipants();
                 updateTranscriptHighlight(); // Reset Highlight
+                updateLineNumbers();
                 
                 // Set default meeting title
                 const titleEl = document.getElementById('meeting-title');
                 if (titleEl && titleEl.tagName === 'H1') {
                     titleEl.textContent = 'Meeting Notes';
                 }
+
+                // รีเซ็ตเวลา Duration Timer เมื่อเริ่มใหม่
+                meetingStartTime = Date.now();
 
                 await saveStateToFirestore();
                 
@@ -1988,6 +2231,8 @@
             document.getElementById('save-meeting-cancel').addEventListener('click', hideAllModals);
 
             document.getElementById('history-btn').addEventListener('click', async () => {
+                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
+                
                 historyModal.classList.remove('hidden');
                 const container = document.getElementById('history-list-container');
                 container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
@@ -2046,6 +2291,7 @@
                                 saveToHistory(transcriptTextarea.value);
                                 renderParticipants();
                                 updateTranscriptHighlight(); // Highlight the loaded text
+                                updateLineNumbers();
                                 
                                 const titleEl = document.getElementById('meeting-title');
                                 if (titleEl && titleEl.tagName === 'H1') {
