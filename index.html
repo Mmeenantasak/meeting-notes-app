@@ -725,8 +725,8 @@
     <!-- สคริปต์ดักจับ Error ที่แสดงขึ้นมาลอยทับจอ (ป้องกับปัญหาจอดำ) -->
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
-            document.body.innerHTML = `
-            <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#141210;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;font-family:sans-serif;">
+            document.body.innerHTML += `
+            <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(20,18,16,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;font-family:sans-serif;">
                <div style="background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:12px; padding:30px; max-width:600px; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
                   <h2 style="color:#ef4444; font-size: 24px; margin-bottom:10px;">⚠️ พบข้อผิดพลาดทำให้หน้าเว็บขาว/ดำ</h2>
                   <p style="color:#fff; font-size: 16px;"><strong>บรรทัดที่:</strong> ${lineno}</p>
@@ -736,6 +736,25 @@
             </div>`;
         };
     </script>
+
+    <!-- กล่องแจ้งเตือนถ้าลืมใส่ Config (อยู่นอกสุด จะได้ไม่ถูกซ่อน) -->
+    <div id="setup-instructions-container" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#141210; z-index:9999; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:12px; padding:40px; max-width:600px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+            <h2 style="color:#ef4444; font-size: 26px; font-weight:bold; margin-bottom:15px; font-family:'Sarabun',sans-serif;">⚠️ ขาดการเชื่อมต่อฐานข้อมูล Firebase</h2>
+            <p style="color:#fff; font-size: 16px; line-height:1.6; font-family:'Sarabun',sans-serif;">
+                หน้าจอนี้เกิดขึ้นเพราะคุณนำโค้ดไปรันบนเว็บจริง แต่ยังไม่ได้ใส่ค่า <strong>Firebase Config</strong> ของตัวเองลงไปในโค้ดครับ
+            </p>
+            <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:15px; margin-top:20px; text-align:left;">
+                <p style="color:#fca5a5; font-size:14px; margin:0; line-height:1.6; font-family:'Sarabun',sans-serif;">
+                    <strong>วิธีแก้ไข:</strong><br>
+                    1. เปิดไฟล์ <code>index.html</code> ในโปรแกรมเขียนโค้ดของคุณ<br>
+                    2. เลื่อนไปที่บรรทัดประมาณ <strong>570</strong> (ส่วนที่เขียนว่า <code>myFirebaseConfig</code>)<br>
+                    3. นำค่า Config จาก Firebase Console ของคุณมาวางทับคำว่า <code>"YOUR_API_KEY"</code> และค่าอื่นๆ ให้ครบถ้วน<br>
+                    4. เซฟไฟล์แล้ว Deploy ใหม่อีกครั้งครับ
+                </p>
+            </div>
+        </div>
+    </div>
 
     <!-- ปรับ display:flex เป็นค่าเริ่มต้น เพื่อไม่ให้จอดำระหว่างรอโหลด -->
     <div id="login-screen" style="display:flex; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem; background:#141210;">
@@ -814,8 +833,6 @@
                 <button id="signout-btn" class="tool-btn" style="font-size:0.75rem; padding:0.4rem 0.75rem; border: 1px solid rgba(168,130,120,0.3); color: #c08070;">SIGN OUT</button>
             </div>
         </header>
-
-        <div id="setup-instructions-container"></div>
 
         <!-- SEATING PLAN PANEL -->
         <div id="seating-panel">
@@ -1000,37 +1017,37 @@
         // (คัดลอกมาวางทับ "YOUR_API_KEY" และค่าอื่นๆ ได้เลย ห้ามลบปีกกา {} หรือเครื่องหมายลูกน้ำ ,)
         // =========================================================================================
         const myFirebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBe1IRZCwUy-1TlP97RRp5biHCu-surkao",
+            authDomain: "my-meeting-notes-dbcb4.firebaseapp.com",
+            projectId: "my-meeting-notes-dbcb4",
+            storageBucket: "my-meeting-notes-dbcb4.firebasestorage.app",
+            messagingSenderId: "518603776860",
+            appId: "1:518603776860:web:0c1297f45a3a8c75809799"
         };
         // =========================================================================================
 
-        /* ── โค้ดระบบ Sandbox & สลับ Path ฐานข้อมูล (ห้ามลบ) ── */
+        /* ── โค้ดระบบ Sandbox & สลับ Path ฐานข้อมูลอัตโนมัติ (ห้ามลบ) ── */
         let activeConfig = myFirebaseConfig;
         if (typeof __firebase_config !== 'undefined') {
             activeConfig = JSON.parse(__firebase_config);
         }
 
         const getBasePath = (uid) => {
-            // ถ้ารันในหน้าต่างแชทนี้ (Sandbox)
+            // ถ้ารันในหน้าต่างแชทพรีวิว (Sandbox) จะเก็บข้อมูลแยกกันเพื่อความปลอดภัย
             if (typeof window.__app_id !== 'undefined' && window.__app_id) {
                 return `artifacts/${window.__app_id}/users/${uid}`;
             }
-            // ถ้ารันบนเว็บของคุณเอง (ดึงข้อมูลเก่ากลับมาทั้งหมด)
+            // ถ้ารันบนเว็บของคุณเอง (Vercel, Hostinger) จะใช้ Path ข้อมูลเก่าที่คุณเคยเซฟไว้
             return `users/${uid}`;
         };
         /* ------------------------------------------------ */
 
         document.addEventListener('DOMContentLoaded', () => {
+            // เช็คว่าผู้ใช้ใส่ Firebase Config หรือยัง? ถ้ายัง ให้โชว์หน้าต่างเตือน (และซ่อนกล่องอื่นๆ)
             if (activeConfig.apiKey === "YOUR_API_KEY" || !activeConfig.apiKey) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-container').style.display = 'none';
-                const setupContainer = document.getElementById('setup-instructions-container');
-                setupContainer.innerHTML = `<div class="text-center p-8 bg-red-100 border-2 border-red-500 rounded-lg max-w-3xl mx-auto mt-8"><h2 class="text-2xl font-bold text-red-700 mb-4">⚠️ การตั้งค่ายังไม่สมบูรณ์</h2><p class="text-red-800">คุณยังไม่ได้ใส่ค่า Firebase Config ในไฟล์ HTML</p><p class="mt-2 text-gray-700">กรุณาคัดลอกค่าจากโปรเจกต์ Firebase ของคุณมาวางทับส่วน <code>myFirebaseConfig</code> ในโค้ดก่อนครับ</p></div>`;
+                document.getElementById('setup-instructions-container').style.display = 'flex';
                 return;
             }
 
@@ -1121,7 +1138,7 @@
                 rowsTop: 2,             // 1-4
                 rowsBottom: 2,          // 1-4
                 seatsPerRow: 8,         // 1-18
-                seatHeight: 44,         // ขนาดที่นั่งเริ่มต้น
+                seatHeight: 44,         // ขนาดที่นั่ง
                 seats: {}               // key: "top-0-0" value: participantId | null
             };
             let isDragMode = false;
@@ -1495,8 +1512,6 @@
                     ghostClass: 'sortable-ghost',
                     dragClass: 'sortable-drag',
                     delay: 0,
-                    delayOnTouchOnly: true,
-                    touchStartThreshold: 8,
                     disabled: !isReorderMode,
                     onEnd: (evt) => {
                         const { oldIndex, newIndex } = evt;
@@ -1519,7 +1534,7 @@
                 reorderBtn.style.color = isReorderMode ? 'var(--accent-color)' : '';
                 reorderBtn.style.borderColor = isReorderMode ? 'var(--accent-color)' : '';
                 
-                showToast(isReorderMode ? 'โหมดเรียงลำดับ — ลากได้เลย' : 'ออกจากโหมดเรียงลำดับ', 'info');
+                showToast(isReorderMode ? 'โหมดเรียงลำดับ — ลากสลับตำแหน่งได้เลย' : 'ออกจากโหมดเรียงลำดับ', 'info');
             });
 
             async function saveStateToFirestore() {
