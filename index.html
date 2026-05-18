@@ -346,56 +346,6 @@
         #horizontal-resizer:hover, #horizontal-resizer.resizing { background-color: var(--accent-color); opacity: 1; }
         #app-container.meeting-mode #horizontal-resizer { display: block; }
 
-        /* ── SEATING RESIZER ── */
-        #seating-resizer {
-            height: 12px;
-            min-height: 12px;
-            flex-shrink: 0;
-            cursor: row-resize;
-            background-color: rgba(0, 0, 0, 0.15);
-            background-clip: content-box;
-            padding: 4px 0;
-            margin: 0;
-            position: relative;
-            z-index: 10;
-            display: none;
-            transition: background-color 0.2s;
-            touch-action: none;
-        }
-        .dark #seating-resizer { background-color: rgba(255, 255, 255, 0.15); }
-        #seating-resizer:hover, #seating-resizer.resizing { background-color: var(--accent-color); opacity: 1; }
-        #app-container.seating-mode #seating-resizer { display: block; }
-
-        .saved-list-item {
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-panel-solid);
-            color: var(--text-primary);
-        }
-        .list-item-action { visibility: hidden; color: var(--text-secondary); }
-        .list-item-action:hover { color: #ef4444; }
-        .saved-list-item:hover .list-item-action { visibility: visible; }
-
-        #toast-container {
-            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 100;
-            display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
-        }
-        .toast {
-            background-color: var(--text-primary); color: var(--bg-panel-solid);
-            padding: 0.5rem 1.25rem;
-            font-size: 0.85rem; opacity: 0; transform: translateY(1rem);
-            transition: all 0.3s ease; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            display: flex; align-items: center; gap: 0.5rem;
-        }
-        .toast.show { opacity: 1; transform: translateY(0); }
-        
-        #save-status {
-            font-size: 0.75rem; color: var(--text-secondary);
-            display: flex; align-items: center; gap: 0.35rem; opacity: 0.8;
-            background: var(--bg-panel-solid); border: 1px solid var(--border-color);
-            padding: 4px 10px; border-radius: 999px;
-        }
-        #save-status.saving { color: var(--text-primary); border-color: var(--text-primary); }
-
         /* ── SEATING PLAN ── */
         #seating-panel {
             display: none;
@@ -619,6 +569,56 @@
             color: var(--text-primary);
         }
 
+        /* ── SEATING RESIZER ── */
+        #seating-resizer {
+            height: 12px;
+            min-height: 12px;
+            flex-shrink: 0;
+            cursor: row-resize;
+            background-color: rgba(0, 0, 0, 0.15);
+            background-clip: content-box;
+            padding: 4px 0;
+            margin: 0;
+            position: relative;
+            z-index: 10;
+            display: none;
+            transition: background-color 0.2s;
+            touch-action: none;
+        }
+        .dark #seating-resizer { background-color: rgba(255, 255, 255, 0.15); }
+        #seating-resizer:hover, #seating-resizer.resizing { background-color: var(--accent-color); opacity: 1; }
+        #app-container.seating-mode #seating-resizer { display: block; }
+
+        .saved-list-item {
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-panel-solid);
+            color: var(--text-primary);
+        }
+        .list-item-action { visibility: hidden; color: var(--text-secondary); }
+        .list-item-action:hover { color: #ef4444; }
+        .saved-list-item:hover .list-item-action { visibility: visible; }
+
+        #toast-container {
+            position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 100;
+            display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
+        }
+        .toast {
+            background-color: var(--text-primary); color: var(--bg-panel-solid);
+            padding: 0.5rem 1.25rem;
+            font-size: 0.85rem; opacity: 0; transform: translateY(1rem);
+            transition: all 0.3s ease; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        
+        #save-status {
+            font-size: 0.75rem; color: var(--text-secondary);
+            display: flex; align-items: center; gap: 0.35rem; opacity: 0.8;
+            background: var(--bg-panel-solid); border: 1px solid var(--border-color);
+            padding: 4px 10px; border-radius: 999px;
+        }
+        #save-status.saving { color: var(--text-primary); border-color: var(--text-primary); }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
@@ -722,7 +722,23 @@
 </head>
 <body class="dark">
 
-    <div id="login-screen" style="display:none; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem; background:#141210;">
+    <!-- สคริปต์ดักจับ Error ที่แสดงขึ้นมาลอยทับจอ (ป้องกับปัญหาจอดำ) -->
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            document.body.innerHTML = `
+            <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#141210;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;font-family:sans-serif;">
+               <div style="background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:12px; padding:30px; max-width:600px; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
+                  <h2 style="color:#ef4444; font-size: 24px; margin-bottom:10px;">⚠️ พบข้อผิดพลาดทำให้หน้าเว็บขาว/ดำ</h2>
+                  <p style="color:#fff; font-size: 16px;"><strong>บรรทัดที่:</strong> ${lineno}</p>
+                  <p style="color:#fff; font-size: 16px; margin-bottom:20px;"><strong>รายละเอียด:</strong> ${message}</p>
+                  <p style="color:#fca5a5; font-size:14px; margin:0; line-height:1.5;">สาเหตุ 90% เกิดจากการคัดลอก Firebase Config มาวางผิดพลาด (เช่น ลืมลูกน้ำ ลืมเครื่องหมายคำพูด หรือลบโค้ดเกิน) กรุณากลับไปตรวจสอบโค้ดส่วน Config ครับ</p>
+               </div>
+            </div>`;
+        };
+    </script>
+
+    <!-- ปรับ display:flex เป็นค่าเริ่มต้น เพื่อไม่ให้จอดำระหว่างรอโหลด -->
+    <div id="login-screen" style="display:flex; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem; background:#141210;">
         <h1 style="color:#fff; font-size:2rem; font-weight:bold; font-family:'Sarabun',sans-serif;">Meeting Notes</h1>
         <div style="display:flex; flex-direction:column; gap:1rem; align-items:center;">
             <button id="login-btn" style="display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1.5rem; background:#fff; color:#000; font-weight:bold; border:none; border-radius:8px; font-size:1rem; cursor:pointer; width:100%; justify-content:center;">
@@ -805,7 +821,6 @@
         <div id="seating-panel">
             <!-- JS Generated -->
         </div>
-        
         <!-- SEATING RESIZER -->
         <div id="seating-resizer"></div>
 
@@ -980,8 +995,11 @@
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Fallback config if not injected by environment
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+        // =========================================================================================
+        // ⚠️ 1. นำค่า Firebase Config จากโปรเจกต์ของคุณมาวางทับตรงนี้ครับ ⚠️
+        // (คัดลอกมาวางทับ "YOUR_API_KEY" และค่าอื่นๆ ได้เลย ห้ามลบปีกกา {} หรือเครื่องหมายลูกน้ำ ,)
+        // =========================================================================================
+        const myFirebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
             projectId: "YOUR_PROJECT_ID",
@@ -989,28 +1007,30 @@
             messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
             appId: "YOUR_APP_ID"
         };
-        
-        /* ── ฟังก์ชันตัวช่วยสลับ Path ฐานข้อมูลให้อัตโนมัติ ── 
-           - ถ้าดูผ่านพรีวิวแชทนี้ จะใช้ Path sandbox ไม่ให้ติด Error
-           - ถ้าเอาไปรันบนเว็บคุณ จะกลับไปดึงข้อมูลเก่าของคุณทั้งหมด */
+        // =========================================================================================
+
+        /* ── โค้ดระบบ Sandbox & สลับ Path ฐานข้อมูล (ห้ามลบ) ── */
+        let activeConfig = myFirebaseConfig;
+        if (typeof __firebase_config !== 'undefined') {
+            activeConfig = JSON.parse(__firebase_config);
+        }
+
         const getBasePath = (uid) => {
+            // ถ้ารันในหน้าต่างแชทนี้ (Sandbox)
             if (typeof window.__app_id !== 'undefined' && window.__app_id) {
                 return `artifacts/${window.__app_id}/users/${uid}`;
             }
+            // ถ้ารันบนเว็บของคุณเอง (ดึงข้อมูลเก่ากลับมาทั้งหมด)
             return `users/${uid}`;
         };
-
-        const PRESET_COLORS = [
-            '#f4a7b9', '#f9c784', '#fdf08a', '#a8d8a8', '#80cbc4', 
-            '#90caf9', '#b39ddb', '#f48fb1', '#bcaaa4', '#e0e0e0', 
-        ];
+        /* ------------------------------------------------ */
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (firebaseConfig.apiKey === "YOUR_API_KEY" || !firebaseConfig.apiKey) {
+            if (activeConfig.apiKey === "YOUR_API_KEY" || !activeConfig.apiKey) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-container').style.display = 'none';
                 const setupContainer = document.getElementById('setup-instructions-container');
-                setupContainer.innerHTML = `<div class="text-center p-8 bg-red-100 border-2 border-red-500 rounded-lg max-w-3xl mx-auto mt-8"><h2 class="text-2xl font-bold text-red-700 mb-4">⚠️ การตั้งค่ายังไม่สมบูรณ์</h2><p class="text-red-800">คุณยังไม่ได้ตั้งค่า Firebase Configuration (firebaseConfig)ในไฟล์ HTML</p><p class="mt-2 text-gray-700">กรุณาคัดลอกค่า <code>firebaseConfig</code> จากโปรเจกต์ Firebase ของคุณมาวางในโค้ดตามคู่มือที่ให้ไว้ก่อนหน้านี้ เพื่อให้แอปพลิเคชันสามารถทำงานได้</p></div>`;
+                setupContainer.innerHTML = `<div class="text-center p-8 bg-red-100 border-2 border-red-500 rounded-lg max-w-3xl mx-auto mt-8"><h2 class="text-2xl font-bold text-red-700 mb-4">⚠️ การตั้งค่ายังไม่สมบูรณ์</h2><p class="text-red-800">คุณยังไม่ได้ใส่ค่า Firebase Config ในไฟล์ HTML</p><p class="mt-2 text-gray-700">กรุณาคัดลอกค่าจากโปรเจกต์ Firebase ของคุณมาวางทับส่วน <code>myFirebaseConfig</code> ในโค้ดก่อนครับ</p></div>`;
                 return;
             }
 
@@ -1101,13 +1121,17 @@
                 rowsTop: 2,             // 1-4
                 rowsBottom: 2,          // 1-4
                 seatsPerRow: 8,         // 1-18
-                seatHeight: 44,         // 32-80 (ขนาดเริ่มต้น)
+                seatHeight: 44,         // ขนาดที่นั่งเริ่มต้น
                 seats: {}               // key: "top-0-0" value: participantId | null
             };
             let isDragMode = false;
             let dragSourceKey = null;
 
             const seatingPanel = document.getElementById('seating-panel');
+            const PRESET_COLORS = [
+                '#f4a7b9', '#f9c784', '#fdf08a', '#a8d8a8', '#80cbc4', 
+                '#90caf9', '#b39ddb', '#f48fb1', '#bcaaa4', '#e0e0e0', 
+            ];
 
             function hideAllModals() {
                 allModals.forEach(modal => modal.classList.add('hidden'));
@@ -1146,7 +1170,7 @@
             }
 
             try {
-                app = initializeApp(firebaseConfig);
+                app = initializeApp(activeConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
@@ -1252,7 +1276,6 @@
             function initializeLogic() {
                 if (!userId) return;
                 const docId = 'shared_meeting_notes';
-                // ดึง Path อัตโนมัติตาม Environment
                 meetingDocRef = doc(db, getBasePath(userId), 'meetings', docId);
 
                 initSortable();
@@ -2219,7 +2242,6 @@
                 document.removeEventListener('touchend', stopSeatingResizing);
             };
 
-            // โหลด seating จาก Firestore
             async function loadSeatingLayout() {
                 if (!meetingDocRef) return;
                 try {
@@ -2693,7 +2715,6 @@
                     layoutToggleBtn.style.borderColor = 'var(--accent-color)';
 
                     await loadSeatingLayout();
-                    
                     resetSeatingPanelHeight();
 
                     // ── AUTO-FILL LOGIC ──
@@ -2736,7 +2757,6 @@
                     if (layoutChanged) {
                         await saveSeatingLayout();
                     }
-                    // ── END AUTO-FILL LOGIC ──
 
                     renderSeatingPanel();
                     showToast('โหมดผังที่นั่ง', 'info');
