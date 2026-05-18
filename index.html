@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>แอปบันทึกการประชุม (Minimalist Dark)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Use cdnjs for reliable SortableJS loading -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --bg-gradient-start: #faf8f5;
@@ -100,7 +100,7 @@
 
         html, body {
             height: 100%;
-            height: 100dvh; /* ใช้ dvh เพื่อปรับขนาดตาม Address bar และ Keyboard อัตโนมัติ */
+            height: 100dvh;
             overflow: hidden;
             touch-action: manipulation;
         }
@@ -120,32 +120,27 @@
             transition: color 0.3s, background 0.3s;
         }
 
-        /* Header title บางและ wide */
         #meeting-title {
             font-weight: 200 !important;
             letter-spacing: 0.2em !important;
         }
 
-        /* ชื่อในการ์ดหนักขึ้น */
         .participant-box h3 {
             font-weight: 600;
             letter-spacing: 0.05em;
         }
 
-        /* Tool buttons และ labels ใช้ mono */
         .tool-btn, #clock, #save-status, #user-display,
         #cols-count, .panel-label, #duration-timer {
             font-family: 'DM Mono', monospace;
             font-weight: 300;
         }
 
-        /* Section headers */
         h2.text-sm {
             font-weight: 300;
             letter-spacing: 0.15em;
         }
 
-        /* --- FIXED: Custom Line Clamp Class --- */
         .custom-line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -153,7 +148,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             word-break: break-word;
-            max-height: 3em; /* Fallback for lineHeight ~1.5 */
+            max-height: 3em; 
         }
 
         /* Ratio Mode */
@@ -199,11 +194,11 @@
             position: relative;
             cursor: pointer;
             transition: all 0.15s ease-out;
-            border-radius: 0.5rem;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none; /* Prevent context menu on mobile long press */
             height: auto;
-            min-height: 75px; /* Compact height */
+            min-height: 75px;
         }
         .participant-box:active {
             transform: scale(0.96);
@@ -223,33 +218,9 @@
              background-color: rgba(255, 255, 255, 0.05);
         }
 
-        /* Participant Avatars */
-        .participant-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            font-weight: 600;
-            font-family: 'DM Mono', monospace;
-            margin-bottom: 0.35rem;
-            flex-shrink: 0;
-            opacity: 0.9;
-        }
-        .participant-box.has-color {
-            background-image: linear-gradient(
-                135deg,
-                var(--card-color-bg, transparent) 0%,
-                transparent 60%
-            );
-        }
-
         .sortable-ghost { opacity: 0.3; background: var(--accent-color); }
         .sortable-drag { opacity: 1 !important; cursor: grabbing; }
 
-        /* Inputs */
         textarea, select, input[type="text"] {
             background-color: transparent;
             border: 1px solid var(--border-color);
@@ -287,13 +258,12 @@
         .edit-icon { bottom: 2px; right: 2px; }
         .delete-icon:hover { color: #ef4444; background-color: rgba(239, 68, 68, 0.1); }
         
-        /* CSS สำหรับ Color Picker */
         .color-picker-popup {
             position: fixed;
             z-index: 999;
             background: var(--bg-panel-solid);
             border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
+            border-radius: 12px;
             padding: 0.5rem;
             display: flex;
             gap: 0.35rem;
@@ -315,11 +285,9 @@
 
         .modal-overlay { backdrop-filter: blur(8px); transition: opacity 0.3s ease; }
         
-        /* Buttons */
         .tool-btn {
             font-size: 0.875rem; 
             padding: 0.6rem 0.75rem; 
-            border-radius: 0.5rem;
             color: var(--btn-text);
             font-weight: 500; 
             transition: all 0.2s;
@@ -342,7 +310,6 @@
         .tool-btn:active { transform: translateY(0); }
         .tool-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-        /* Vertical Resizer */
         #resizer {
             width: 15px; 
             min-width: 15px;
@@ -353,20 +320,13 @@
             padding: 0 6px; 
             transition: background-color 0.2s; 
             margin: 0;
-            border-radius: 99px;
             position: relative;
             z-index: 10;
             touch-action: none;
         }
-        .dark #resizer {
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-        #resizer:hover, #resizer.resizing { 
-            background-color: var(--accent-color); 
-            opacity: 1;
-        }
+        .dark #resizer { background-color: rgba(255, 255, 255, 0.15); }
+        #resizer:hover, #resizer.resizing { background-color: var(--accent-color); opacity: 1; }
         
-        /* Horizontal Resizer */
         #horizontal-resizer {
             height: 12px;
             min-height: 12px;
@@ -376,25 +336,35 @@
             background-clip: content-box;
             padding: 4px 0;
             margin: 0;
-            border-radius: 99px;
             position: relative;
             z-index: 10;
-            display: none; /* ซ่อนไว้ก่อน แสดงเฉพาะโหมดประชุม */
+            display: none;
             transition: background-color 0.2s;
             touch-action: none;
         }
-        .dark #horizontal-resizer {
-            background-color: rgba(255, 255, 255, 0.15);
-        }
-        #horizontal-resizer:hover, #horizontal-resizer.resizing {
-            background-color: var(--accent-color);
-            opacity: 1;
-        }
-        #app-container.meeting-mode #horizontal-resizer {
-            display: block;
-        }
+        .dark #horizontal-resizer { background-color: rgba(255, 255, 255, 0.15); }
+        #horizontal-resizer:hover, #horizontal-resizer.resizing { background-color: var(--accent-color); opacity: 1; }
+        #app-container.meeting-mode #horizontal-resizer { display: block; }
 
-        /* Saved List Item */
+        #seating-resizer {
+            height: 12px;
+            min-height: 12px;
+            flex-shrink: 0;
+            cursor: row-resize;
+            background-color: rgba(0, 0, 0, 0.15);
+            background-clip: content-box;
+            padding: 4px 0;
+            margin: 0;
+            position: relative;
+            z-index: 10;
+            display: none;
+            transition: background-color 0.2s;
+            touch-action: none;
+        }
+        .dark #seating-resizer { background-color: rgba(255, 255, 255, 0.15); }
+        #seating-resizer:hover, #seating-resizer.resizing { background-color: var(--accent-color); opacity: 1; }
+        #app-container.seating-mode #seating-resizer { display: block; }
+
         .saved-list-item {
             border: 1px solid var(--border-color);
             background-color: var(--bg-panel-solid);
@@ -404,14 +374,13 @@
         .list-item-action:hover { color: #ef4444; }
         .saved-list-item:hover .list-item-action { visibility: visible; }
 
-        /* Toast & Status */
         #toast-container {
             position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 100;
             display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
         }
         .toast {
             background-color: var(--text-primary); color: var(--bg-panel-solid);
-            padding: 0.5rem 1.25rem; border-radius: 999px;
+            padding: 0.5rem 1.25rem;
             font-size: 0.85rem; opacity: 0; transform: translateY(1rem);
             transition: all 0.3s ease; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
             display: flex; align-items: center; gap: 0.5rem;
@@ -426,12 +395,234 @@
         }
         #save-status.saving { color: var(--text-primary); border-color: var(--text-primary); }
 
+        /* ── SEATING PLAN ── */
+        #seating-panel {
+            display: none;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            backdrop-filter: blur(24px);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        #app-container.seating-mode #seating-panel {
+            display: flex;
+        }
+
+        /* ประธาน */
+        .chairman-slot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 52px;
+            cursor: pointer;
+            border-radius: 12px;
+            border: 2px dashed var(--border-color);
+            transition: all 0.2s;
+            position: relative;
+        }
+        .chairman-slot.filled {
+            border-style: solid;
+            border-color: var(--accent-color);
+        }
+        .chairman-slot .chairman-name {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-align: center;
+            padding: 0.5rem 0;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+        .chairman-slot .chairman-empty {
+            writing-mode: vertical-rl;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        /* โต๊ะ */
+        .seating-table-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .seating-rows-top {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .seating-rows-bottom {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .table-divider {
+            height: 10px;
+            background: var(--text-secondary);
+            border-radius: 4px;
+            margin: 4px 0;
+            opacity: 0.25;
+            flex-shrink: 0;
+        }
+
+        .seating-row {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+        }
+
+        /* ที่นั่ง */
+        .seat-card {
+            flex: 1;
+            min-width: 0;
+            min-height: 44px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-panel-solid);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+            position: relative;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .seat-card:hover {
+            border-color: var(--accent-color);
+        }
+        .seat-card.filled {
+            border-color: var(--accent-color);
+        }
+        .seat-card.active-speaker {
+            box-shadow: 0 0 0 2px var(--accent-color);
+        }
+        .seat-card .seat-name {
+            font-size: 0.62rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 2px 4px;
+            line-height: 1.3;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            color: var(--text-primary);
+            pointer-events: none;
+        }
+        .seat-card .seat-empty-icon {
+            color: var(--text-secondary);
+            opacity: 0.3;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        /* Drag mode styling (Removed wiggle, using dashed borders) */
+        .drag-mode .seat-card,
+        .drag-mode .chairman-slot {
+            cursor: grab;
+            border-style: dashed !important;
+            opacity: 0.85;
+        }
+        .drag-mode .seat-card:active {
+            cursor: grabbing;
+            opacity: 0.6;
+            transform: scale(0.95);
+        }
+        .seat-card.drag-over {
+            border-color: var(--accent-color);
+            background: rgba(184, 168, 152, 0.15);
+            transform: scale(1.05);
+        }
+
+        /* Seating controls */
+        .seating-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .seating-control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+        }
+        .seating-ctrl-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .seating-ctrl-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+        .drag-mode-btn {
+            padding: 3px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-left: auto;
+        }
+        .drag-mode-btn.active {
+            border-color: #f4a7b9;
+            color: #f4a7b9;
+            background: rgba(244, 167, 185, 0.1);
+        }
+        .chairman-side-btn {
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .chairman-side-btn:hover {
+            border-color: var(--accent-color);
+            color: var(--text-primary);
+        }
+
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
-        /* Transcript & Line Numbers */
         #transcript-wrapper {
             position: relative;
             display: flex;
@@ -456,17 +647,37 @@
             background-color: transparent !important;
         }
 
-        /* แก้ไข Highlight ใน Transcript ให้แสดงสีถูกต้อง */
         #transcript-overlay span { color: transparent; }
         #transcript-overlay span[style*="color:"] { 
              color: revert !important; 
              -webkit-text-fill-color: revert !important;
         }
 
-        /* --- Meeting Mode (โหมดประชุม/โฟกัส) --- */
-        #app-container.meeting-mode #main-container {
+        #app-container.seating-mode {
             flex-direction: column;
         }
+
+        #app-container.seating-mode #seating-panel {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            max-height: 55vh;
+            overflow-y: auto;
+        }
+
+        #app-container.seating-mode #main-container {
+            flex: 1;
+            min-height: 0;
+        }
+
+        #app-container.seating-mode #left-panel {
+            display: none;
+        }
+        #app-container.seating-mode #resizer {
+            display: none !important;
+        }
+
+        #app-container.meeting-mode #main-container { flex-direction: column; }
         #app-container.meeting-mode #left-panel {
             overflow-y: hidden;
             overflow-x: hidden;
@@ -475,11 +686,7 @@
             width: 100%;
             padding-right: 0; 
         }
-        #app-container.meeting-mode #left-panel > div:first-child {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
+        #app-container.meeting-mode #left-panel > div:first-child { height: 100%; display: flex; flex-direction: column; }
         #app-container.meeting-mode #participants-grid {
             display: grid !important;
             grid-template-columns: repeat(var(--meeting-cols, 4), minmax(0, 1fr)) !important;
@@ -493,29 +700,13 @@
             padding-bottom: 0.5rem;
             margin-bottom: 0;
         }
-        #app-container.meeting-mode .participant-box {
-            min-width: unset; 
-            flex-shrink: 0;
-            min-height: 65px;
-        }
-        #app-container.meeting-mode #right-panel {
-            flex: 1 1 0 !important;
-            min-height: 0;
-        }
-        #app-container.meeting-mode #resizer {
-            display: none !important;
-        }
+        #app-container.meeting-mode .participant-box { min-width: unset; flex-shrink: 0; min-height: 65px; }
+        #app-container.meeting-mode #right-panel { flex: 1 1 0 !important; min-height: 0; }
+        #app-container.meeting-mode #resizer { display: none !important; }
 
-        /* --- UPDATED MEDIA QUERY FOR TABLET VERTICAL --- */
         @media (max-width: 1024px) {
-            html, body { 
-                height: 100dvh; 
-                overflow: hidden; 
-            }
-            #app-container { 
-                height: 100dvh; 
-                overflow: hidden; 
-            }
+            html, body { height: 100dvh; overflow: hidden; }
+            #app-container { height: 100dvh; overflow: hidden; }
             #main-container { 
                 flex-direction: column; 
                 gap: 1rem; 
@@ -524,15 +715,8 @@
                 -webkit-overflow-scrolling: touch; 
                 padding-bottom: 2rem; 
             }
-            #left-panel, #right-panel { 
-                flex-basis: auto !important; 
-                width: 100%; 
-                padding: 0; 
-                flex-shrink: 0;
-            }
-            #right-panel { 
-                min-height: 50vh; 
-            }
+            #left-panel, #right-panel { flex-basis: auto !important; width: 100%; padding: 0; flex-shrink: 0; }
+            #right-panel { min-height: 50vh; }
             #resizer { display: none; }
         }
     </style>
@@ -550,9 +734,7 @@
                 เข้าใช้งานแบบไม่ระบุตัวตน (Guest)
             </button>
         </div>
-        <p id="domain-error-msg" style="color:#ef4444; font-size:0.875rem; text-align:center; display:none; max-width:400px; line-height:1.5; background:rgba(239,68,68,0.1); padding:1rem; border-radius:8px; border:1px solid rgba(239,68,68,0.3);">
-            <!-- Error message will be injected here -->
-        </p>
+        <p id="domain-error-msg" style="color:#ef4444; font-size:0.875rem; text-align:center; display:none; max-width:400px; line-height:1.5; background:rgba(239,68,68,0.1); padding:1rem; border-radius:8px; border:1px solid rgba(239,68,68,0.3);"></p>
     </div>
 
     <div id="app-container" style="display:none;" class="container mx-auto p-2 md:p-3 flex-col transition-all duration-300">
@@ -584,8 +766,10 @@
                             <button id="download-btn" class="tool-btn">DOWNLOAD</button>
                             
                             <div class="col-span-2 h-px bg-gray-200 dark:bg-zinc-700/50 my-1"></div>
-                            <button id="new-meeting-btn" class="tool-btn">NEW MEETING</button>
-                            <button id="history-btn" class="tool-btn">HISTORY</button>
+                            
+                            <button id="save-meeting-btn" class="tool-btn">SAVE ROOM</button>
+                            <button id="history-btn" class="tool-btn">LOAD ROOM</button>
+                            <button id="new-meeting-btn" class="tool-btn col-span-2">NEW MEETING</button>
 
                             <button id="clear-text-btn" class="tool-btn col-span-2 text-red-400 hover:text-red-300 hover:bg-red-900/20 border-red-900/30">CLEAR TEXT</button>
                             
@@ -600,23 +784,13 @@
                 <span id="user-display" style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text-secondary);letter-spacing:0.03em;"></span>
             </div>
 
-            <!-- Meeting Title -->
             <div class="absolute left-1/2 transform -translate-x-1/2 text-center">
-                <h1 id="meeting-title"
-                    class="text-xl md:text-2xl font-semibold tracking-wide uppercase cursor-pointer hover:opacity-70 transition"
-                    style="color: var(--text-primary);"
-                    title="คลิกเพื่อแก้ชื่อ">
-                    Meeting Notes
-                </h1>
+                <h1 id="meeting-title" class="text-xl md:text-2xl font-semibold tracking-wide uppercase cursor-pointer hover:opacity-70 transition" style="color: var(--text-primary);" title="คลิกเพื่อแก้ชื่อ">Meeting Notes</h1>
             </div>
             
             <div class="flex items-center gap-3">
-                <button id="layout-toggle-btn" class="px-3 py-1 text-xs font-mono border rounded hover:bg-white dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);" title="สลับ Layout">
-                    LAYOUT
-                </button>
-                <button id="ratio-toggle" class="px-3 py-1 text-xs font-mono border rounded hover:bg-white dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);">
-                    AUTO
-                </button>
+                <button id="layout-toggle-btn" class="px-3 py-1 text-xs font-mono border rounded hover:bg-white dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);" title="สลับ Layout">NORMAL</button>
+                <button id="ratio-toggle" class="px-3 py-1 text-xs font-mono border rounded hover:bg-white dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);">AUTO</button>
                 <button id="theme-toggle" class="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-800 transition text-gray-500 dark:text-gray-400">
                     <svg id="theme-icon-light" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                     <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
@@ -627,16 +801,27 @@
 
         <div id="setup-instructions-container"></div>
 
+        <!-- SEATING PLAN PANEL -->
+        <div id="seating-panel">
+            <!-- JS Generated -->
+        </div>
+        
+        <!-- SEATING RESIZER -->
+        <div id="seating-resizer"></div>
+
         <main id="main-container" class="flex flex-grow min-h-0 gap-4">
-            <!-- Left Column: Participants & AI Tools -->
+            <!-- Left Column: Participants -->
             <div id="left-panel" class="flex flex-col gap-4 overflow-y-auto pr-1" style="flex-basis: 33%; min-width: 280px;">
-                <!-- Participants Panel -->
                 <div class="bg-panel p-5 rounded-lg shadow-sm flex-shrink-0">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
-                            Participants
-                        </h2>
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Participants</h2>
                         <div class="flex items-center gap-1 grid-controls">
+                            <!-- ปุ่ม Reorder Mode -->
+                            <button id="reorder-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500" title="Reorder">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                </svg>
+                            </button>
                             <button id="decrease-cols-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500">-</button>
                             <span id="cols-count" class="font-mono text-xs w-6 text-center text-gray-500">2</span>
                             <button id="increase-cols-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500">+</button>
@@ -654,7 +839,7 @@
 
             <!-- Right Column: Transcript Area -->
             <div id="right-panel" class="flex flex-col" style="flex: 1 1 0; min-width: 80px;">
-                 <div style="border: 1px solid var(--border-color); border-radius:0.5rem;" class="p-6 h-full flex flex-col relative overflow-hidden">
+                 <div style="border: 1px solid var(--border-color); border-radius:0.5rem;" class="p-6 h-full flex flex-col relative overflow-hidden mt-4">
                     <div id="save-status" class="absolute bottom-4 right-6 z-10 select-none">
                          <svg class="w-3 h-3 animate-spin hidden" id="save-spinner" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                          <span id="save-text">READY</span>
@@ -666,7 +851,6 @@
                             <div id="transcript-overlay" class="w-full h-full p-4 rounded-lg pointer-events-none overflow-y-auto absolute top-0 left-0 text-transparent whitespace-pre-wrap break-words text-base leading-relaxed font-mono z-0"></div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </main>
@@ -680,7 +864,6 @@
         <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
             <div class="p-5 border-b flex justify-between items-center" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Edit Name</h3><button class="modal-close text-gray-500 hover:text-white transition">&times;</button></div>
             <div class="p-6">
-                <!-- Autocomplete dropdown -->
                 <div style="position:relative;">
                     <input type="text" id="edit-name-input" class="w-full p-3 border rounded-lg bg-transparent focus:ring-1 focus:ring-offset-0" style="border-color: var(--border-color);">
                     <div id="autocomplete-list" style="position:absolute;left:0;right:0;background:var(--bg-panel-solid);border:1px solid var(--border-color);border-radius:0.5rem;max-height:180px;overflow-y:auto;z-index:200;display:none;"></div>
@@ -690,7 +873,6 @@
         </div>
     </div>
     
-    <!-- Save List Modal -->
     <div id="save-list-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
             <div class="p-5 border-b" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Save Group</h3></div>
@@ -704,7 +886,6 @@
         </div>
     </div>
     
-    <!-- Bulk Add Modal -->
     <div id="bulk-add-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
             <div class="p-5 border-b" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Paste List</h3></div>
@@ -719,7 +900,6 @@
         </div>
     </div>
 
-    <!-- Load List Modal -->
     <div id="load-list-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md flex flex-col max-h-[80vh]">
             <div class="p-5 border-b" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Load Group</h3></div>
@@ -732,7 +912,6 @@
         </div>
     </div>
 
-    <!-- Confirm Modal -->
     <div id="confirm-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-[60]">
         <div class="bg-panel rounded-lg shadow-2xl w-full max-w-sm text-center p-6">
             <h3 id="confirm-title" class="text-lg font-bold mb-2">Confirm</h3>
@@ -744,7 +923,6 @@
         </div>
     </div>
     
-    <!-- Alert Modal (Fallback) -->
     <div id="alert-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-[60]">
         <div class="bg-panel rounded-lg shadow-2xl w-full max-w-sm text-center p-6">
             <h3 class="text-lg font-bold mb-2">Notice</h3>
@@ -753,7 +931,6 @@
         </div>
     </div>
 
-    <!-- Meeting History Modal -->
     <div id="history-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-panel rounded-lg shadow-2xl w-full max-w-lg flex flex-col max-h-[80vh]">
             <div class="p-5 border-b flex justify-between items-center" style="border-color: var(--border-color);">
@@ -769,24 +946,22 @@
         </div>
     </div>
 
-    <!-- Save Meeting Modal -->
     <div id="save-meeting-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
             <div class="p-5 border-b" style="border-color: var(--border-color);">
-                <h3 class="text-lg font-bold">Save & New Meeting</h3>
+                <h3 class="text-lg font-bold">Save Room</h3>
             </div>
             <div class="p-6">
-                <p class="text-sm text-gray-500 mb-3">ตั้งชื่อการประชุมครั้งนี้ก่อนเริ่มใหม่</p>
+                <p class="text-sm text-gray-500 mb-3">บันทึกชื่อห้อง</p>
                 <input type="text" id="meeting-title-input" class="w-full p-3 border rounded-lg bg-transparent focus:ring-1 font-mono text-sm" placeholder="เช่น ประชุมคณะกรรมการ 12/05/68" style="border-color: var(--border-color);">
             </div>
             <div class="p-5 border-t flex justify-end gap-3" style="border-color: var(--border-color);">
                 <button id="save-meeting-cancel" class="tool-btn">Cancel</button>
-                <button id="save-meeting-confirm" class="tool-btn bg-white text-black dark:bg-white dark:text-black">Save & Start New</button>
+                <button id="save-meeting-confirm" class="tool-btn bg-white text-black dark:bg-white dark:text-black">Save Room</button>
             </div>
         </div>
     </div>
 
-    <!-- Search Modal -->
     <div id="search-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center p-4 hidden z-[70]" style="padding-top:15vh;">
         <div class="bg-panel rounded-lg shadow-2xl w-full" style="max-width:480px;">
             <div class="p-5 border-b flex justify-between items-center" style="border-color: var(--border-color);">
@@ -802,10 +977,11 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const firebaseConfig = {
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyBe1IRZCwUy-1TlP97RRp5biHCu-surkao",
             authDomain: "my-meeting-notes-dbcb4.firebaseapp.com",
             projectId: "my-meeting-notes-dbcb4",
@@ -832,11 +1008,10 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-container').style.display = 'none';
                 const setupContainer = document.getElementById('setup-instructions-container');
-                setupContainer.innerHTML = `<div class="text-center p-8 bg-red-100 border-2 border-red-500 rounded-lg max-w-3xl mx-auto mt-8"><h2 class="text-2xl font-bold text-red-700 mb-4">⚠️ การตั้งค่ายังไม่สมบูรณ์</h2><p class="text-red-800">คุณยังไม่ได้ตั้งค่า Firebase Configuration (firebaseConfig) ในไฟล์ HTML</p><p class="mt-2 text-gray-700">กรุณาคัดลอกค่า <code>firebaseConfig</code> จากโปรเจกต์ Firebase ของคุณมาวางในโค้ดตามคู่มือที่ให้ไว้ก่อนหน้านี้ เพื่อให้แอปพลิเคชันสามารถทำงานได้</p></div>`;
+                setupContainer.innerHTML = `<div class="text-center p-8 bg-red-100 border-2 border-red-500 rounded-lg max-w-3xl mx-auto mt-8"><h2 class="text-2xl font-bold text-red-700 mb-4">⚠️ การตั้งค่ายังไม่สมบูรณ์</h2><p class="text-red-800">คุณยังไม่ได้ตั้งค่า Firebase Configuration (firebaseConfig)ในไฟล์ HTML</p><p class="mt-2 text-gray-700">กรุณาคัดลอกค่า <code>firebaseConfig</code> จากโปรเจกต์ Firebase ของคุณมาวางในโค้ดตามคู่มือที่ให้ไว้ก่อนหน้านี้ เพื่อให้แอปพลิเคชันสามารถทำงานได้</p></div>`;
                 return;
             }
 
-            // DOM Elements
             const appContainer = document.getElementById('app-container');
             const layoutToggleBtn = document.getElementById('layout-toggle-btn');
             const ratioToggleBtn = document.getElementById('ratio-toggle');
@@ -867,20 +1042,17 @@
             const saveListBtn = document.getElementById('save-list-btn');
             const loadListBtn = document.getElementById('load-list-btn');
             
-            // New UX Elements
             const saveSpinner = document.getElementById('save-spinner');
             const saveText = document.getElementById('save-text');
             const toastContainer = document.getElementById('toast-container');
             const clearTextBtn = document.getElementById('clear-text-btn');
             
-            // Bulk Add Elements
             const bulkAddBtn = document.getElementById('bulk-add-btn');
             const bulkAddModal = document.getElementById('bulk-add-modal');
             const bulkAddTextarea = document.getElementById('bulk-add-textarea');
             const bulkAddConfirmBtn = document.getElementById('bulk-add-confirm');
             const bulkAddCancelBtn = document.getElementById('bulk-add-cancel');
 
-            // Modal Elements
             const allModals = document.querySelectorAll('.modal-overlay');
             const editNameModal = document.getElementById('edit-name-modal');
             const editNameInput = document.getElementById('edit-name-input');
@@ -905,36 +1077,29 @@
             
             let app, auth, db, userId, meetingDocRef;
             let unsubscribeMeeting = null;
-            
-            // Ratio State
-            const ratios = ['Auto', '16:9', '4:3'];
-            let currentRatioIndex = 0;
+        
+        const ratios = ['Auto', '16:9', '4:3'];
+        let currentRatioIndex = 0;
+        let layoutModeIndex = 0; // 0 = Normal, 1 = Focus, 2 = Seating
+        let isReorderMode = false;
 
-            // Layout State
-            let isMeetingMode = false;
-
-            // Undo/Redo State
-            let textHistory = [];
+        let textHistory = [];
             let historyIndex = -1;
             const MAX_HISTORY = 50;
             
-            // Cache ชื่อ
-            let allNamesCache = []; // cache ชื่อทุกกรุ๊ป
+            let allNamesCache = []; 
+            let sttStableText = ''; 
+            let isInterimActive = false; 
 
-            let sttStableText = ''; // เก็บข้อความหลักที่แน่นอนแล้ว
-            let isInterimActive = false; // สถานะว่ากำลังพูดแทรกอยู่หรือไม่
-
-            let meetingStartTime = Date.now(); // เวลาเริ่มสำหรับ Duration Timer
+            let meetingStartTime = Date.now(); 
 
             function hideAllModals() {
                 allModals.forEach(modal => modal.classList.add('hidden'));
             }
 
-            // Update Transcript Highlight
             function updateTranscriptHighlight() {
                 if (!transcriptOverlay) return;
                 
-                // ถ้าไม่มีคนที่มีสีเลย ไม่ต้องทำอะไร
                 const coloredParticipants = participants.filter(p => p.name && p.color);
                 if (coloredParticipants.length === 0) {
                     if (transcriptOverlay.innerHTML !== '') transcriptOverlay.innerHTML = '';
@@ -968,6 +1133,11 @@
                 app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
+
+                // Priority custom token login for the environment
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    signInWithCustomToken(auth, __initial_auth_token).catch(e => console.error("Custom token error", e));
+                }
             } catch (error) {
                 console.error("Firebase Initialization Error:", error);
                 showToast("การตั้งค่า Firebase ไม่ถูกต้อง", "error");
@@ -979,25 +1149,21 @@
             let nextId = 1;
             let columnCount = 2;
             let sortableInstance = null;
-            let searchState = { term: '', matches: [], currentIndex: -1 };
 
-            // Auth Logic สำหรับ Google Sign-in และ Guest Fallback
             const provider = new GoogleAuthProvider();
 
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     userId = user.uid;
-                    // แสดงชื่อบัญชีใน header
                     const displayName = user.displayName || user.email || 'User';
                     document.getElementById('user-display').textContent = displayName;
                     
-                    initializeLogic(); // เริ่มโหลดข้อมูลการประชุมของผู้ใช้
+                    initializeLogic(); 
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('app-container').style.display = 'flex';
                 } else {
                     document.getElementById('app-container').style.display = 'none';
                     document.getElementById('login-screen').style.display = 'flex';
-                    // Optional: Clear active subscriptions if signing out
                     if(unsubscribeMeeting) unsubscribeMeeting();
                 }
             });
@@ -1008,7 +1174,6 @@
                     await signInWithPopup(auth, provider);
                 } catch (e) {
                     console.error("Login Error:", e);
-                    // ตรวจจับ Error: Unauthorized Domain
                     if (e.code === 'auth/unauthorized-domain') {
                         const currentDomain = window.location.hostname || "โดเมนปัจจุบัน";
                         const errorMsg = document.getElementById('domain-error-msg');
@@ -1020,7 +1185,6 @@
                 }
             });
 
-            // ปุ่ม Guest สำหรับเข้าใช้งานเมื่อ Google Sign-in ติดปัญหา Domain 
             document.getElementById('login-guest-btn').addEventListener('click', async () => {
                 try {
                     document.getElementById('domain-error-msg').style.display = 'none';
@@ -1035,7 +1199,6 @@
                 signOut(auth);
             });
 
-            // Meeting title แก้ได้
             function attachTitleEditListener(element) {
                 element.addEventListener('click', function() {
                     const current = this.textContent;
@@ -1056,10 +1219,8 @@
                         h1.title = 'คลิกเพื่อแก้ชื่อ';
                         h1.textContent = input.value.trim() || 'Meeting Notes';
                         input.replaceWith(h1);
-                        // bind event ใหม่
                         attachTitleEditListener(h1);
                         
-                        // บันทึกลง Firestore
                         if (meetingDocRef) {
                             updateDoc(meetingDocRef, { meetingTitle: h1.textContent }).catch(() => {});
                         }
@@ -1073,10 +1234,10 @@
             }
             attachTitleEditListener(document.getElementById('meeting-title'));
 
-
             function initializeLogic() {
+                if (!userId) return;
                 const docId = 'shared_meeting_notes';
-                meetingDocRef = doc(db, 'users', userId, 'meetings', docId);
+                meetingDocRef = doc(db, 'artifacts', appId, 'users', userId, 'meetings', docId);
 
                 initSortable();
 
@@ -1084,26 +1245,29 @@
                     if (docSnap.exists()) {
                         const data = docSnap.data();
                         
-                        // โหลดชื่อจาก Firestore
                         if (data.meetingTitle) {
-                            const titleEl = document.getElementById('meeting-title');
-                            // ตรวจสอบว่าเป็น H1 เพื่อไม่ให้เขียนทับตอนที่ผู้ใช้กำลังพิมพ์ (Input)
-                            if (titleEl && titleEl.tagName === 'H1') {
-                                titleEl.textContent = data.meetingTitle;
-                            }
+                        const titleEl = document.getElementById('meeting-title');
+                        if (titleEl && titleEl.tagName === 'H1') {
+                            titleEl.textContent = data.meetingTitle;
                         }
-                        
-                        // Update participants if changed
-                        if (JSON.stringify(participants) !== JSON.stringify(data.participants)) {
-                            participants = data.participants || [
-                                { id: 1, name: 'ประธาน' },
-                                { id: 2, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
-                                { id: 3, name: 'ผู้ชี้แจง' }
-                            ];
-                            renderParticipants();
-                        }
-                        
-                        const maxId = participants.reduce((max, p) => p.id > max ? p.id : max, 0);
+                    }
+                    
+                    if (JSON.stringify(participants) !== JSON.stringify(data.participants)) {
+                        participants = data.participants || [
+                            { id: 1, name: 'ประธาน' },
+                            { id: 2, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
+                            { id: 3, name: 'ผู้ชี้แจง' }
+                        ];
+                        renderParticipants();
+                    }
+
+                    // โหลด seating layout ถ้ามี
+                    if (data.seatingLayout) {
+                        seatingLayout = { ...seatingLayout, ...data.seatingLayout };
+                        if (layoutModeIndex === 2) renderSeatingPanel();
+                    }
+                    
+                    const maxId = participants.reduce((max, p) => p.id > max ? p.id : max, 0);
                         nextId = maxId + 1;
                         
                         const serverTranscript = data.transcript || '';
@@ -1111,11 +1275,11 @@
                         if (document.activeElement !== transcriptTextarea) {
                              if(transcriptTextarea.value !== serverTranscript) {
                                  transcriptTextarea.value = serverTranscript;
-                                 sttStableText = serverTranscript; // Sync กับข้อมูล Server
+                                 sttStableText = serverTranscript;
                                  if (textHistory.length === 0) {
                                      saveToHistory(serverTranscript);
                                  }
-                                 updateTranscriptHighlight(); // Update highlight
+                                 updateTranscriptHighlight(); 
                              }
                         } else if (textHistory.length === 0 && serverTranscript) {
                              saveToHistory(serverTranscript);
@@ -1139,7 +1303,7 @@
                     }
                 }, (error) => {
                     console.error("Firestore Snapshot Error: ", error);
-                    if (error.code === 'permission-denied') return; // Stop the retry loop
+                    if (error.code === 'permission-denied') return; 
                     showToast("Connection lost — reconnecting…", "error");
                     setTimeout(() => {
                         if (unsubscribeMeeting) unsubscribeMeeting();
@@ -1148,15 +1312,12 @@
                 });
 
                 updateColumnLayout(getInitialColumnCount());
-                
-                // โหลด cache เมื่อเริ่มต้นการทำงาน
                 loadAllNamesCache();
             }
             
-            // โหลดและแคชชื่อทั้งหมด
             async function loadAllNamesCache() {
                 try {
-                    const snap = await getDocs(collection(db, 'users', userId, 'participant_lists'));
+                    const snap = await getDocs(collection(db, 'artifacts', appId, 'users', userId, 'participant_lists'));
                     const nameSet = new Set();
                     snap.forEach(d => {
                         (d.data().participants || []).forEach(p => nameSet.add(p.name));
@@ -1167,7 +1328,6 @@
                 }
             }
             
-            // --- Toast Logic ---
             function showToast(message, type = 'info') {
                 const toast = document.createElement('div');
                 toast.className = `toast ${type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : 'toast-info'}`;
@@ -1192,7 +1352,6 @@
                 }, 3000);
             }
 
-            // --- Undo/Redo Logic ---
             function saveToHistory(text) {
                 if (historyIndex >= 0 && textHistory[historyIndex] === text) return;
 
@@ -1226,7 +1385,7 @@
                     sttStableText = prevText;
                     updateUndoRedoButtons();
                     debouncedSave(); 
-                    updateTranscriptHighlight(); // Update highlight
+                    updateTranscriptHighlight(); 
                 }
             });
 
@@ -1239,7 +1398,7 @@
                     sttStableText = nextText;
                     updateUndoRedoButtons();
                     debouncedSave();
-                    updateTranscriptHighlight(); // Update highlight
+                    updateTranscriptHighlight(); 
                 }
             });
             
@@ -1255,10 +1414,10 @@
                     isInterimActive = false;
                     transcriptTextarea.value = '';
                     sttStableText = '';
-                    saveToHistory(''); // Save empty state
+                    saveToHistory(''); 
                     
                     debouncedSave();
-                    updateTranscriptHighlight(); // Update highlight
+                    updateTranscriptHighlight(); 
                     hideAllModals();
                     showToast("Transcript cleared", "success");
                 };
@@ -1267,7 +1426,7 @@
 
             let historyTimeout;
             transcriptTextarea.addEventListener('input', () => {
-                sttStableText = transcriptTextarea.value; // ยึดข้อความที่พิมพ์เป็นหลัก
+                sttStableText = transcriptTextarea.value; 
 
                 clearTimeout(historyTimeout);
                 historyTimeout = setTimeout(() => {
@@ -1277,7 +1436,6 @@
                 debouncedSave();
                 transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
                 
-                // จุดที่ 4: Update Transcript Highlight
                 updateTranscriptHighlight();
             });
 
@@ -1297,9 +1455,10 @@
                     animation: 150,
                     ghostClass: 'sortable-ghost',
                     dragClass: 'sortable-drag',
-                    delay: 200,
+                    delay: 0,
                     delayOnTouchOnly: true,
                     touchStartThreshold: 8,
+                    disabled: !isReorderMode,
                     onEnd: (evt) => {
                         const { oldIndex, newIndex } = evt;
                         const [movedItem] = participants.splice(oldIndex, 1);
@@ -1309,8 +1468,24 @@
                 });
             }
 
+            // ── REORDER BUTTON ──
+            document.getElementById('reorder-btn').addEventListener('click', () => {
+                isReorderMode = !isReorderMode;
+                
+                if (sortableInstance) {
+                    sortableInstance.option('disabled', !isReorderMode);
+                }
+                
+                const reorderBtn = document.getElementById('reorder-btn');
+                reorderBtn.style.color = isReorderMode ? 'var(--accent-color)' : '';
+                reorderBtn.style.borderColor = isReorderMode ? 'var(--accent-color)' : '';
+                
+                showToast(isReorderMode ? 'โหมดเรียงลำดับ — ลากได้เลย' : 'ออกจากโหมดเรียงลำดับ', 'info');
+            });
+
             async function saveStateToFirestore() {
                 if (!meetingDocRef) return;
+                if (!userId) return;
                 
                 saveSpinner.classList.remove('hidden');
                 saveText.textContent = "SAVING";
@@ -1351,6 +1526,102 @@
                 };
             };
             const debouncedSave = debounce(saveStateToFirestore, 1000); 
+
+            // ── COLOR PICKER POPUP (Global) ──
+            function showColorPicker(e, p) {
+                document.querySelectorAll('.color-picker-popup').forEach(el => el.remove());
+
+                const popup = document.createElement('div');
+                popup.className = 'color-picker-popup';
+
+                let targetEl = e.target;
+                if (e.touches && e.touches.length > 0) {
+                    targetEl = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY) || e.target;
+                }
+                const btnRect = targetEl.getBoundingClientRect();
+                const finalTop = btnRect.top - 90 < 60 ? btnRect.bottom + 8 : btnRect.top - 90;
+                popup.style.top = `${finalTop}px`;
+                popup.style.left = `${Math.max(8, btnRect.left - 50)}px`;
+
+                PRESET_COLORS.forEach(color => {
+                    const dot = document.createElement('div');
+                    dot.className = 'color-dot';
+                    dot.dataset.color = color;
+                    if (p.color === color) dot.classList.add('selected');
+                    dot.style.background = color;
+                    popup.appendChild(dot);
+                });
+
+                const clearDot = document.createElement('div');
+                clearDot.className = 'color-dot';
+                clearDot.dataset.color = 'clear';
+                clearDot.style.cssText = 'background:transparent;border:2px dashed var(--text-secondary);';
+                popup.appendChild(clearDot);
+                document.body.appendChild(popup);
+
+                let cleanup;
+
+                // ฟังก์ชันสำหรับการเลือกสี
+                const applyColor = (target) => {
+                    if (!target || !target.classList.contains('color-dot')) return false;
+                    const color = target.dataset.color;
+                    if (color === 'clear') {
+                        delete p.color;
+                    } else {
+                        p.color = color;
+                    }
+                    cleanup();
+                    renderParticipants();
+                    saveStateToFirestore();
+                    return true;
+                };
+
+                // รองรับการกดค้างแล้วลากไปปล่อยนิ้วที่สี (Drag & Release)
+                const onPointerUpOrTouchEnd = (ev) => {
+                    let clientX, clientY;
+                    if (ev.type.startsWith('touch') && ev.changedTouches && ev.changedTouches.length > 0) {
+                        clientX = ev.changedTouches[0].clientX;
+                        clientY = ev.changedTouches[0].clientY;
+                    } else if (ev.clientX !== undefined && ev.clientY !== undefined) {
+                        clientX = ev.clientX;
+                        clientY = ev.clientY;
+                    } else {
+                        return;
+                    }
+
+                    const target = document.elementFromPoint(clientX, clientY);
+                    if (applyColor(target)) {
+                        if (ev.cancelable) ev.preventDefault();
+                    }
+                };
+
+                // การกดพื้นที่ว่างเพื่อปิด
+                const onClickGlobal = (ev) => {
+                    if (!popup.contains(ev.target)) {
+                        cleanup();
+                    }
+                };
+
+                // รองรับการแตะปกติในกล่องสี
+                popup.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    applyColor(ev.target);
+                });
+
+                cleanup = () => {
+                    popup.remove();
+                    document.removeEventListener('pointerup', onPointerUpOrTouchEnd);
+                    document.removeEventListener('touchend', onPointerUpOrTouchEnd);
+                    document.removeEventListener('click', onClickGlobal, true);
+                };
+
+                // แนบ Event Listener (ใช้ Timeout เผื่อเลี่ยง event ที่ตกค้างจากการเปิด)
+                setTimeout(() => {
+                    document.addEventListener('pointerup', onPointerUpOrTouchEnd);
+                    document.addEventListener('touchend', onPointerUpOrTouchEnd, { passive: false });
+                    document.addEventListener('click', onClickGlobal, true);
+                }, 100);
+            }
             
             function renderParticipants() {
                 participantsGrid.innerHTML = '';
@@ -1368,13 +1639,11 @@
                     nameElement.className = 'font-bold text-sm w-full uppercase tracking-wide pointer-events-none px-1 leading-snug custom-line-clamp-2';
                     nameElement.textContent = p.name;
                     
-                    // Edit Icon (Pencil) - Bottom Right
                     const editIcon = document.createElement('div');
                     editIcon.className = 'card-action-icon edit-icon';
                     editIcon.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>';
                     editIcon.title = "Edit Name";
                     
-                    // Delete Icon (X) - Top Right
                     const deleteIcon = document.createElement('div');
                     deleteIcon.className = 'card-action-icon delete-icon';
                     deleteIcon.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
@@ -1384,117 +1653,72 @@
                     box.appendChild(nameElement);
                     box.appendChild(editIcon);
 
-                    // สีของการ์ด: กรอบทั้งหมด + สีจางในการ์ด
                     if (p.color) {
                         box.style.borderColor = p.color;
                         box.style.boxShadow = `inset 0 0 0 1px ${p.color}`;
-                        box.style.background = `${p.color}0A`; // เปลี่ยนจาก 18 เป็น 0A เพื่อให้จางลงอีก (~4% opacity)
+                        box.style.background = `${p.color}0A`; 
                     } else {
                         box.style.borderColor = '';
                         box.style.boxShadow = '';
                         box.style.background = '';
                     }
 
-                    // Color picker button
-                    const colorBtn = document.createElement('div');
-                    colorBtn.className = 'card-action-icon';
-                    colorBtn.style.cssText = 'bottom:2px;left:2px;top:auto;right:auto;';
-                    colorBtn.innerHTML = '<svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>';
-                    if (p.color) colorBtn.style.color = p.color;
-                    box.appendChild(colorBtn);
-
-                    // Color picker popup
-                    colorBtn.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        document.querySelectorAll('.color-picker-popup').forEach(el => el.remove());
-                        
-                        const popup = document.createElement('div');
-                        popup.className = 'color-picker-popup';
-
-                        const btnRect = colorBtn.getBoundingClientRect();
-                        const popupTop = btnRect.top - 90;
-                        const popupLeft = btnRect.left - 50;
-                        const finalTop = popupTop < 60 ? btnRect.bottom + 8 : popupTop;
-                        
-                        popup.style.top = `${finalTop}px`;
-                        popup.style.left = `${Math.max(8, popupLeft)}px`;
-                        
-                        PRESET_COLORS.forEach(color => {
-                            const dot = document.createElement('div');
-                            dot.className = 'color-dot';
-                            if (p.color === color) dot.classList.add('selected');
-                            dot.style.background = color;
-                            dot.addEventListener('click', (ev) => {
-                                ev.preventDefault();
-                                ev.stopPropagation();
-                                p.color = color;
-                                popup.remove();
-                                renderParticipants();
-                                saveStateToFirestore();
-                            });
-                            popup.appendChild(dot);
-                        });
-                        
-                        const clearDot = document.createElement('div');
-                        clearDot.className = 'color-dot';
-                        clearDot.style.cssText = 'background:transparent;border:2px dashed var(--text-secondary);';
-                        clearDot.title = 'ล้างสี';
-                        clearDot.addEventListener('click', (ev) => {
-                            ev.preventDefault();
-                            ev.stopPropagation();
-                            delete p.color;
-                            popup.remove();
-                            renderParticipants();
-                            saveStateToFirestore();
-                        });
-                        popup.appendChild(clearDot);
-                        
-                        document.body.appendChild(popup);
-                        
-                        setTimeout(() => {
-                            document.addEventListener('click', () => popup.remove(), { once: true });
-                        }, 0);
-                    });
-                    
                     let startX = 0;
                     let startY = 0;
                     let isDragging = false;
                     const dragThreshold = 10;
+                    let pressTimer = null;
 
                     box.addEventListener('pointerdown', (e) => {
+                        if (e.target.closest('.card-action-icon')) return;
                         startX = e.clientX;
                         startY = e.clientY;
                         isDragging = false;
+                        
+                        pressTimer = setTimeout(() => {
+                            if (!isDragging) {
+                                showColorPicker(e, p);
+                            }
+                        }, 600);
                     });
-                    
+
+                    box.addEventListener('pointerup', () => {
+                        clearTimeout(pressTimer);
+                    });
+
+                    box.addEventListener('pointercancel', () => {
+                        clearTimeout(pressTimer);
+                    });
+
                     box.addEventListener('pointermove', (e) => {
                         if (!isDragging) {
                             const dx = Math.abs(e.clientX - startX);
                             const dy = Math.abs(e.clientY - startY);
                             if (dx > dragThreshold || dy > dragThreshold) {
                                 isDragging = true;
+                                clearTimeout(pressTimer); 
                             }
                         }
                     });
-                    
-                    // ใช้ click แทน pointerup เพราะเบราว์เซอร์มือถือ (โดยเฉพาะ Android) มองว่า click 
-                    // เป็น User Gesture ที่ปลอดภัยสำหรับการสั่ง .focus() เพื่อเรียกคีย์บอร์ด
+
+                    box.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                    });
+
                     box.addEventListener('click', (e) => {
                         if (isDragging) return;
                         if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
+                        if (document.querySelector('.color-picker-popup')) return; 
                         handleParticipantSelect(p.id);
                     });
 
-                    // เสริมการโฟกัสล่วงหน้าใน touchend เพื่อให้คีย์บอร์ดเด้งไวขึ้นบนแท็บเล็ตบางรุ่น
                     box.addEventListener('touchend', (e) => {
                         if (isDragging) return;
                         if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
+                        if (document.querySelector('.color-picker-popup')) return;
                         transcriptTextarea.focus();
                     }, { passive: true });
 
-                    // Icon clicks handle actions (เปลี่ยนจาก pointerdown เป็น click ทั้งหมด)
                     editIcon.addEventListener('click', (e) => { 
                         e.preventDefault();
                         e.stopPropagation(); 
@@ -1511,23 +1735,17 @@
                 });
                 if (!sortableInstance) initSortable();
                 
-                // จุดที่ 4: เรียกหลัง renderParticipants
                 updateTranscriptHighlight();
             }
             
             function updateColumnLayout(newCount) {
                 columnCount = newCount;
                 colsCountSpan.textContent = columnCount;
-                
-                // สำหรับโหมดปกติ
                 participantsGrid.className = `grid gap-3 grid-cols-${columnCount} mb-4`;
-                
-                // สำหรับโหมดประชุม (Meeting Mode)
                 document.documentElement.style.setProperty('--meeting-cols', columnCount);
             }
             
             function handleParticipantSelect(id) {
-                // เคลียร์ interim ก่อนแทรกชื่อ
                 if (isInterimActive) {
                     transcriptTextarea.value = sttStableText;
                     isInterimActive = false;
@@ -1535,7 +1753,6 @@
 
                 activeParticipantId = id;
                 
-                // แทน renderParticipants() ด้วยการ swap class เฉยๆ เพื่อป้องกัน DOM re-render
                 document.querySelectorAll('.participant-box').forEach(box => {
                     box.classList.toggle('active', parseInt(box.dataset.id) === id);
                 });
@@ -1552,13 +1769,12 @@
                     : `${currentText}${textToInsert.trimStart()}`;
                 
                 transcriptTextarea.value = newText;
-                sttStableText = newText; // อัปเดต text หลัก
+                sttStableText = newText; 
                 
                 saveToHistory(newText);
                 debouncedSave();
-                updateTranscriptHighlight(); // Update highlight
+                updateTranscriptHighlight(); 
 
-                // คืน focus ให้ textarea และเลื่อนลงล่างสุดเพื่อให้แป้นพิมพ์ค้างอยู่
                 transcriptTextarea.focus();
                 transcriptTextarea.setSelectionRange(transcriptTextarea.value.length, transcriptTextarea.value.length);
                 transcriptTextarea.scrollTop = transcriptTextarea.scrollHeight;
@@ -1575,7 +1791,6 @@
                 }
             }
 
-            // Autocomplete ตอนแก้ชื่อในการ์ด
             document.getElementById('edit-name-input').addEventListener('input', function() {
                 const val = this.value.trim().toLowerCase();
                 const list = document.getElementById('autocomplete-list');
@@ -1589,7 +1804,7 @@
                     const item = document.createElement('div');
                     item.textContent = name;
                     item.style.cssText = 'padding:0.6rem 1rem;cursor:pointer;font-size:0.82rem;border-bottom:1px solid var(--border-color);';
-                    item.addEventListener('click', (e) => { // เปลี่ยนเป็น click
+                    item.addEventListener('click', (e) => { 
                         e.preventDefault();
                         document.getElementById('edit-name-input').value = name;
                         list.style.display = 'none';
@@ -1601,8 +1816,7 @@
                 list.style.display = 'block';
             });
 
-            // ปิด dropdown เมื่อคลิกที่อื่น
-            document.addEventListener('click', (e) => { // เปลี่ยนเป็น click
+            document.addEventListener('click', (e) => { 
                 if (!e.target.closest('#edit-name-modal')) {
                     const list = document.getElementById('autocomplete-list');
                     if (list) list.style.display = 'none';
@@ -1658,7 +1872,7 @@
             });
             
             saveListBtn.addEventListener('click', () => {
-                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
+                toolsDropdown.classList.add('hidden'); 
                 if (participants.length === 0) {
                     showToast("No participants to save", "info");
                     return;
@@ -1673,8 +1887,9 @@
                     showToast("Please enter a name", "error");
                     return;
                 }
+                if (!userId) return;
                 try {
-                    const listRef = collection(db, 'users', userId, 'participant_lists');
+                    const listRef = collection(db, 'artifacts', appId, 'users', userId, 'participant_lists');
                     await addDoc(listRef, {
                         name: listName,
                         participants: participants,
@@ -1682,7 +1897,7 @@
                     });
                     hideAllModals();
                     showToast(`Group "${listName}" saved`, "success");
-                    await loadAllNamesCache(); // รีโหลด cache หลัง save group ใหม่
+                    await loadAllNamesCache(); 
                 } catch (error) {
                     console.error("Error saving list:", error);
                     showToast("Error saving group", "error");
@@ -1690,12 +1905,13 @@
             });
 
             loadListBtn.addEventListener('click', async () => {
-                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
+                toolsDropdown.classList.add('hidden'); 
                 loadListModal.classList.remove('hidden');
                 savedListsContainer.innerHTML = '<p class="text-center text-gray-500 font-mono text-sm">Loading...</p>';
+                if (!userId) return;
                 
                 try {
-                    const listRef = collection(db, 'users', userId, 'participant_lists');
+                    const listRef = collection(db, 'artifacts', appId, 'users', userId, 'participant_lists');
                     const q = query(listRef, orderBy('createdAt', 'desc'));
                     const querySnapshot = await getDocs(q);
                     
@@ -1760,23 +1976,26 @@
             }
 
             async function deleteGroupAction(docId, elementToRemove) {
-                if(confirm("Delete this group permanently?")) {
+                confirmTitle.textContent = "Delete Group";
+                confirmMessage.textContent = "Delete this group permanently?";
+                confirmOkBtn.onclick = async () => {
                     try {
-                        await deleteDoc(doc(db, 'users', userId, 'participant_lists', docId));
+                        if (!userId) return;
+                        await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'participant_lists', docId));
                         elementToRemove.remove();
                         if (savedListsContainer.children.length === 0) {
                             savedListsContainer.innerHTML = '<p class="text-center text-gray-500">No saved groups</p>';
                         }
+                        hideAllModals();
                     } catch(error) {
                          console.error("Error deleting list:", error);
                          showToast("Failed to delete", "error");
                     }
-                }
+                };
+                confirmModal.classList.remove('hidden');
             }
 
-
             transcriptTextarea.addEventListener('scroll', () => {
-                // Sync Overlay
                 transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
             });
             
@@ -1788,9 +2007,8 @@
                 saveStateToFirestore();
             });
             
-            // Bulk Add Logic
             bulkAddBtn.addEventListener('click', () => {
-                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
+                toolsDropdown.classList.add('hidden'); 
                 bulkAddTextarea.value = '';
                 bulkAddModal.classList.remove('hidden');
                 bulkAddTextarea.focus();
@@ -1910,14 +2128,21 @@
             copyAllBtn.addEventListener('click', () => {
                 const textToCopy = transcriptTextarea.value;
                 if (textToCopy.trim() === '') { showToast('Nothing to copy', 'info'); return; }
-                navigator.clipboard.writeText(textToCopy).then(() => {
+                
+                // Fallback for iframe execution
+                const textAreaFallback = document.createElement("textarea");
+                textAreaFallback.value = textToCopy;
+                document.body.appendChild(textAreaFallback);
+                textAreaFallback.select();
+                try {
+                    document.execCommand('copy');
                     showToast('Copied to clipboard', 'success');
-                }, () => {
+                } catch (err) {
                     showToast('Copy failed', 'error');
-                });
+                }
+                document.body.removeChild(textAreaFallback);
             });
 
-            // ── HORIZONTAL RESIZER (Meeting Mode) ──
             let isHResizing = false;
             const hResizer = document.getElementById('horizontal-resizer');
 
@@ -1949,6 +2174,475 @@
                 document.removeEventListener('touchend', stopHResizing);
             };
 
+            // ── SEATING RESIZER LOGIC ──
+            const seatingResizer = document.getElementById('seating-resizer');
+            let isSeatingResizing = false;
+
+            const handleSeatingMouseMove = (e) => {
+                if (!isSeatingResizing) return;
+                const event = e.touches ? e.touches[0] : e;
+                const sPanel = document.getElementById('seating-panel');
+                const panelTop = sPanel.getBoundingClientRect().top;
+                
+                let newHeight = event.clientY - panelTop;
+                const minHeight = 120; 
+                const maxHeight = window.innerHeight * 0.75; // กันไม่ให้ดึงทับจอจนมิด
+                newHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
+                
+                sPanel.style.maxHeight = 'none'; // ยกเลิก css max-height เดิม
+                sPanel.style.height = `${newHeight}px`;
+                sPanel.style.flexBasis = `${newHeight}px`;
+            };
+
+            const stopSeatingResizing = () => {
+                isSeatingResizing = false;
+                seatingResizer.classList.remove('resizing');
+                document.removeEventListener('mousemove', handleSeatingMouseMove);
+                document.removeEventListener('mouseup', stopSeatingResizing);
+                document.removeEventListener('touchmove', handleSeatingMouseMove);
+                document.removeEventListener('touchend', stopSeatingResizing);
+            };
+
+            // ── SEATING PLAN ──
+            let seatingLayout = {
+            chairmanSide: 'left',   // 'left' | 'right'
+            rowsTop: 2,             // 1-4
+            rowsBottom: 2,          // 1-4
+            seatsPerRow: 8,         // 1-18
+            seatHeight: 44,         // 32-80
+            seats: {}               // key: "top-0-0" value: participantId | null
+        };
+        let isDragMode = false;
+        let dragSourceKey = null;
+
+        const seatingPanel = document.getElementById('seating-panel');
+
+        // โหลด seating จาก Firestore
+            async function loadSeatingLayout() {
+                if (!meetingDocRef) return;
+                try {
+                    const snap = await getDoc(meetingDocRef);
+                    if (snap.exists() && snap.data().seatingLayout) {
+                        seatingLayout = { ...seatingLayout, ...snap.data().seatingLayout };
+                    }
+                } catch(e) { console.error('Seating load error', e); }
+            }
+
+            async function saveSeatingLayout() {
+                if (!meetingDocRef) return;
+                try {
+                    await updateDoc(meetingDocRef, { seatingLayout });
+                } catch(e) { console.error('Seating save error', e); }
+            }
+
+            function resetSeatingPanelHeight() {
+                seatingPanel.style.height = '';
+                seatingPanel.style.flexBasis = '';
+                seatingPanel.style.maxHeight = '';
+            }
+
+            function renderSeatingPanel() {
+                seatingPanel.innerHTML = '';
+
+                // Controls bar
+                const controls = document.createElement('div');
+                controls.className = 'seating-controls';
+                controls.style.cssText = 'display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem;width:100%;';
+
+                // แถวบน
+                const topGroup = document.createElement('div');
+                topGroup.className = 'seating-control-group';
+                topGroup.innerHTML = `
+                    <span>บน</span>
+                    <button class="seating-ctrl-btn" id="top-minus">−</button>
+                    <span id="top-count">${seatingLayout.rowsTop}</span>
+                    <button class="seating-ctrl-btn" id="top-plus">+</button>
+                `;
+
+                // แถวล่าง
+                const botGroup = document.createElement('div');
+                botGroup.className = 'seating-control-group';
+                botGroup.innerHTML = `
+                    <span>ล่าง</span>
+                    <button class="seating-ctrl-btn" id="bot-minus">−</button>
+                    <span id="bot-count">${seatingLayout.rowsBottom}</span>
+                    <button class="seating-ctrl-btn" id="bot-plus">+</button>
+                `;
+
+                // ที่นั่งต่อแถว
+                const seatGroup = document.createElement('div');
+                seatGroup.className = 'seating-control-group';
+                seatGroup.innerHTML = `
+                    <span>ที่นั่ง/แถว</span>
+                    <button class="seating-ctrl-btn" id="seat-minus">−</button>
+                    <span id="seat-count">${seatingLayout.seatsPerRow}</span>
+                    <button class="seating-ctrl-btn" id="seat-plus">+</button>
+                `;
+
+                // ขนาดที่นั่ง
+                const sizeGroup = document.createElement('div');
+                sizeGroup.className = 'seating-control-group';
+                sizeGroup.innerHTML = `
+                    <span>ขนาด</span>
+                    <button class="seating-ctrl-btn" id="size-minus">−</button>
+                    <button class="seating-ctrl-btn" id="size-plus">+</button>
+                `;
+
+                // ประธานซ้าย/ขวา
+                const chairBtn = document.createElement('button');
+                chairBtn.className = 'chairman-side-btn';
+                chairBtn.textContent = seatingLayout.chairmanSide === 'left' ? 'ประธาน ← ซ้าย' : 'ประธาน → ขวา';
+                chairBtn.addEventListener('click', () => {
+                    seatingLayout.chairmanSide = seatingLayout.chairmanSide === 'left' ? 'right' : 'left';
+                    saveSeatingLayout();
+                    resetSeatingPanelHeight();
+                    renderSeatingPanel();
+                });
+
+                // Drag mode
+                const dragBtn = document.createElement('button');
+                dragBtn.className = `drag-mode-btn ${isDragMode ? 'active' : ''}`;
+                dragBtn.textContent = isDragMode ? '✦ DRAG ON' : 'DRAG';
+                dragBtn.addEventListener('click', () => {
+                    isDragMode = !isDragMode;
+                    seatingPanel.classList.toggle('drag-mode', isDragMode);
+                    renderSeatingPanel();
+                    if (isDragMode) showToast('โหมดลากวาง — ลากชื่อไปวางได้เลย', 'info');
+                    else showToast('ออกจากโหมดลากวาง', 'info');
+                });
+
+                controls.appendChild(topGroup);
+                controls.appendChild(botGroup);
+                controls.appendChild(seatGroup);
+                controls.appendChild(sizeGroup);
+                controls.appendChild(chairBtn);
+                controls.appendChild(dragBtn);
+
+                // ── BUILD LAYOUT ──
+                const tableWrapper = document.createElement('div');
+                tableWrapper.style.cssText = 'display:flex;flex-direction:row;align-items:stretch;gap:6px;flex:1;min-width:0;overflow-x:auto;';
+
+                const chairmanEl = buildChairmanSlot();
+                const tableArea = document.createElement('div');
+                tableArea.style.cssText = 'display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;';
+
+                // แถวบน
+                for (let r = 0; r < seatingLayout.rowsTop; r++) {
+                    tableArea.appendChild(buildRow('top', r));
+                }
+
+                // โต๊ะ
+                const divider = document.createElement('div');
+                divider.className = 'table-divider';
+                tableArea.appendChild(divider);
+
+                // แถวล่าง
+                for (let r = 0; r < seatingLayout.rowsBottom; r++) {
+                    tableArea.appendChild(buildRow('bottom', r));
+                }
+
+                if (seatingLayout.chairmanSide === 'left') {
+                    tableWrapper.appendChild(chairmanEl);
+                    tableWrapper.appendChild(tableArea);
+                } else {
+                    tableWrapper.appendChild(tableArea);
+                    tableWrapper.appendChild(chairmanEl);
+                }
+
+                seatingPanel.appendChild(controls);
+                seatingPanel.appendChild(tableWrapper);
+
+                // Control events
+                seatingPanel.querySelector('#top-minus').addEventListener('click', () => {
+                    if (seatingLayout.rowsTop > 1) { seatingLayout.rowsTop--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
+                });
+                seatingPanel.querySelector('#top-plus').addEventListener('click', () => {
+                    if (seatingLayout.rowsTop < 4) { seatingLayout.rowsTop++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
+                });
+                seatingPanel.querySelector('#bot-minus').addEventListener('click', () => {
+                    if (seatingLayout.rowsBottom > 1) { seatingLayout.rowsBottom--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
+                });
+                seatingPanel.querySelector('#bot-plus').addEventListener('click', () => {
+                    if (seatingLayout.rowsBottom < 4) { seatingLayout.rowsBottom++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
+                });
+                seatingPanel.querySelector('#seat-minus').addEventListener('click', () => {
+                    if (seatingLayout.seatsPerRow > 1) { seatingLayout.seatsPerRow--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
+                });
+                seatingPanel.querySelector('#seat-plus').addEventListener('click', () => {
+                    if (seatingLayout.seatsPerRow < 18) { seatingLayout.seatsPerRow++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
+                });
+                
+                seatingPanel.querySelector('#size-minus').addEventListener('click', () => {
+                    if (seatingLayout.seatHeight > 32) {
+                        seatingLayout.seatHeight -= 8;
+                        saveSeatingLayout();
+                        resetSeatingPanelHeight();
+                        renderSeatingPanel();
+                    }
+                });
+                seatingPanel.querySelector('#size-plus').addEventListener('click', () => {
+                    if (seatingLayout.seatHeight < 80) {
+                        seatingLayout.seatHeight += 8;
+                        saveSeatingLayout();
+                        resetSeatingPanelHeight();
+                        renderSeatingPanel();
+                    }
+                });
+
+                if (isDragMode) seatingPanel.classList.add('drag-mode');
+            }
+
+            function buildChairmanSlot() {
+                const slot = document.createElement('div');
+                slot.className = 'chairman-slot';
+                slot.style.minHeight = `${seatingLayout.seatHeight * 3}px`;
+                const chairId = seatingLayout.seats['chairman'];
+                const chairP = chairId ? participants.find(p => p.id === chairId) : null;
+
+                if (chairP) {
+                    slot.classList.add('filled');
+                    if (chairP.color) {
+                        slot.style.borderColor = chairP.color;
+                        slot.style.background = `${chairP.color}18`;
+                    }
+                    const nameEl = document.createElement('div');
+                    nameEl.className = 'chairman-name';
+                    nameEl.textContent = chairP.name;
+                    slot.appendChild(nameEl);
+                } else {
+                    const emptyEl = document.createElement('div');
+                    emptyEl.className = 'chairman-empty';
+                    emptyEl.textContent = 'ประธาน';
+                    slot.appendChild(emptyEl);
+                }
+
+                slot.dataset.seatKey = 'chairman';
+                setupSeatEvents(slot, 'chairman', chairId);
+                return slot;
+            }
+
+            function buildRow(zone, rowIndex) {
+                const row = document.createElement('div');
+                row.className = 'seating-row';
+
+                for (let c = 0; c < seatingLayout.seatsPerRow; c++) {
+                    const key = `${zone}-${rowIndex}-${c}`;
+                    const pId = seatingLayout.seats[key];
+                    const p = pId ? participants.find(x => x.id === pId) : null;
+
+                    const seat = document.createElement('div');
+                    seat.className = 'seat-card';
+                    seat.style.minHeight = `${seatingLayout.seatHeight}px`;
+                    seat.style.height = `${seatingLayout.seatHeight}px`;
+
+                    if (p) {
+                        seat.classList.add('filled');
+                        if (p.color) {
+                            seat.style.borderColor = p.color;
+                            seat.style.background = `${p.color}0A`;
+                        }
+                        if (p.id === activeParticipantId) seat.classList.add('active-speaker');
+                        
+                        const fontSize = seatingLayout.seatHeight < 40 ? '0.55rem' 
+                                       : seatingLayout.seatHeight < 56 ? '0.62rem' 
+                                       : '0.72rem';
+                        const nameEl = document.createElement('div');
+                        nameEl.className = 'seat-name';
+                        nameEl.style.fontSize = fontSize;
+                        nameEl.textContent = p.name;
+                        seat.appendChild(nameEl);
+                    } else {
+                        const icon = document.createElement('div');
+                        icon.className = 'seat-empty-icon';
+                        icon.textContent = '+';
+                        seat.appendChild(icon);
+                    }
+
+                    seat.dataset.seatKey = key;
+                    setupSeatEvents(seat, key, pId);
+                    row.appendChild(seat);
+                }
+                return row;
+            }
+
+            function setupSeatEvents(el, key, currentPId) {
+                if (isDragMode) {
+                    // Drag source
+                    el.addEventListener('pointerdown', (e) => {
+                        if (!currentPId) return;
+                        dragSourceKey = key;
+                        el.style.opacity = '0.5';
+                    });
+
+                    el.addEventListener('pointerup', () => {
+                        el.style.opacity = '';
+                    });
+
+                    // Drop target
+                    el.addEventListener('dragover', (e) => e.preventDefault());
+
+                    el.addEventListener('pointerenter', () => {
+                        if (dragSourceKey && dragSourceKey !== key) {
+                            el.classList.add('drag-over');
+                        }
+                    });
+
+                    el.addEventListener('pointerleave', () => {
+                        el.classList.remove('drag-over');
+                    });
+
+                    // Drop
+                    document.addEventListener('pointerup', function onDrop() {
+                        if (dragSourceKey && dragSourceKey !== key) {
+                            const hoveredEls = document.querySelectorAll('.drag-over');
+                            if (hoveredEls.length > 0) {
+                                // swap
+                                const targetKey = hoveredEls[0].dataset?.seatKey;
+                                if (targetKey) {
+                                    const temp = seatingLayout.seats[dragSourceKey];
+                                    seatingLayout.seats[dragSourceKey] = seatingLayout.seats[targetKey] || null;
+                                    seatingLayout.seats[targetKey] = temp || null;
+                                    if (!seatingLayout.seats[dragSourceKey]) delete seatingLayout.seats[dragSourceKey];
+                                    if (!seatingLayout.seats[targetKey]) delete seatingLayout.seats[targetKey];
+                                    saveSeatingLayout();
+                                    renderSeatingPanel();
+                                }
+                            }
+                        }
+                        dragSourceKey = null;
+                        document.removeEventListener('pointerup', onDrop);
+                    }, { once: true });
+
+                    el.dataset.seatKey = key;
+                } else {
+                    // Normal mode
+                    el.addEventListener('click', () => {
+                        if (currentPId) {
+                            // มีชื่อ → log ใน transcript
+                            handleParticipantSelect(currentPId);
+                        } else {
+                            // ว่าง → เลือกชื่อมาวาง
+                            showSeatAssignPicker(key);
+                        }
+                    });
+
+                    // Long press → clear seat
+                    let pressTimer;
+                    el.addEventListener('pointerdown', () => {
+                        pressTimer = setTimeout(() => {
+                            if (currentPId) {
+                                delete seatingLayout.seats[key];
+                                saveSeatingLayout();
+                                renderSeatingPanel();
+                                showToast('ลบออกจากที่นั่งแล้ว', 'info');
+                            }
+                        }, 800);
+                    });
+                    el.addEventListener('pointerup', () => clearTimeout(pressTimer));
+                    el.addEventListener('pointermove', () => clearTimeout(pressTimer));
+                }
+            }
+
+            function showSeatAssignPicker(key) {
+                // สร้าง popup เลือกชื่อ
+                document.querySelectorAll('.seat-assign-popup').forEach(el => el.remove());
+
+                const popup = document.createElement('div');
+                popup.className = 'seat-assign-popup';
+                popup.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: var(--bg-panel-solid);
+                    border: 1px solid var(--border-color);
+                    border-radius: 16px;
+                    padding: 1rem;
+                    z-index: 200;
+                    width: min(320px, 90vw);
+                    max-height: 60vh;
+                    overflow-y: auto;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+                    backdrop-filter: blur(20px);
+                `;
+
+                const title = document.createElement('p');
+                title.style.cssText = 'font-family:DM Mono,monospace;font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.75rem;letter-spacing:0.05em;';
+                title.textContent = 'เลือกชื่อที่จะวาง';
+                popup.appendChild(title);
+
+                // ปุ่มล้างที่นั่ง
+                const clearBtn = document.createElement('div');
+                clearBtn.style.cssText = 'padding:0.5rem 0.75rem;border-radius:10px;border:1px dashed var(--border-color);cursor:pointer;font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.5rem;text-align:center;';
+                clearBtn.textContent = '— ล้างที่นั่ง —';
+                clearBtn.addEventListener('click', () => {
+                    delete seatingLayout.seats[key];
+                    saveSeatingLayout();
+                    renderSeatingPanel();
+                    popup.remove();
+                    overlay.remove();
+                });
+                popup.appendChild(clearBtn);
+
+                participants.forEach(p => {
+                    const item = document.createElement('div');
+                    item.style.cssText = `
+                        padding: 0.6rem 0.75rem;
+                        border-radius: 10px;
+                        border: 1px solid ${p.color || 'var(--border-color)'};
+                        background: ${p.color ? p.color + '0A' : 'transparent'};
+                        cursor: pointer;
+                        font-size: 0.78rem;
+                        font-weight: 500;
+                        margin-bottom: 0.35rem;
+                        color: var(--text-primary);
+                        transition: all 0.15s;
+                    `;
+                    item.textContent = p.name;
+                    item.addEventListener('click', () => {
+                        seatingLayout.seats[key] = p.id;
+                        saveSeatingLayout();
+                        renderSeatingPanel();
+                        popup.remove();
+                        overlay.remove();
+                    });
+                    popup.appendChild(item);
+                });
+
+                const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
+    overlay.addEventListener('click', () => { popup.remove(); overlay.remove(); });
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(popup);
+}
+
+// Escape ออกจาก drag mode
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isDragMode) {
+                    isDragMode = false;
+                    seatingPanel.classList.remove('drag-mode');
+                    renderSeatingPanel();
+                    showToast('ออกจากโหมดลากวาง', 'info');
+                }
+            });
+
+            seatingResizer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                isSeatingResizing = true;
+                seatingResizer.classList.add('resizing');
+                document.addEventListener('mousemove', handleSeatingMouseMove);
+                document.addEventListener('mouseup', stopSeatingResizing);
+            });
+
+            seatingResizer.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                isSeatingResizing = true;
+                seatingResizer.classList.add('resizing');
+                document.addEventListener('touchmove', handleSeatingMouseMove, { passive: false });
+                document.addEventListener('touchend', stopSeatingResizing);
+            }, { passive: false });
+
             hResizer.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 isHResizing = true;
@@ -1958,40 +2652,97 @@
             });
 
             hResizer.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                isHResizing = true;
-                hResizer.classList.add('resizing');
-                document.addEventListener('touchmove', handleHMouseMove, { passive: false });
-                document.addEventListener('touchend', stopHResizing);
-            }, { passive: false });
+            e.preventDefault();
+            isHResizing = true;
+            hResizer.classList.add('resizing');
+            document.addEventListener('touchmove', handleHMouseMove, { passive: false });
+            document.addEventListener('touchend', stopHResizing);
+        }, { passive: false });
 
-            layoutToggleBtn.addEventListener('click', () => {
-                isMeetingMode = !isMeetingMode;
-                appContainer.classList.toggle('meeting-mode', isMeetingMode);
-                layoutToggleBtn.textContent = isMeetingMode ? 'NORMAL' : 'LAYOUT';
+        layoutToggleBtn.addEventListener('click', async () => {
+            layoutModeIndex = (layoutModeIndex + 1) % 3;
+            appContainer.classList.remove('meeting-mode', 'seating-mode');
+            
+            if (layoutModeIndex === 0) {
+                layoutToggleBtn.textContent = 'NORMAL';
+                layoutToggleBtn.style.color = 'var(--text-secondary)';
+                layoutToggleBtn.style.borderColor = 'var(--border-color)';
                 
-                if (isMeetingMode) {
-                    // คำนวณความสูงให้พอดี 4 แถว
-                    // การ์ดสูงประมาณ 65px + gap 8px = ~73px ต่อแถว
-                    const rowHeight = 73;
-                    const rows = 4;
-                    const padding = 65; // header + padding ของ panel
-                    leftPanel.style.height = `${rowHeight * rows + padding}px`;
-                    leftPanel.style.flexBasis = `${rowHeight * rows + padding}px`;
-                } else {
-                    // รีเซ็ตกลับโหมดปกติ
-                    leftPanel.style.height = '';
-                    leftPanel.style.flexBasis = '33%'; // รีเซ็ตให้กลับมาขนาดปกติ
+                leftPanel.style.height = '';
+                leftPanel.style.flexBasis = '33%';
+                
+                isDragMode = false;
+                showToast('โหมดปกติ', 'info');
+            } else if (layoutModeIndex === 1) {
+                appContainer.classList.add('meeting-mode');
+                layoutToggleBtn.textContent = 'FOCUS';
+                layoutToggleBtn.style.color = 'var(--accent-color)';
+                layoutToggleBtn.style.borderColor = 'var(--accent-color)';
+                
+                const rowHeight = 73;
+                const rows = 4;
+                const padding = 65; 
+                leftPanel.style.height = `${rowHeight * rows + padding}px`;
+                leftPanel.style.flexBasis = `${rowHeight * rows + padding}px`;
+            } else if (layoutModeIndex === 2) {
+                appContainer.classList.add('seating-mode');
+                layoutToggleBtn.textContent = 'SEATING';
+                layoutToggleBtn.style.color = 'var(--accent-color)';
+                layoutToggleBtn.style.borderColor = 'var(--accent-color)';
+
+                await loadSeatingLayout();
+                
+                resetSeatingPanelHeight();
+
+                // ── AUTO-FILL LOGIC ──
+                let layoutChanged = false;
+
+                // 1. ล้างที่นั่งของคนที่ถูกลบออกจากระบบไปแล้ว
+                Object.keys(seatingLayout.seats).forEach(key => {
+                    const pId = seatingLayout.seats[key];
+                    if (!participants.find(p => p.id === pId)) {
+                        delete seatingLayout.seats[key];
+                        layoutChanged = true;
+                    }
+                });
+
+                // 2. สร้างลำดับที่นั่งทั้งหมดที่สามารถนั่งได้
+                const allSeatKeys = ['chairman'];
+                for (let r = 0; r < seatingLayout.rowsTop; r++) {
+                    for (let c = 0; c < seatingLayout.seatsPerRow; c++) {
+                        allSeatKeys.push(`top-${r}-${c}`);
+                    }
+                }
+                for (let r = 0; r < seatingLayout.rowsBottom; r++) {
+                    for (let c = 0; c < seatingLayout.seatsPerRow; c++) {
+                        allSeatKeys.push(`bottom-${r}-${c}`);
+                    }
                 }
 
-                showToast(isMeetingMode ? 'โหมดโฟกัส' : 'โหมดปกติ', 'info');
-                
-                // บังคับให้เบราว์เซอร์คำนวณขนาดและเลื่อนแถบข้อความลงล่างสุดใหม่ เพื่อป้องกันอาการแปลกๆ ของ Flexbox
-                setTimeout(() => { transcriptTextarea.scrollTop = transcriptTextarea.scrollHeight; }, 100);
-            });
+                // 3. เอาคนที่ยังไม่มีที่นั่ง ไปใส่ในที่นั่งว่าง
+                participants.forEach(p => {
+                    const isSeated = Object.values(seatingLayout.seats).includes(p.id);
+                    if (!isSeated) {
+                        const emptyKey = allSeatKeys.find(key => !seatingLayout.seats[key]);
+                        if (emptyKey) {
+                            seatingLayout.seats[emptyKey] = p.id;
+                            layoutChanged = true;
+                        }
+                    }
+                });
 
-            ratioToggleBtn.addEventListener('click', () => {
-                currentRatioIndex = (currentRatioIndex + 1) % ratios.length;
+                if (layoutChanged) {
+                    await saveSeatingLayout();
+                }
+                // ── END AUTO-FILL LOGIC ──
+
+                renderSeatingPanel();
+                showToast('โหมดผังที่นั่ง', 'info');
+            }
+        });
+
+        ratioToggleBtn.addEventListener('click', () => {
+            currentRatioIndex = (currentRatioIndex + 1) % ratios.length;
                 const newRatio = ratios[currentRatioIndex];
                 ratioToggleBtn.textContent = newRatio.toUpperCase();
                 
@@ -2045,29 +2796,26 @@
                 const end = transcriptTextarea.selectionEnd;
                 transcriptTextarea.value = transcriptTextarea.value.substring(0, start) + timeString + transcriptTextarea.value.substring(end);
                 
-                sttStableText = transcriptTextarea.value; // อัปเดต text หลัก
+                sttStableText = transcriptTextarea.value; 
                 saveToHistory(transcriptTextarea.value);
 
                 transcriptTextarea.selectionStart = transcriptTextarea.selectionEnd = start + timeString.length;
                 transcriptTextarea.focus();
                 saveStateToFirestore();
-                updateTranscriptHighlight(); // Update highlight
+                updateTranscriptHighlight(); 
             }
             
-            // Toggle Tools Dropdown Menu
             toolsMenuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 toolsDropdown.classList.toggle('hidden');
             });
 
-            // Close Tools Dropdown when clicking outside
             document.addEventListener('click', (e) => {
                 if (!toolsDropdown.classList.contains('hidden') && !toolsDropdown.contains(e.target) && !toolsMenuBtn.contains(e.target)) {
                     toolsDropdown.classList.add('hidden');
                 }
             });
 
-            // Search Popup + Shortcut
             document.addEventListener('keydown', (e) => {
                 if (e.ctrlKey) {
                     if (e.key === 's') { e.preventDefault(); saveBtn.click(); } 
@@ -2150,8 +2898,8 @@
                 newLeftWidth = Math.max(minLeft, Math.min(newLeftWidth, maxLeft));
                 
                 leftPanel.style.flexBasis = `${newLeftWidth}px`;
-                leftPanel.style.flexGrow = '0';    // ป้องกันการเด้ง
-                leftPanel.style.flexShrink = '0'; // ป้องกันการเด้ง
+                leftPanel.style.flexGrow = '0';    
+                leftPanel.style.flexShrink = '0'; 
             };
             const stopResizing = () => {
                 isResizing = false;
@@ -2180,7 +2928,6 @@
                 const now = new Date();
                 clockDiv.textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 
-                // Duration Timer Update
                 const elapsed = Date.now() - meetingStartTime;
                 const h = Math.floor(elapsed / 3600000).toString().padStart(2, '0');
                 const m = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0');
@@ -2198,13 +2945,12 @@
 
             // ── MEETING HISTORY ──
             const historyModal = document.getElementById('history-modal');
-            const saveMeetingModal = document.getElementById('save-meeting-modal');
-            const meetingTitleInput = document.getElementById('meeting-title-input');
 
             async function saveCurrentMeetingToHistory(title) {
                 if (!transcriptTextarea.value.trim() && participants.length === 0) return;
+                if (!userId) return;
                 try {
-                    const historyRef = collection(db, 'users', userId, 'meeting_history');
+                    const historyRef = collection(db, 'artifacts', appId, 'users', userId, 'meeting_history');
                     await addDoc(historyRef, {
                         title: title || `การประชุม ${new Date().toLocaleDateString('th-TH')}`,
                         transcript: transcriptTextarea.value,
@@ -2218,63 +2964,64 @@
                 }
             }
 
-            document.getElementById('new-meeting-btn').addEventListener('click', () => {
-                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
+            // ── SAVE ROOM BUTTON ──
+            document.getElementById('save-meeting-btn').addEventListener('click', async () => {
+                toolsDropdown.classList.add('hidden');
                 
                 if (!transcriptTextarea.value.trim() && participants.length === 0) {
-                    showToast('ไม่มีข้อมูลการประชุม', 'info');
+                    showToast('ไม่มีข้อมูลให้บันทึก', 'info');
                     return;
                 }
-                meetingTitleInput.value = '';
-                meetingTitleInput.placeholder = `การประชุม ${new Date().toLocaleDateString('th-TH', {day:'numeric', month:'long', year:'numeric'})}`;
-                saveMeetingModal.classList.remove('hidden');
-                meetingTitleInput.focus();
+                
+                const currentTitle = document.getElementById('meeting-title')?.textContent || 'Meeting Notes';
+                await saveCurrentMeetingToHistory(currentTitle);
+                showToast(`บันทึก "${currentTitle}" แล้ว`, 'success');
             });
 
-            document.getElementById('save-meeting-confirm').addEventListener('click', async () => {
-                const title = meetingTitleInput.value.trim() || meetingTitleInput.placeholder;
+            // ── NEW MEETING BUTTON (Clear Room) ──
+            document.getElementById('new-meeting-btn').addEventListener('click', () => {
+                toolsDropdown.classList.add('hidden'); 
                 
-                await saveCurrentMeetingToHistory(title);
-                
-                transcriptTextarea.value = '';
-                sttStableText = '';
-                isInterimActive = false;
-                participants = [];
-                activeParticipantId = null;
-                nextId = 1;
-                textHistory = [];
-                historyIndex = -1;
-                updateUndoRedoButtons();
-                renderParticipants();
-                updateTranscriptHighlight(); // Reset Highlight
-                
-                // Set default meeting title
-                const titleEl = document.getElementById('meeting-title');
-                if (titleEl && titleEl.tagName === 'H1') {
-                    titleEl.textContent = 'Meeting Notes';
-                }
+                confirmTitle.textContent = "New Meeting";
+                confirmMessage.textContent = "Start a new meeting? The current board will be cleared.";
+                confirmOkBtn.onclick = () => {
+                    transcriptTextarea.value = '';
+                    sttStableText = '';
+                    isInterimActive = false;
+                    participants = [];
+                    activeParticipantId = null;
+                    nextId = 1;
+                    textHistory = [];
+                    historyIndex = -1;
+                    updateUndoRedoButtons();
+                    renderParticipants();
+                    updateTranscriptHighlight(); 
+                    
+                    const titleEl = document.getElementById('meeting-title');
+                    if (titleEl && titleEl.tagName === 'H1') {
+                        titleEl.textContent = 'Meeting Notes';
+                    }
 
-                // รีเซ็ตเวลา Duration Timer เมื่อเริ่มใหม่
-                meetingStartTime = Date.now();
-
-                await saveStateToFirestore();
-                
-                hideAllModals();
-                showToast(`บันทึก "${title}" แล้ว เริ่มการประชุมใหม่`, 'success');
+                    meetingStartTime = Date.now();
+                    saveStateToFirestore();
+                    hideAllModals();
+                    showToast(`เริ่มการประชุมใหม่`, 'success');
+                };
+                confirmModal.classList.remove('hidden');
             });
 
-            document.getElementById('save-meeting-cancel').addEventListener('click', hideAllModals);
-
+            // ── LOAD ROOM (HISTORY) BUTTON ──
             document.getElementById('history-btn').addEventListener('click', async () => {
-                toolsDropdown.classList.add('hidden'); // ซ่อนเมนู Dropdown
+                toolsDropdown.classList.add('hidden'); 
                 
                 historyModal.classList.remove('hidden');
                 const container = document.getElementById('history-list-container');
                 container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
+                if (!userId) return;
                 
                 try {
                     const q = query(
-                        collection(db, 'users', userId, 'meeting_history'),
+                        collection(db, 'artifacts', appId, 'users', userId, 'meeting_history'),
                         orderBy('savedAt', 'desc')
                     );
                     const snap = await getDocs(q);
@@ -2325,7 +3072,7 @@
                                 historyIndex = -1;
                                 saveToHistory(transcriptTextarea.value);
                                 renderParticipants();
-                                updateTranscriptHighlight(); // Highlight the loaded text
+                                updateTranscriptHighlight(); 
                                 
                                 const titleEl = document.getElementById('meeting-title');
                                 if (titleEl && titleEl.tagName === 'H1') {
@@ -2339,20 +3086,24 @@
                             confirmModal.classList.remove('hidden');
                         });
                         
-                        item.querySelector('.delete-history-btn').addEventListener('click', async (e) => {
+                        item.querySelector('.delete-history-btn').addEventListener('click', (e) => {
                             e.stopPropagation();
-                            if (confirm(`ลบ "${data.title}" ออกจากประวัติ?`)) {
+                            confirmTitle.textContent = "Delete History";
+                            confirmMessage.textContent = `ลบ "${data.title}" ออกจากประวัติ?`;
+                            confirmOkBtn.onclick = async () => {
                                 try {
-                                    await deleteDoc(doc(db, 'users', userId, 'meeting_history', docId));
+                                    await deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'meeting_history', docId));
                                     item.remove();
                                     if (container.children.length === 0) {
                                         container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>';
                                     }
                                     showToast('ลบแล้ว', 'success');
+                                    hideAllModals();
                                 } catch(err) {
                                     showToast('ลบไม่สำเร็จ', 'error');
                                 }
-                            }
+                            };
+                            confirmModal.classList.remove('hidden');
                         });
                         container.appendChild(item);
                     });
