@@ -2531,58 +2531,101 @@
 
             function setupSeatEvents(el, key, currentPId) {
                 if (isDragMode) {
-                    // Drag source
+                    el.dataset.seatKey = key;
+
+                    // Drag source (รองรับทั้งเมาส์และหน้าจอสัมผัส)
                     el.addEventListener('pointerdown', (e) => {
+                        // ป้องกันการลากถ้ากดโดนปุ่มลบ
+                        if (e.target.closest('.seat-remove-btn')) return;
                         if (!currentPId) return;
+                        
                         dragSourceKey = key;
                         el.style.opacity = '0.5';
-                    });
 
-                    el.addEventListener('pointerup', () => {
-                        el.style.opacity = '';
-                    });
+                        const onMove = (ev) => {
+                            // ป้องกันหน้าจอเลื่อนเวลาลากนิ้วบนมือถือ
+                            if (ev.cancelable) ev.preventDefault();
+                            
+                            let clientX, clientY;
+                            if (ev.touches && ev.touches.length > 0) {
+                                clientX = ev.touches[0].clientX;
+                                clientY = ev.touches[0].clientY;
+                            } else {
+                                clientX = ev.clientX;
+                                clientY = ev.clientY;
+                            }
 
-                    // Drop target
-                    el.addEventListener('dragover', (e) => e.preventDefault());
+                            // ลบคลาส drag-over อันเก่าออกก่อน
+                            document.querySelectorAll('.drag-over').forEach(n => n.classList.remove('drag-over'));
 
-                    el.addEventListener('pointerenter', () => {
-                        if (dragSourceKey && dragSourceKey !== key) {
-                            el.classList.add('drag-over');
-                        }
-                    });
-
-                    el.addEventListener('pointerleave', () => {
-                        el.classList.remove('drag-over');
-                    });
-
-                    // Drop
-                    document.addEventListener('pointerup', function onDrop() {
-                        if (dragSourceKey && dragSourceKey !== key) {
-                            const hoveredEls = document.querySelectorAll('.drag-over');
-                            if (hoveredEls.length > 0) {
-                                // swap
-                                const targetKey = hoveredEls[0].dataset?.seatKey;
-                                if (targetKey) {
-                                    const temp = seatingLayout.seats[dragSourceKey];
-                                    seatingLayout.seats[dragSourceKey] = seatingLayout.seats[targetKey] || null;
-                                    seatingLayout.seats[targetKey] = temp || null;
-                                    if (!seatingLayout.seats[dragSourceKey]) delete seatingLayout.seats[dragSourceKey];
-                                    if (!seatingLayout.seats[targetKey]) delete seatingLayout.seats[targetKey];
-                                    saveSeatingLayout();
-                                    renderSeatingPanel();
+                            // ค้นหา Element ที่อยู่ใต้นิ้ว/เมาส์
+                            const targetEl = document.elementFromPoint(clientX, clientY);
+                            if (targetEl) {
+                                const seatTarget = targetEl.closest('.seat-card, .chairman-slot');
+                                if (seatTarget && seatTarget.dataset.seatKey && seatTarget.dataset.seatKey !== dragSourceKey) {
+                                    seatTarget.classList.add('drag-over');
                                 }
                             }
-                        }
-                        dragSourceKey = null;
-                        document.removeEventListener('pointerup', onDrop);
-                    }, { once: true });
+                        };
 
-                    el.dataset.seatKey = key;
+                        const onUp = (ev) => {
+                            el.style.opacity = '';
+                            
+                            let clientX, clientY;
+                            if (ev.changedTouches && ev.changedTouches.length > 0) {
+                                clientX = ev.changedTouches[0].clientX;
+                                clientY = ev.changedTouches[0].clientY;
+                            } else {
+                                clientX = ev.clientX;
+                                clientY = ev.clientY;
+                            }
+
+                            // ค้นหาตำแหน่งที่ปล่อยนิ้วว่าลงที่นั่งไหน
+                            const targetEl = document.elementFromPoint(clientX, clientY);
+                            let targetKey = null;
+                            if (targetEl) {
+                                const seatTarget = targetEl.closest('.seat-card, .chairman-slot');
+                                if (seatTarget) {
+                                    targetKey = seatTarget.dataset.seatKey;
+                                }
+                            }
+
+                            // ถ้าตำแหน่งที่ปล่อยไม่ใช่ที่เดิม ให้สลับที่
+                            if (targetKey && targetKey !== dragSourceKey) {
+                                const temp = seatingLayout.seats[dragSourceKey];
+                                seatingLayout.seats[dragSourceKey] = seatingLayout.seats[targetKey] || null;
+                                seatingLayout.seats[targetKey] = temp || null;
+                                
+                                if (!seatingLayout.seats[dragSourceKey]) delete seatingLayout.seats[dragSourceKey];
+                                if (!seatingLayout.seats[targetKey]) delete seatingLayout.seats[targetKey];
+                                
+                                saveSeatingLayout();
+                                renderSeatingPanel();
+                            }
+
+                            // ล้างค่าสถานะการลากทั้งหมด
+                            document.querySelectorAll('.drag-over').forEach(n => n.classList.remove('drag-over'));
+                            dragSourceKey = null;
+
+                            // ถอด Event Listeners ออกเพื่อไม่ให้ค้างในหน่วยความจำ
+                            document.removeEventListener('pointermove', onMove);
+                            document.removeEventListener('pointerup', onUp);
+                            document.removeEventListener('touchmove', onMove);
+                            document.removeEventListener('touchend', onUp);
+                        };
+
+                        // ผูก Event ติดตามการเคลื่อนไหวของนิ้วและเมาส์
+                        document.addEventListener('pointermove', onMove, { passive: false });
+                        document.addEventListener('pointerup', onUp);
+                        document.addEventListener('touchmove', onMove, { passive: false });
+                        document.addEventListener('touchend', onUp);
+                    });
 
                     // เพิ่มปุ่ม X ถ้ามีคนนั่งอยู่ (ทำงานเฉพาะในโหมด Drag)
                     if (currentPId) {
                         el.style.overflow = 'visible'; // ป้องกันปุ่ม X ถูกซ่อนตามขอบของการ์ด
                         const removeBtn = document.createElement('div');
+                        removeBtn.className = 'seat-remove-btn';
                         removeBtn.style.cssText = `
                             position: absolute;
                             top: -6px;
@@ -2606,6 +2649,8 @@
                         
                         // ป้องกันไม่ให้การกดปุ่ม X ไปเผลอกระตุ้นการลาก (Drag)
                         removeBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+                        removeBtn.addEventListener('mousedown', (e) => e.stopPropagation());
+                        removeBtn.addEventListener('touchstart', (e) => e.stopPropagation());
                         
                         removeBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
