@@ -1217,6 +1217,13 @@
                     initializeLogic(); 
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('app-container').style.display = 'flex';
+
+                    // โหลด Layout Mode จาก localStorage
+                    const savedLayout = parseInt(localStorage.getItem('layoutMode') || '0');
+                    if (savedLayout > 0 && layoutModeIndex === 0) {
+                        layoutModeIndex = savedLayout - 1;
+                        layoutToggleBtn.click();
+                    }
                 } else {
                     document.getElementById('app-container').style.display = 'none';
                     document.getElementById('login-screen').style.display = 'flex';
@@ -1321,6 +1328,11 @@
                         if (data.seatingLayout) {
                             seatingLayout = { ...seatingLayout, ...data.seatingLayout };
                             if (layoutModeIndex === 2) renderSeatingPanel();
+                        }
+                        
+                        // โหลด Column Count ถ้ามี
+                        if (data.columnCount && data.columnCount !== columnCount) {
+                            updateColumnLayout(data.columnCount);
                         }
                         
                         const maxId = participants.reduce((max, p) => p.id > max ? p.id : max, 0);
@@ -1549,7 +1561,8 @@
                     await updateDoc(meetingDocRef, {
                         participants: participants,
                         transcript: transcriptTextarea.value,
-                        meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes'
+                        meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes',
+                        columnCount: columnCount
                     });
                     
                     setTimeout(() => {
@@ -1563,7 +1576,8 @@
                         await setDoc(meetingDocRef, {
                             participants: participants,
                             transcript: transcriptTextarea.value,
-                            meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes'
+                            meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes',
+                            columnCount: columnCount
                         }, { merge: true });
                     } else {
                         console.error("Error saving state to Firestore: ", error);
@@ -2142,8 +2156,19 @@
                 reader.readAsArrayBuffer(file);
             });
 
-            increaseColsBtn.addEventListener('click', () => { if (columnCount < 10) updateColumnLayout(columnCount + 1); });
-            decreaseColsBtn.addEventListener('click', () => { if (columnCount > 1) updateColumnLayout(columnCount - 1); });
+            increaseColsBtn.addEventListener('click', () => { 
+                if (columnCount < 10) {
+                    updateColumnLayout(columnCount + 1);
+                    saveStateToFirestore();
+                }
+            });
+            
+            decreaseColsBtn.addEventListener('click', () => { 
+                if (columnCount > 1) {
+                    updateColumnLayout(columnCount - 1);
+                    saveStateToFirestore();
+                }
+            });
 
             saveBtn.addEventListener('click', () => {
                 saveStateToFirestore();
@@ -2553,6 +2578,45 @@
                     }, { once: true });
 
                     el.dataset.seatKey = key;
+
+                    // เพิ่มปุ่ม X ถ้ามีคนนั่งอยู่ (ทำงานเฉพาะในโหมด Drag)
+                    if (currentPId) {
+                        el.style.overflow = 'visible'; // ป้องกันปุ่ม X ถูกซ่อนตามขอบของการ์ด
+                        const removeBtn = document.createElement('div');
+                        removeBtn.style.cssText = `
+                            position: absolute;
+                            top: -6px;
+                            right: -6px;
+                            width: 18px;
+                            height: 18px;
+                            border-radius: 50%;
+                            background: #ef4444;
+                            color: white;
+                            font-size: 0.65rem;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            cursor: pointer;
+                            z-index: 20;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                            font-weight: bold;
+                            line-height: 1;
+                        `;
+                        removeBtn.textContent = '×';
+                        
+                        // ป้องกันไม่ให้การกดปุ่ม X ไปเผลอกระตุ้นการลาก (Drag)
+                        removeBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
+                        
+                        removeBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            delete seatingLayout.seats[key];
+                            saveSeatingLayout();
+                            renderSeatingPanel();
+                            showToast('ลบออกจากที่นั่งแล้ว', 'info');
+                        });
+                        el.appendChild(removeBtn);
+                    }
+
                 } else {
                     // Normal mode
                     el.addEventListener('click', () => {
@@ -2564,21 +2628,8 @@
                             showSeatAssignPicker(key);
                         }
                     });
-
-                    // Long press → clear seat
-                    let pressTimer;
-                    el.addEventListener('pointerdown', () => {
-                        pressTimer = setTimeout(() => {
-                            if (currentPId) {
-                                delete seatingLayout.seats[key];
-                                saveSeatingLayout();
-                                renderSeatingPanel();
-                                showToast('ลบออกจากที่นั่งแล้ว', 'info');
-                            }
-                        }, 800);
-                    });
-                    el.addEventListener('pointerup', () => clearTimeout(pressTimer));
-                    el.addEventListener('pointermove', () => clearTimeout(pressTimer));
+                    
+                    // (ลบส่วนของการกดค้าง 800ms ทิ้งไปทั้งหมดตามที่คุณออกแบบไว้แล้ว)
                 }
             }
 
@@ -2776,6 +2827,9 @@
                     renderSeatingPanel();
                     showToast('โหมดผังที่นั่ง', 'info');
                 }
+                
+                // บันทึก Layout Mode ลง localStorage
+                localStorage.setItem('layoutMode', layoutModeIndex);
             });
 
             ratioToggleBtn.addEventListener('click', () => {
