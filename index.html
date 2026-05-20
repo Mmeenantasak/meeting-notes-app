@@ -59,9 +59,7 @@
             pointer-events: none;
         }
 
-        /* Dark aurora blobs */
-        .dark body::before,
-        .dark::before {
+        .dark body::before, .dark::before {
             background:
                 radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
                 radial-gradient(ellipse 60% 50% at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 55%),
@@ -71,7 +69,6 @@
             animation: aurora-shift 20s ease-in-out infinite alternate;
         }
 
-        /* Light aurora blobs */
         body:not(.dark)::before {
             background:
                 radial-gradient(ellipse 80% 60% at 15% 10%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
@@ -120,165 +117,94 @@
             transition: color 0.3s, background 0.3s;
         }
 
-        #meeting-title {
-            font-weight: 200 !important;
-            letter-spacing: 0.2em !important;
+        #meeting-title { font-weight: 200 !important; letter-spacing: 0.2em !important; }
+        .participant-box h3 { font-weight: 600; letter-spacing: 0.05em; }
+        .tool-btn, #clock, #save-status, #user-display, #cols-count, .panel-label, #duration-timer {
+            font-family: 'DM Mono', monospace; font-weight: 300;
         }
-
-        .participant-box h3 {
-            font-weight: 600;
-            letter-spacing: 0.05em;
-        }
-
-        .tool-btn, #clock, #save-status, #user-display,
-        #cols-count, .panel-label, #duration-timer {
-            font-family: 'DM Mono', monospace;
-            font-weight: 300;
-        }
-
-        h2.text-sm {
-            font-weight: 300;
-            letter-spacing: 0.15em;
-        }
-
+        h2.text-sm { font-weight: 300; letter-spacing: 0.15em; }
         .custom-line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;  
-            overflow: hidden;
-            text-overflow: ellipsis;
-            word-break: break-word;
-            max-height: 3em; 
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;  
+            overflow: hidden; text-overflow: ellipsis; word-break: break-word; max-height: 3em; 
         }
 
         /* Ratio Mode */
-        body.has-ratio {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #000 !important;
-        }
+        body.has-ratio { display: flex; align-items: center; justify-content: center; background: #000 !important; }
         #app-container.ratio-mode {
             background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
             box-shadow: 0 0 0 1px var(--border-color), 0 0 60px rgba(0,0,0,0.8);
-            max-width: none !important;
-            height: auto !important;
-            border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            max-width: none !important; height: auto !important; border-radius: 12px;
+            overflow: hidden; display: flex; flex-direction: column;
         }
-        #app-container.ratio-16-9 {
-            width: min(98vw, calc(98vh * 16 / 9)) !important;
-            height: min(98vh, calc(98vw * 9 / 16)) !important;
-        }
-        #app-container.ratio-4-3 {
-            width: min(98vw, calc(98vh * 4 / 3)) !important;
-            height: min(98vh, calc(98vw * 3 / 4)) !important;
-        }
+        #app-container.ratio-16-9 { width: min(98vw, calc(98vh * 16 / 9)) !important; height: min(98vh, calc(98vw * 9 / 16)) !important; }
+        #app-container.ratio-4-3 { width: min(98vw, calc(98vh * 4 / 3)) !important; height: min(98vh, calc(98vw * 3 / 4)) !important; }
 
-        /* Glass Panel */
         .bg-panel {
-            background-color: var(--bg-panel);
-            backdrop-filter: blur(24px) saturate(160%);
+            background-color: var(--bg-panel); backdrop-filter: blur(24px) saturate(160%);
             -webkit-backdrop-filter: blur(24px) saturate(160%);
-            border: 1px solid var(--border-color);
-            transition: background-color 0.3s, border-color 0.3s;
+            border: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s;
         }
 
         /* Participant Cards */
         .participant-box {
-            background-color: var(--bg-panel-solid);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--card-shadow);
-            position: relative;
-            cursor: pointer;
-            transition: all 0.15s ease-out;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
-            height: auto;
-            min-height: 75px;
+            background-color: var(--bg-panel-solid); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);
+            position: relative; cursor: pointer; transition: all 0.15s ease-out; user-select: none;
+            -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; height: auto; min-height: 75px;
         }
         .participant-box:active {
-            transform: scale(0.96);
-            border-color: var(--accent-color);
-            background-color: rgba(255, 255, 255, 0.05);
+            transform: scale(0.96); border-color: var(--accent-color); background-color: rgba(255, 255, 255, 0.05);
         }
-        .participant-box:hover {
-            border-color: var(--accent-color);
-            box-shadow: var(--card-shadow-hover);
-        }
+        .participant-box:hover { border-color: var(--accent-color); box-shadow: var(--card-shadow-hover); }
         .participant-box.active {
-            border-color: var(--accent-color);
-            background-color: rgba(255, 255, 255, 0.05);
-            box-shadow: inset 0 0 0 1px var(--accent-color);
-        }
-        .dark .participant-box.active {
-             background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent-color); background-color: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 1px var(--accent-color);
         }
 
         .sortable-ghost { opacity: 0.3; background: var(--accent-color); }
         .sortable-drag { opacity: 1 !important; cursor: grabbing; }
 
         textarea, select, input[type="text"] {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            border-radius: 0.5rem;
-            transition: all 0.2s;
+            background-color: transparent; border: 1px solid var(--border-color); color: var(--text-primary);
+            border-radius: 0.5rem; transition: all 0.2s;
         }
         textarea:focus, select:focus, input[type="text"]:focus {
-            box-shadow: 0 0 0 2px var(--focus-ring);
-            border-color: var(--accent-color);
-            background-color: var(--bg-panel-solid);
-            outline: none;
+            box-shadow: 0 0 0 2px var(--focus-ring); border-color: var(--accent-color);
+            background-color: var(--bg-panel-solid); outline: none;
         }
 
-        /* Action Icons */
+        /* ── EDIT MODE FOR CARDS ── */
         .card-action-icon {
-            position: absolute;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-            opacity: 0.6;
-            z-index: 10;
+            position: absolute; width: 28px; height: 28px; display: none; align-items: center; justify-content: center;
+            border-radius: 50%; color: var(--text-secondary); transition: all 0.2s; opacity: 0.6; z-index: 10;
         }
-        .card-action-icon:hover, .card-action-icon:active {
-            opacity: 1;
-            background-color: rgba(128, 128, 128, 0.1);
-            color: var(--text-primary);
-        }
-        .delete-icon { top: 2px; right: 2px; }
+        .card-action-icon:hover, .card-action-icon:active { opacity: 1; background-color: rgba(128, 128, 128, 0.1); color: var(--text-primary); }
         .edit-icon { bottom: 2px; right: 2px; }
-        .delete-icon:hover { color: #ef4444; background-color: rgba(239, 68, 68, 0.1); }
-        
-        .color-picker-popup {
-            position: fixed;
-            z-index: 999;
-            background: var(--bg-panel-solid);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 0.5rem;
+
+        /* When edit mode is active */
+        #participants-grid.edit-cards-mode .participant-box {
+            border-style: dashed !important;
+            cursor: default;
+        }
+        #participants-grid.edit-cards-mode .participant-box:active {
+            transform: none; /* disable scale down */
+        }
+        #participants-grid.edit-cards-mode .card-action-icon {
             display: flex;
-            gap: 0.35rem;
-            flex-wrap: wrap;
-            width: 140px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        #participants-grid.edit-cards-mode .delete-icon {
+            position: absolute; top: -6px; right: -6px; width: 22px; height: 22px;
+            border-radius: 50%; background: #ef4444; color: white; opacity: 1;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        #participants-grid.edit-cards-mode .delete-icon:hover { background-color: #dc2626; }
+        #participants-grid.edit-cards-mode .delete-icon svg { width: 14px; height: 14px; }
+
+        .color-picker-popup {
+            position: fixed; z-index: 999; background: var(--bg-panel-solid); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 0.5rem; display: flex; gap: 0.35rem; flex-wrap: wrap; width: 140px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         .color-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: transform 0.15s, border-color 0.15s;
-            flex-shrink: 0;
+            width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
+            transition: transform 0.15s, border-color 0.15s; flex-shrink: 0;
         }
         .color-dot:hover { transform: scale(1.2); }
         .color-dot.selected { border-color: var(--text-primary); }
@@ -286,314 +212,96 @@
         .modal-overlay { backdrop-filter: blur(8px); transition: opacity 0.3s ease; }
         
         .tool-btn {
-            font-size: 0.875rem; 
-            padding: 0.6rem 0.75rem; 
-            color: var(--btn-text);
-            font-weight: 500; 
-            transition: all 0.2s;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 0.5rem;
-            background-color: var(--btn-base-bg);
-            border: 1px solid transparent;
-            height: 100%;
-            touch-action: manipulation;
+            font-size: 0.875rem; padding: 0.6rem 0.75rem; color: var(--btn-text); font-weight: 500; 
+            transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+            background-color: var(--btn-base-bg); border: 1px solid transparent; height: 100%; touch-action: manipulation;
         }
-        .dark .tool-btn {
-            border: 1px solid var(--border-color);
-        }
-        .tool-btn:hover {
-            background-color: var(--btn-base-hover);
-            transform: translateY(-1px);
-        }
+        .dark .tool-btn { border: 1px solid var(--border-color); }
+        .tool-btn:hover { background-color: var(--btn-base-hover); transform: translateY(-1px); }
         .tool-btn:active { transform: translateY(0); }
         .tool-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-        #resizer {
-            width: 15px; 
-            min-width: 15px;
-            flex-shrink: 0;
-            cursor: col-resize; 
-            background-color: rgba(0, 0, 0, 0.15);
-            background-clip: content-box; 
-            padding: 0 6px; 
-            transition: background-color 0.2s; 
-            margin: 0;
-            position: relative;
-            z-index: 10;
-            touch-action: none;
+        #resizer, #horizontal-resizer, #seating-resizer {
+            background-color: rgba(0, 0, 0, 0.15); background-clip: content-box; 
+            transition: background-color 0.2s; margin: 0; position: relative; z-index: 10; touch-action: none;
         }
-        .dark #resizer { background-color: rgba(255, 255, 255, 0.15); }
-        #resizer:hover, #resizer.resizing { background-color: var(--accent-color); opacity: 1; }
+        .dark #resizer, .dark #horizontal-resizer, .dark #seating-resizer { background-color: rgba(255, 255, 255, 0.15); }
+        #resizer:hover, #resizer.resizing, #horizontal-resizer:hover, #horizontal-resizer.resizing, #seating-resizer:hover, #seating-resizer.resizing { 
+            background-color: var(--accent-color); opacity: 1; 
+        }
+
+        #resizer { width: 15px; min-width: 15px; flex-shrink: 0; cursor: col-resize; padding: 0 6px; border-radius: 99px; }
+        #horizontal-resizer { height: 12px; min-height: 12px; flex-shrink: 0; cursor: row-resize; padding: 4px 0; display: none; border-radius: 99px; }
+        #seating-resizer { height: 12px; min-height: 12px; flex-shrink: 0; cursor: row-resize; padding: 4px 0; display: none; }
         
-        #horizontal-resizer {
-            height: 12px;
-            min-height: 12px;
-            flex-shrink: 0;
-            cursor: row-resize;
-            background-color: rgba(0, 0, 0, 0.15);
-            background-clip: content-box;
-            padding: 4px 0;
-            margin: 0;
-            position: relative;
-            z-index: 10;
-            display: none;
-            transition: background-color 0.2s;
-            touch-action: none;
-        }
-        .dark #horizontal-resizer { background-color: rgba(255, 255, 255, 0.15); }
-        #horizontal-resizer:hover, #horizontal-resizer.resizing { background-color: var(--accent-color); opacity: 1; }
         #app-container.meeting-mode #horizontal-resizer { display: block; }
-
-        /* ── SEATING PLAN ── */
-        #seating-panel {
-            display: none;
-            flex-direction: row;
-            align-items: stretch;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            background: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            backdrop-filter: blur(24px);
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        #app-container.seating-mode #seating-panel {
-            display: flex;
-        }
-
-        /* ประธาน */
-        .chairman-slot {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            width: 52px;
-            cursor: pointer;
-            border-radius: 12px;
-            border: 2px dashed var(--border-color);
-            transition: all 0.2s;
-            position: relative;
-        }
-        .chairman-slot.filled {
-            border-style: solid;
-            border-color: var(--accent-color);
-        }
-        .chairman-slot .chairman-name {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-align: center;
-            padding: 0.5rem 0;
-            color: var(--text-primary);
-            word-break: break-all;
-        }
-        .chairman-slot .chairman-empty {
-            writing-mode: vertical-rl;
-            font-size: 0.65rem;
-            color: var(--text-secondary);
-            opacity: 0.5;
-        }
-
-        /* โต๊ะ */
-        .seating-table-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 0;
-        }
-
-        .seating-rows-top {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .seating-rows-bottom {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .table-divider {
-            height: 10px;
-            background: var(--text-secondary);
-            border-radius: 4px;
-            margin: 4px 0;
-            opacity: 0.25;
-            flex-shrink: 0;
-        }
-
-        .seating-row {
-            display: flex;
-            gap: 4px;
-            flex-wrap: nowrap;
-        }
-
-        /* ที่นั่ง */
-        .seat-card {
-            flex: 1;
-            min-width: 0;
-            min-height: 44px;
-            border-radius: 10px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-panel-solid);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.15s;
-            position: relative;
-            overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-        .seat-card:hover {
-            border-color: var(--accent-color);
-        }
-        .seat-card.filled {
-            border-color: var(--accent-color);
-        }
-        .seat-card.active-speaker {
-            box-shadow: 0 0 0 2px var(--accent-color);
-        }
-        .seat-card .seat-name {
-            font-size: 0.62rem;
-            font-weight: 600;
-            text-align: center;
-            padding: 2px 4px;
-            line-height: 1.3;
-            word-break: break-word;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            color: var(--text-primary);
-            pointer-events: none;
-        }
-        .seat-card .seat-empty-icon {
-            color: var(--text-secondary);
-            opacity: 0.3;
-            font-size: 1rem;
-            pointer-events: none;
-        }
-
-        /* Drag mode styling */
-        .drag-mode .seat-card,
-        .drag-mode .chairman-slot {
-            cursor: grab;
-            border-style: dashed !important;
-            opacity: 0.85;
-        }
-        .drag-mode .seat-card:active {
-            cursor: grabbing;
-            opacity: 0.6;
-            transform: scale(0.95);
-        }
-        .seat-card.drag-over {
-            border-color: var(--accent-color);
-            background: rgba(184, 168, 152, 0.15);
-            transform: scale(1.05);
-        }
-
-        /* Seating controls */
-        .seating-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            padding: 0.5rem 0.75rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .seating-control-group {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-            font-family: 'DM Mono', monospace;
-            font-size: 0.65rem;
-            color: var(--text-secondary);
-        }
-        .seating-ctrl-btn {
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.7rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
-        }
-        .seating-ctrl-btn:hover {
-            border-color: var(--accent-color);
-            color: var(--text-primary);
-        }
-        .drag-mode-btn {
-            padding: 3px 10px;
-            border-radius: 999px;
-            border: 1px solid var(--border-color);
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: 'DM Mono', monospace;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-left: auto;
-        }
-        .drag-mode-btn.active {
-            border-color: #f4a7b9;
-            color: #f4a7b9;
-            background: rgba(244, 167, 185, 0.1);
-        }
-        .chairman-side-btn {
-            padding: 3px 8px;
-            border-radius: 999px;
-            border: 1px solid var(--border-color);
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: 'DM Mono', monospace;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .chairman-side-btn:hover {
-            border-color: var(--accent-color);
-            color: var(--text-primary);
-        }
-
-        /* ── SEATING RESIZER ── */
-        #seating-resizer {
-            height: 12px;
-            min-height: 12px;
-            flex-shrink: 0;
-            cursor: row-resize;
-            background-color: rgba(0, 0, 0, 0.15);
-            background-clip: content-box;
-            padding: 4px 0;
-            margin: 0;
-            position: relative;
-            z-index: 10;
-            display: none;
-            transition: background-color 0.2s;
-            touch-action: none;
-        }
-        .dark #seating-resizer { background-color: rgba(255, 255, 255, 0.15); }
-        #seating-resizer:hover, #seating-resizer.resizing { background-color: var(--accent-color); opacity: 1; }
         #app-container.seating-mode #seating-resizer { display: block; }
 
-        .saved-list-item {
-            border: 1px solid var(--border-color);
-            background-color: var(--bg-panel-solid);
-            color: var(--text-primary);
+        #seating-panel {
+            display: none; flex-direction: row; align-items: stretch; gap: 0.5rem; padding: 0.75rem;
+            background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px;
+            backdrop-filter: blur(24px); overflow: hidden; flex-shrink: 0;
         }
+        #app-container.seating-mode #seating-panel { display: flex; }
+
+        .chairman-slot {
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; width: 52px;
+            cursor: pointer; border-radius: 12px; border: 2px dashed var(--border-color); transition: all 0.2s; position: relative;
+        }
+        .chairman-slot.filled { border-style: solid; border-color: var(--accent-color); }
+        .chairman-slot .chairman-name {
+            writing-mode: vertical-rl; text-orientation: mixed; font-size: 0.7rem; font-weight: 600;
+            letter-spacing: 0.05em; text-align: center; padding: 0.5rem 0; color: var(--text-primary); word-break: break-all;
+        }
+        .chairman-slot .chairman-empty { writing-mode: vertical-rl; font-size: 0.65rem; color: var(--text-secondary); opacity: 0.5; }
+
+        .seating-table-area { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .seating-rows-top, .seating-rows-bottom { display: flex; flex-direction: column; gap: 4px; }
+        .table-divider { height: 10px; background: var(--text-secondary); border-radius: 4px; margin: 4px 0; opacity: 0.25; flex-shrink: 0; }
+        .seating-row { display: flex; gap: 4px; flex-wrap: nowrap; }
+
+        .seat-card {
+            flex: 1; min-width: 0; min-height: 44px; border-radius: 10px; border: 1px solid var(--border-color);
+            background: var(--bg-panel-solid); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.15s; position: relative; overflow: visible;
+            -webkit-tap-highlight-color: transparent; user-select: none;
+        }
+        .seat-card:hover { border-color: var(--accent-color); }
+        .seat-card.filled { border-color: var(--accent-color); }
+        .seat-card.active-speaker { box-shadow: 0 0 0 2px var(--accent-color); }
+        .seat-card .seat-name {
+            font-size: 0.62rem; font-weight: 600; text-align: center; padding: 2px 4px; line-height: 1.3;
+            word-break: break-word; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; color: var(--text-primary); pointer-events: none;
+        }
+        .seat-card .seat-empty-icon { color: var(--text-secondary); opacity: 0.3; font-size: 1rem; pointer-events: none; }
+
+        .drag-mode .seat-card, .drag-mode .chairman-slot { cursor: grab; border-style: dashed !important; opacity: 0.85; }
+        .drag-mode .seat-card:active { cursor: grabbing; opacity: 0.6; transform: scale(0.95); }
+        .seat-card.drag-over { border-color: var(--accent-color); background: rgba(184, 168, 152, 0.15); transform: scale(1.05); }
+
+        .seating-controls {
+            display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border-color);
+        }
+        .seating-control-group { display: flex; align-items: center; gap: 0.35rem; font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--text-secondary); }
+        .seating-ctrl-btn {
+            width: 20px; height: 20px; border-radius: 6px; border: 1px solid var(--border-color); background: transparent;
+            color: var(--text-secondary); font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+        }
+        .seating-ctrl-btn:hover { border-color: var(--accent-color); color: var(--text-primary); }
+        
+        .drag-mode-btn {
+            padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-color); background: transparent;
+            color: var(--text-secondary); font-family: 'DM Mono', monospace; font-size: 0.65rem; cursor: pointer; transition: all 0.2s; margin-left: auto;
+        }
+        .drag-mode-btn.active { border-color: #f4a7b9; color: #f4a7b9; background: rgba(244, 167, 185, 0.1); }
+        .chairman-side-btn {
+            padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border-color); background: transparent;
+            color: var(--text-secondary); font-family: 'DM Mono', monospace; font-size: 0.65rem; cursor: pointer; transition: all 0.15s;
+        }
+        .chairman-side-btn:hover { border-color: var(--accent-color); color: var(--text-primary); }
+
+        .saved-list-item { border: 1px solid var(--border-color); background-color: var(--bg-panel-solid); color: var(--text-primary); }
         .list-item-action { visibility: hidden; color: var(--text-secondary); }
         .list-item-action:hover { color: #ef4444; }
         .saved-list-item:hover .list-item-action { visibility: visible; }
@@ -603,19 +311,15 @@
             display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none;
         }
         .toast {
-            background-color: var(--text-primary); color: var(--bg-panel-solid);
-            padding: 0.5rem 1.25rem;
-            font-size: 0.85rem; opacity: 0; transform: translateY(1rem);
-            transition: all 0.3s ease; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            background-color: var(--text-primary); color: var(--bg-panel-solid); padding: 0.5rem 1.25rem;
+            font-size: 0.85rem; opacity: 0; transform: translateY(1rem); transition: all 0.3s ease; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
             display: flex; align-items: center; gap: 0.5rem;
         }
         .toast.show { opacity: 1; transform: translateY(0); }
         
         #save-status {
-            font-size: 0.75rem; color: var(--text-secondary);
-            display: flex; align-items: center; gap: 0.35rem; opacity: 0.8;
-            background: var(--bg-panel-solid); border: 1px solid var(--border-color);
-            padding: 4px 10px; border-radius: 999px;
+            font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.35rem; opacity: 0.8;
+            background: var(--bg-panel-solid); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 999px;
         }
         #save-status.saving { color: var(--text-primary); border-color: var(--text-primary); }
 
@@ -624,80 +328,28 @@
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
-        #transcript-wrapper {
-            position: relative;
-            display: flex;
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-        }
-
+        #transcript-wrapper { position: relative; display: flex; flex: 1; min-height: 0; overflow: hidden; }
         #transcript-overlay {
-            will-change: contents;
-            contain: content;
-            pointer-events: none;
-            outline: none !important;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
+            will-change: contents; contain: content; pointer-events: none; outline: none !important;
+            -webkit-tap-highlight-color: transparent; user-select: none;
         }
-
-        #transcript-textarea:focus {
-            outline: none !important;
-            box-shadow: none !important;
-            border-color: transparent !important;
-            background-color: transparent !important;
-        }
-
+        #transcript-textarea:focus { outline: none !important; box-shadow: none !important; border-color: transparent !important; background-color: transparent !important; }
         #transcript-overlay span { color: transparent; }
-        #transcript-overlay span[style*="color:"] { 
-             color: revert !important; 
-             -webkit-text-fill-color: revert !important;
-        }
+        #transcript-overlay span[style*="color:"] { color: revert !important; -webkit-text-fill-color: revert !important; }
 
         /* ── LAYOUT MODES ── */
-        #app-container.seating-mode {
-            flex-direction: column;
-        }
-        #app-container.seating-mode #seating-panel {
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            max-height: 55vh;
-            overflow-y: auto;
-        }
-        #app-container.seating-mode #main-container {
-            flex: 1;
-            min-height: 0;
-        }
-        #app-container.seating-mode #left-panel {
-            display: none;
-        }
-        #app-container.seating-mode #resizer {
-            display: none !important;
-        }
+        #app-container.seating-mode { flex-direction: column; }
+        #app-container.seating-mode #seating-panel { display: flex; flex-direction: column; flex-shrink: 0; max-height: 55vh; overflow-y: auto; }
+        #app-container.seating-mode #main-container { flex: 1; min-height: 0; }
+        #app-container.seating-mode #left-panel { display: none; }
+        #app-container.seating-mode #resizer { display: none !important; }
 
         #app-container.meeting-mode #main-container { flex-direction: column; }
-        #app-container.meeting-mode #left-panel {
-            overflow-y: hidden;
-            overflow-x: hidden;
-            flex-shrink: 0;
-            flex-grow: 0;
-            width: 100%;
-            padding-right: 0; 
-        }
+        #app-container.meeting-mode #left-panel { overflow-y: hidden; overflow-x: hidden; flex-shrink: 0; flex-grow: 0; width: 100%; padding-right: 0; }
         #app-container.meeting-mode #left-panel > div:first-child { height: 100%; display: flex; flex-direction: column; }
         #app-container.meeting-mode #participants-grid {
-            display: grid !important;
-            grid-template-columns: repeat(var(--meeting-cols, 4), minmax(0, 1fr)) !important;
-            overflow-y: auto;
-            overflow-x: hidden;
-            flex: 1; 
-            min-height: 0; 
-            max-height: none;
-            gap: 0.5rem;
-            padding-right: 0.25rem; 
-            padding-bottom: 0.5rem;
-            margin-bottom: 0;
+            display: grid !important; grid-template-columns: repeat(var(--meeting-cols, 4), minmax(0, 1fr)) !important;
+            overflow-y: auto; overflow-x: hidden; flex: 1; min-height: 0; max-height: none; gap: 0.5rem; padding-right: 0.25rem; padding-bottom: 0.5rem; margin-bottom: 0;
         }
         #app-container.meeting-mode .participant-box { min-width: unset; flex-shrink: 0; min-height: 65px; }
         #app-container.meeting-mode #right-panel { flex: 1 1 0 !important; min-height: 0; }
@@ -706,14 +358,7 @@
         @media (max-width: 1024px) {
             html, body { height: 100dvh; overflow: hidden; }
             #app-container { height: 100dvh; overflow: hidden; }
-            #main-container { 
-                flex-direction: column; 
-                gap: 1rem; 
-                overflow-y: auto; 
-                overflow-x: hidden;
-                -webkit-overflow-scrolling: touch; 
-                padding-bottom: 2rem; 
-            }
+            #main-container { flex-direction: column; gap: 1rem; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 2rem; }
             #left-panel, #right-panel { flex-basis: auto !important; width: 100%; padding: 0; flex-shrink: 0; }
             #right-panel { min-height: 50vh; }
             #resizer { display: none; }
@@ -721,8 +366,6 @@
     </style>
 </head>
 <body class="dark">
-
-    <!-- สคริปต์ดักจับ Error ที่แสดงขึ้นมาลอยทับจอ (ป้องกับปัญหาจอดำ) -->
     <script>
         window.onerror = function(message, source, lineno, colno, error) {
             document.body.innerHTML += `
@@ -737,7 +380,6 @@
         };
     </script>
 
-    <!-- กล่องแจ้งเตือนถ้าลืมใส่ Config (อยู่นอกสุด จะได้ไม่ถูกซ่อน) -->
     <div id="setup-instructions-container" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#141210; z-index:9999; align-items:center; justify-content:center; padding:20px;">
         <div style="background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:12px; padding:40px; max-width:600px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
             <h2 style="color:#ef4444; font-size: 26px; font-weight:bold; margin-bottom:15px; font-family:'Sarabun',sans-serif;">⚠️ ขาดการเชื่อมต่อฐานข้อมูล Firebase</h2>
@@ -756,7 +398,6 @@
         </div>
     </div>
 
-    <!-- ปรับ display:flex เป็นค่าเริ่มต้น เพื่อไม่ให้จอดำระหว่างรอโหลด -->
     <div id="login-screen" style="display:flex; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem; background:#141210;">
         <h1 style="color:#fff; font-size:2rem; font-weight:bold; font-family:'Sarabun',sans-serif;">Meeting Notes</h1>
         <div style="display:flex; flex-direction:column; gap:1rem; align-items:center;">
@@ -838,7 +479,6 @@
         <div id="seating-panel">
             <!-- JS Generated -->
         </div>
-        <!-- SEATING RESIZER -->
         <div id="seating-resizer"></div>
 
         <main id="main-container" class="flex flex-grow min-h-0 gap-4">
@@ -848,6 +488,10 @@
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Participants</h2>
                         <div class="flex items-center gap-1 grid-controls">
+                            <!-- ปุ่ม Edit Mode -->
+                            <button id="edit-cards-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500" title="Edit Mode">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            </button>
                             <!-- ปุ่ม Reorder Mode -->
                             <button id="reorder-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500" title="Reorder">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -888,10 +532,8 @@
         </main>
     </div>
 
-    <!-- Toast Container -->
     <div id="toast-container"></div>
 
-    <!-- Modals -->
     <div id="edit-name-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
             <div class="p-5 border-b flex justify-between items-center" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Edit Name</h3><button class="modal-close text-gray-500 hover:text-white transition">&times;</button></div>
@@ -1014,36 +656,30 @@
 
         // =========================================================================================
         // ⚠️ 1. นำค่า Firebase Config จากโปรเจกต์ของคุณมาวางทับตรงนี้ครับ ⚠️
-        // (คัดลอกมาวางทับ "YOUR_API_KEY" และค่าอื่นๆ ได้เลย ห้ามลบปีกกา {} หรือเครื่องหมายลูกน้ำ ,)
         // =========================================================================================
         const myFirebaseConfig = {
-            apiKey: "AIzaSyBe1IRZCwUy-1TlP97RRp5biHCu-surkao",
-            authDomain: "my-meeting-notes-dbcb4.firebaseapp.com",
-            projectId: "my-meeting-notes-dbcb4",
-            storageBucket: "my-meeting-notes-dbcb4.firebasestorage.app",
-            messagingSenderId: "518603776860",
-            appId: "1:518603776860:web:0c1297f45a3a8c75809799"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "your-project.firebaseapp.com",
+            projectId: "your-project",
+            storageBucket: "your-project.firebasestorage.app",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123"
         };
         // =========================================================================================
 
-        /* ── โค้ดระบบ Sandbox & สลับ Path ฐานข้อมูลอัตโนมัติ (ห้ามลบ) ── */
         let activeConfig = myFirebaseConfig;
         if (typeof __firebase_config !== 'undefined') {
             activeConfig = JSON.parse(__firebase_config);
         }
 
         const getBasePath = (uid) => {
-            // ถ้ารันในหน้าต่างแชทพรีวิว (Sandbox) จะเก็บข้อมูลแยกกันเพื่อความปลอดภัย
             if (typeof window.__app_id !== 'undefined' && window.__app_id) {
                 return `artifacts/${window.__app_id}/users/${uid}`;
             }
-            // ถ้ารันบนเว็บของคุณเอง (Vercel, Hostinger) จะใช้ Path ข้อมูลเก่าที่คุณเคยเซฟไว้
             return `users/${uid}`;
         };
-        /* ------------------------------------------------ */
 
         document.addEventListener('DOMContentLoaded', () => {
-            // เช็คว่าผู้ใช้ใส่ Firebase Config หรือยัง? ถ้ายัง ให้โชว์หน้าต่างเตือน (และซ่อนกล่องอื่นๆ)
             if (activeConfig.apiKey === "YOUR_API_KEY" || !activeConfig.apiKey) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('app-container').style.display = 'none';
@@ -1113,7 +749,7 @@
             const loadListModal = document.getElementById('load-list-modal');
             const savedListsContainer = document.getElementById('saved-lists-container');
             const loadListCancelBtn = document.getElementById('load-list-cancel');
-            
+
             let app, auth, db, userId, meetingDocRef;
             let unsubscribeMeeting = null;
         
@@ -1121,6 +757,7 @@
             let currentRatioIndex = 0;
             let layoutModeIndex = 0; // 0 = Normal, 1 = Focus, 2 = Seating
             let isReorderMode = false;
+            let isEditCardsMode = false;
 
             let textHistory = [];
             let historyIndex = -1;
@@ -1129,17 +766,16 @@
             let allNamesCache = []; 
             let sttStableText = ''; 
             let isInterimActive = false; 
-
             let meetingStartTime = Date.now(); 
 
             // ── SEATING PLAN STATE ──
             let seatingLayout = {
-                chairmanSide: 'left',   // 'left' | 'right'
-                rowsTop: 2,             // 1-4
-                rowsBottom: 2,          // 1-4
-                seatsPerRow: 8,         // 1-18
-                seatHeight: 44,         // ขนาดที่นั่ง
-                seats: {}               // key: "top-0-0" value: participantId | null
+                chairmanSide: 'left',
+                rowsTop: 2,
+                rowsBottom: 2,
+                seatsPerRow: 8,
+                seatHeight: 44,
+                seats: {}
             };
             let isDragMode = false;
             let dragSourceKey = null;
@@ -1154,43 +790,10 @@
                 allModals.forEach(modal => modal.classList.add('hidden'));
             }
 
-            function updateTranscriptHighlight() {
-                if (!transcriptOverlay) return;
-                
-                const coloredParticipants = participants.filter(p => p.name && p.color);
-                if (coloredParticipants.length === 0) {
-                    if (transcriptOverlay.innerHTML !== '') transcriptOverlay.innerHTML = '';
-                    return;
-                }
-                
-                let text = transcriptTextarea.value;
-                let html = text
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;');
-                
-                coloredParticipants.forEach(p => {
-                    const escaped = p.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    const regex = new RegExp(`(${escaped})(\\s*:\\s*)`, 'g');
-                    html = html.replace(regex,
-                        `<span style="color:${p.color};font-weight:600;">$1</span><span style="color:${p.color};opacity:0.7;">$2</span>`
-                    );
-                });
-                
-                const newHTML = `<span style="color:transparent;white-space:pre-wrap;word-break:break-word;display:block;">${html}</span>`;
-                
-                if (transcriptOverlay.innerHTML !== newHTML) {
-                    transcriptOverlay.innerHTML = newHTML;
-                }
-                
-                transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
-            }
-
             try {
                 app = initializeApp(activeConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
-
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     signInWithCustomToken(auth, __initial_auth_token).catch(e => console.error("Custom token error", e));
                 }
@@ -1218,7 +821,6 @@
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('app-container').style.display = 'flex';
 
-                    // โหลด Layout Mode จาก localStorage
                     const savedLayout = parseInt(localStorage.getItem('layoutMode') || '0');
                     if (savedLayout > 0 && layoutModeIndex === 0) {
                         layoutModeIndex = savedLayout - 1;
@@ -1258,9 +860,7 @@
                 }
             });
 
-            document.getElementById('signout-btn').addEventListener('click', () => {
-                signOut(auth);
-            });
+            document.getElementById('signout-btn').addEventListener('click', () => signOut(auth));
 
             function attachTitleEditListener(element) {
                 element.addEventListener('click', function() {
@@ -1324,13 +924,11 @@
                             renderParticipants();
                         }
 
-                        // โหลด seating layout ถ้ามี
                         if (data.seatingLayout) {
                             seatingLayout = { ...seatingLayout, ...data.seatingLayout };
                             if (layoutModeIndex === 2) renderSeatingPanel();
                         }
                         
-                        // โหลด Column Count ถ้ามี
                         if (data.columnCount && data.columnCount !== columnCount) {
                             updateColumnLayout(data.columnCount);
                         }
@@ -1344,9 +942,7 @@
                              if(transcriptTextarea.value !== serverTranscript) {
                                  transcriptTextarea.value = serverTranscript;
                                  sttStableText = serverTranscript;
-                                 if (textHistory.length === 0) {
-                                     saveToHistory(serverTranscript);
-                                 }
+                                 if (textHistory.length === 0) saveToHistory(serverTranscript);
                                  updateTranscriptHighlight(); 
                              }
                         } else if (textHistory.length === 0 && serverTranscript) {
@@ -1363,7 +959,8 @@
                                 { id: 2, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
                                 { id: 3, name: 'ผู้ชี้แจง' }
                             ],
-                            transcript: ''
+                            transcript: '',
+                            columnCount: columnCount
                         };
                         setDoc(meetingDocRef, defaultData).catch(e => {
                             if (e.code === 'permission-denied') console.error("Permission error");
@@ -1391,9 +988,7 @@
                         (d.data().participants || []).forEach(p => nameSet.add(p.name));
                     });
                     allNamesCache = [...nameSet].sort();
-                } catch(e) { 
-                    console.error('Cache load error', e); 
-                }
+                } catch(e) { console.error('Cache load error', e); }
             }
             
             function showToast(message, type = 'info') {
@@ -1407,103 +1002,76 @@
 
                 toast.innerHTML = `${iconHtml}<span>${message}</span>`;
                 toastContainer.appendChild(toast);
-
-                requestAnimationFrame(() => {
-                    toast.classList.add('show');
-                });
-
+                requestAnimationFrame(() => toast.classList.add('show'));
                 setTimeout(() => {
                     toast.classList.remove('show');
-                    setTimeout(() => {
-                        toast.remove();
-                    }, 300);
+                    setTimeout(() => toast.remove(), 300);
                 }, 3000);
             }
 
             function saveToHistory(text) {
                 if (historyIndex >= 0 && textHistory[historyIndex] === text) return;
-
-                if (historyIndex < textHistory.length - 1) {
-                    textHistory = textHistory.slice(0, historyIndex + 1);
-                }
-
+                if (historyIndex < textHistory.length - 1) textHistory = textHistory.slice(0, historyIndex + 1);
                 textHistory.push(text);
-                if (textHistory.length > MAX_HISTORY) {
-                    textHistory.shift();
-                } else {
-                    historyIndex++;
-                }
+                if (textHistory.length > MAX_HISTORY) textHistory.shift();
+                else historyIndex++;
                 updateUndoRedoButtons();
             }
 
             function updateUndoRedoButtons() {
                 undoBtn.disabled = historyIndex <= 0;
                 redoBtn.disabled = historyIndex >= textHistory.length - 1;
-                
                 undoBtn.style.opacity = undoBtn.disabled ? '0.4' : '1';
                 redoBtn.style.opacity = redoBtn.disabled ? '0.4' : '1';
             }
 
             undoBtn.addEventListener('click', () => {
                 if (historyIndex > 0) {
-                    isInterimActive = false;
-                    historyIndex--;
+                    isInterimActive = false; historyIndex--;
                     const prevText = textHistory[historyIndex];
-                    transcriptTextarea.value = prevText;
-                    sttStableText = prevText;
-                    updateUndoRedoButtons();
-                    debouncedSave(); 
-                    updateTranscriptHighlight(); 
+                    transcriptTextarea.value = prevText; sttStableText = prevText;
+                    updateUndoRedoButtons(); debouncedSave(); updateTranscriptHighlight(); 
                 }
             });
 
             redoBtn.addEventListener('click', () => {
                 if (historyIndex < textHistory.length - 1) {
-                    isInterimActive = false;
-                    historyIndex++;
+                    isInterimActive = false; historyIndex++;
                     const nextText = textHistory[historyIndex];
-                    transcriptTextarea.value = nextText;
-                    sttStableText = nextText;
-                    updateUndoRedoButtons();
-                    debouncedSave();
-                    updateTranscriptHighlight(); 
+                    transcriptTextarea.value = nextText; sttStableText = nextText;
+                    updateUndoRedoButtons(); debouncedSave(); updateTranscriptHighlight(); 
                 }
             });
-            
-            clearTextBtn.addEventListener('click', () => {
-                if (transcriptTextarea.value.trim() === '') {
-                    showToast("Transcript is already empty", "info");
+
+            function updateTranscriptHighlight() {
+                if (!transcriptOverlay) return;
+                const coloredParticipants = participants.filter(p => p.name && p.color);
+                if (coloredParticipants.length === 0) {
+                    if (transcriptOverlay.innerHTML !== '') transcriptOverlay.innerHTML = '';
                     return;
                 }
                 
-                confirmTitle.textContent = "Clear Transcript";
-                confirmMessage.textContent = "Delete all text in the transcript? You can Undo this action.";
-                confirmOkBtn.onclick = () => {
-                    isInterimActive = false;
-                    transcriptTextarea.value = '';
-                    sttStableText = '';
-                    saveToHistory(''); 
-                    
-                    debouncedSave();
-                    updateTranscriptHighlight(); 
-                    hideAllModals();
-                    showToast("Transcript cleared", "success");
-                };
-                confirmModal.classList.remove('hidden');
-            });
+                let text = transcriptTextarea.value;
+                let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                
+                coloredParticipants.forEach(p => {
+                    const escaped = p.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`(${escaped})(\\s*:\\s*)`, 'g');
+                    html = html.replace(regex, `<span style="color:${p.color};font-weight:600;">$1</span><span style="color:${p.color};opacity:0.7;">$2</span>`);
+                });
+                
+                const newHTML = `<span style="color:transparent;white-space:pre-wrap;word-break:break-word;display:block;">${html}</span>`;
+                if (transcriptOverlay.innerHTML !== newHTML) transcriptOverlay.innerHTML = newHTML;
+                transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
+            }
 
             let historyTimeout;
             transcriptTextarea.addEventListener('input', () => {
                 sttStableText = transcriptTextarea.value; 
-
                 clearTimeout(historyTimeout);
-                historyTimeout = setTimeout(() => {
-                    saveToHistory(transcriptTextarea.value);
-                }, 500); 
-                
+                historyTimeout = setTimeout(() => saveToHistory(transcriptTextarea.value), 500); 
                 debouncedSave();
                 transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
-                
                 updateTranscriptHighlight();
             });
 
@@ -1514,10 +1082,7 @@
             }
 
             function initSortable() {
-                if (typeof Sortable === 'undefined') {
-                    console.error("Sortable library not loaded.");
-                    return;
-                }
+                if (typeof Sortable === 'undefined') return;
                 if (sortableInstance) return;
                 sortableInstance = new Sortable(participantsGrid, {
                     animation: 150,
@@ -1534,29 +1099,36 @@
                 });
             }
 
-            // ── REORDER BUTTON ──
+            // ── REORDER & EDIT BUTTONS ──
             document.getElementById('reorder-btn').addEventListener('click', () => {
                 isReorderMode = !isReorderMode;
-                
-                if (sortableInstance) {
-                    sortableInstance.option('disabled', !isReorderMode);
-                }
-                
+                if (sortableInstance) sortableInstance.option('disabled', !isReorderMode);
                 const reorderBtn = document.getElementById('reorder-btn');
                 reorderBtn.style.color = isReorderMode ? 'var(--accent-color)' : '';
                 reorderBtn.style.borderColor = isReorderMode ? 'var(--accent-color)' : '';
-                
                 showToast(isReorderMode ? 'โหมดเรียงลำดับ — ลากสลับตำแหน่งได้เลย' : 'ออกจากโหมดเรียงลำดับ', 'info');
             });
 
-            async function saveStateToFirestore() {
-                if (!meetingDocRef) return;
-                if (!userId) return;
+            document.getElementById('edit-cards-btn').addEventListener('click', () => {
+                isEditCardsMode = !isEditCardsMode;
+                const btn = document.getElementById('edit-cards-btn');
+                btn.style.color = isEditCardsMode ? '#ef4444' : '';
+                btn.style.borderColor = isEditCardsMode ? '#ef4444' : '';
                 
+                if (isEditCardsMode) {
+                    participantsGrid.classList.add('edit-cards-mode');
+                    showToast('เข้าสู่โหมดแก้ไข (ลากวาง หรือ พิมพ์ ไม่ได้ในโหมดนี้)', 'info');
+                } else {
+                    participantsGrid.classList.remove('edit-cards-mode');
+                    showToast('ออกจากโหมดแก้ไข', 'info');
+                }
+            });
+
+            async function saveStateToFirestore() {
+                if (!meetingDocRef || !userId) return;
                 saveSpinner.classList.remove('hidden');
                 saveText.textContent = "SAVING";
                 saveText.parentNode.classList.add('saving');
-
                 try {
                     await updateDoc(meetingDocRef, {
                         participants: participants,
@@ -1564,20 +1136,14 @@
                         meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes',
                         columnCount: columnCount
                     });
-                    
                     setTimeout(() => {
-                         saveSpinner.classList.add('hidden');
-                         saveText.textContent = "SAVED";
-                         saveText.parentNode.classList.remove('saving');
+                         saveSpinner.classList.add('hidden'); saveText.textContent = "SAVED"; saveText.parentNode.classList.remove('saving');
                     }, 800);
-
                 } catch (error) {
                     if (error.code === 'not-found') {
                         await setDoc(meetingDocRef, {
-                            participants: participants,
-                            transcript: transcriptTextarea.value,
-                            meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes',
-                            columnCount: columnCount
+                            participants: participants, transcript: transcriptTextarea.value,
+                            meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes', columnCount: columnCount
                         }, { merge: true });
                     } else {
                         console.error("Error saving state to Firestore: ", error);
@@ -1595,17 +1161,13 @@
             };
             const debouncedSave = debounce(saveStateToFirestore, 1000); 
 
-            // ── COLOR PICKER POPUP (Global) ──
             function showColorPicker(e, p) {
                 document.querySelectorAll('.color-picker-popup').forEach(el => el.remove());
-
                 const popup = document.createElement('div');
                 popup.className = 'color-picker-popup';
 
                 let targetEl = e.target;
-                if (e.touches && e.touches.length > 0) {
-                    targetEl = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY) || e.target;
-                }
+                if (e.touches && e.touches.length > 0) targetEl = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY) || e.target;
                 const btnRect = targetEl.getBoundingClientRect();
                 const finalTop = btnRect.top - 90 < 60 ? btnRect.bottom + 8 : btnRect.top - 90;
                 popup.style.top = `${finalTop}px`;
@@ -1613,68 +1175,39 @@
 
                 PRESET_COLORS.forEach(color => {
                     const dot = document.createElement('div');
-                    dot.className = 'color-dot';
-                    dot.dataset.color = color;
+                    dot.className = 'color-dot'; dot.dataset.color = color;
                     if (p.color === color) dot.classList.add('selected');
                     dot.style.background = color;
                     popup.appendChild(dot);
                 });
 
                 const clearDot = document.createElement('div');
-                clearDot.className = 'color-dot';
-                clearDot.dataset.color = 'clear';
+                clearDot.className = 'color-dot'; clearDot.dataset.color = 'clear';
                 clearDot.style.cssText = 'background:transparent;border:2px dashed var(--text-secondary);';
                 popup.appendChild(clearDot);
                 document.body.appendChild(popup);
 
                 let cleanup;
-
-                // ฟังก์ชันสำหรับการเลือกสี
                 const applyColor = (target) => {
                     if (!target || !target.classList.contains('color-dot')) return false;
                     const color = target.dataset.color;
-                    if (color === 'clear') {
-                        delete p.color;
-                    } else {
-                        p.color = color;
-                    }
-                    cleanup();
-                    renderParticipants();
-                    saveStateToFirestore();
-                    return true;
+                    if (color === 'clear') delete p.color; else p.color = color;
+                    cleanup(); renderParticipants(); saveStateToFirestore(); return true;
                 };
 
-                // รองรับการกดค้างแล้วลากไปปล่อยนิ้วที่สี (Drag & Release)
                 const onPointerUpOrTouchEnd = (ev) => {
                     let clientX, clientY;
                     if (ev.type.startsWith('touch') && ev.changedTouches && ev.changedTouches.length > 0) {
-                        clientX = ev.changedTouches[0].clientX;
-                        clientY = ev.changedTouches[0].clientY;
+                        clientX = ev.changedTouches[0].clientX; clientY = ev.changedTouches[0].clientY;
                     } else if (ev.clientX !== undefined && ev.clientY !== undefined) {
-                        clientX = ev.clientX;
-                        clientY = ev.clientY;
-                    } else {
-                        return;
-                    }
-
+                        clientX = ev.clientX; clientY = ev.clientY;
+                    } else return;
                     const target = document.elementFromPoint(clientX, clientY);
-                    if (applyColor(target)) {
-                        if (ev.cancelable) ev.preventDefault();
-                    }
+                    if (applyColor(target)) { if (ev.cancelable) ev.preventDefault(); }
                 };
 
-                // การกดพื้นที่ว่างเพื่อปิด
-                const onClickGlobal = (ev) => {
-                    if (!popup.contains(ev.target)) {
-                        cleanup();
-                    }
-                };
-
-                // รองรับการแตะปกติในกล่องสี
-                popup.addEventListener('click', (ev) => {
-                    ev.stopPropagation();
-                    applyColor(ev.target);
-                });
+                const onClickGlobal = (ev) => { if (!popup.contains(ev.target)) cleanup(); };
+                popup.addEventListener('click', (ev) => { ev.stopPropagation(); applyColor(ev.target); });
 
                 cleanup = () => {
                     popup.remove();
@@ -1683,7 +1216,6 @@
                     document.removeEventListener('click', onClickGlobal, true);
                 };
 
-                // แนบ Event Listener (ใช้ Timeout เผื่อเลี่ยง event ที่ตกค้างจากการเปิด)
                 setTimeout(() => {
                     document.addEventListener('pointerup', onPointerUpOrTouchEnd);
                     document.addEventListener('touchend', onPointerUpOrTouchEnd, { passive: false });
@@ -1697,6 +1229,7 @@
                     participantsGrid.innerHTML = `<p class="col-span-full text-center text-sm" style="color: var(--text-secondary);">No participants yet</p>`;
                     return;
                 }
+                
                 participants.forEach(p => {
                     const box = document.createElement('div');
                     box.className = 'participant-box p-3 text-center flex flex-col items-center justify-center min-h-[75px] relative';
@@ -1707,6 +1240,7 @@
                     nameElement.className = 'font-bold text-sm w-full uppercase tracking-wide pointer-events-none px-1 leading-snug custom-line-clamp-2';
                     nameElement.textContent = p.name;
                     
+                    // Edit and Delete icons (shown via CSS when in edit-cards-mode)
                     const editIcon = document.createElement('div');
                     editIcon.className = 'card-action-icon edit-icon';
                     editIcon.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>';
@@ -1722,61 +1256,39 @@
                     box.appendChild(editIcon);
 
                     if (p.color) {
-                        box.style.borderColor = p.color;
-                        box.style.boxShadow = `inset 0 0 0 1px ${p.color}`;
-                        box.style.background = `${p.color}0A`; 
-                    } else {
-                        box.style.borderColor = '';
-                        box.style.boxShadow = '';
-                        box.style.background = '';
+                        box.style.borderColor = p.color; box.style.boxShadow = `inset 0 0 0 1px ${p.color}`; box.style.background = `${p.color}0A`; 
                     }
 
-                    let startX = 0;
-                    let startY = 0;
-                    let isDragging = false;
+                    let startX = 0, startY = 0, isDragging = false, pressTimer = null;
                     const dragThreshold = 10;
-                    let pressTimer = null;
 
                     box.addEventListener('pointerdown', (e) => {
                         if (e.target.closest('.card-action-icon')) return;
-                        startX = e.clientX;
-                        startY = e.clientY;
-                        isDragging = false;
+                        if (isEditCardsMode) return; // Disable color picker in edit mode
+                        startX = e.clientX; startY = e.clientY; isDragging = false;
                         
                         pressTimer = setTimeout(() => {
-                            if (!isDragging) {
-                                showColorPicker(e, p);
-                            }
+                            if (!isDragging && !isEditCardsMode) showColorPicker(e, p);
                         }, 600);
                     });
 
-                    box.addEventListener('pointerup', () => {
-                        clearTimeout(pressTimer);
-                    });
-
-                    box.addEventListener('pointercancel', () => {
-                        clearTimeout(pressTimer);
-                    });
-
+                    box.addEventListener('pointerup', () => clearTimeout(pressTimer));
+                    box.addEventListener('pointercancel', () => clearTimeout(pressTimer));
                     box.addEventListener('pointermove', (e) => {
                         if (!isDragging) {
-                            const dx = Math.abs(e.clientX - startX);
-                            const dy = Math.abs(e.clientY - startY);
-                            if (dx > dragThreshold || dy > dragThreshold) {
-                                isDragging = true;
-                                clearTimeout(pressTimer); 
+                            if (Math.abs(e.clientX - startX) > dragThreshold || Math.abs(e.clientY - startY) > dragThreshold) {
+                                isDragging = true; clearTimeout(pressTimer); 
                             }
                         }
                     });
 
-                    box.addEventListener('contextmenu', (e) => {
-                        e.preventDefault();
-                    });
+                    box.addEventListener('contextmenu', (e) => e.preventDefault());
 
                     box.addEventListener('click', (e) => {
                         if (isDragging) return;
                         if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
                         if (document.querySelector('.color-picker-popup')) return; 
+                        if (isEditCardsMode) return; // Prevent transcript logging in edit mode
                         handleParticipantSelect(p.id);
                     });
 
@@ -1784,25 +1296,23 @@
                         if (isDragging) return;
                         if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
                         if (document.querySelector('.color-picker-popup')) return;
+                        if (isEditCardsMode) return; 
                         transcriptTextarea.focus();
                     }, { passive: true });
 
                     editIcon.addEventListener('click', (e) => { 
-                        e.preventDefault();
-                        e.stopPropagation(); 
+                        e.preventDefault(); e.stopPropagation(); 
                         handleNameEdit(p.id); 
                     });
                     
                     deleteIcon.addEventListener('click', (e) => { 
-                        e.preventDefault();
-                        e.stopPropagation(); 
+                        e.preventDefault(); e.stopPropagation(); 
                         handleDeleteParticipant(p.id); 
                     });
 
                     participantsGrid.appendChild(box);
                 });
                 if (!sortableInstance) initSortable();
-                
                 updateTranscriptHighlight();
             }
             
@@ -1810,17 +1320,13 @@
                 columnCount = newCount;
                 colsCountSpan.textContent = columnCount;
                 participantsGrid.className = `grid gap-3 grid-cols-${columnCount} mb-4`;
+                if(isEditCardsMode) participantsGrid.classList.add('edit-cards-mode');
                 document.documentElement.style.setProperty('--meeting-cols', columnCount);
             }
             
             function handleParticipantSelect(id) {
-                if (isInterimActive) {
-                    transcriptTextarea.value = sttStableText;
-                    isInterimActive = false;
-                }
-
+                if (isInterimActive) { transcriptTextarea.value = sttStableText; isInterimActive = false; }
                 activeParticipantId = id;
-                
                 document.querySelectorAll('.participant-box').forEach(box => {
                     box.classList.toggle('active', parseInt(box.dataset.id) === id);
                 });
@@ -1829,19 +1335,13 @@
                 if (!participant) return;
                 
                 saveToHistory(transcriptTextarea.value);
-
                 const currentText = transcriptTextarea.value;
                 const textToInsert = `\n${participant.name}  :  `; 
                 const newText = (currentText.length > 0 && !currentText.endsWith('\n')) 
-                    ? `${currentText}${textToInsert}` 
-                    : `${currentText}${textToInsert.trimStart()}`;
+                    ? `${currentText}${textToInsert}` : `${currentText}${textToInsert.trimStart()}`;
                 
-                transcriptTextarea.value = newText;
-                sttStableText = newText; 
-                
-                saveToHistory(newText);
-                debouncedSave();
-                updateTranscriptHighlight(); 
+                transcriptTextarea.value = newText; sttStableText = newText; 
+                saveToHistory(newText); debouncedSave(); updateTranscriptHighlight(); 
 
                 transcriptTextarea.focus();
                 transcriptTextarea.setSelectionRange(transcriptTextarea.value.length, transcriptTextarea.value.length);
@@ -1852,10 +1352,8 @@
                 const input = editNameInput;
                 const participant = participants.find(p => p.id === id);
                 if (participant) { 
-                    input.dataset.id = id;
-                    input.value = participant.name;
-                    editNameModal.classList.remove('hidden'); 
-                    input.focus();
+                    input.dataset.id = id; input.value = participant.name;
+                    editNameModal.classList.remove('hidden'); input.focus();
                 }
             }
 
@@ -1873,9 +1371,7 @@
                     item.textContent = name;
                     item.style.cssText = 'padding:0.6rem 1rem;cursor:pointer;font-size:0.82rem;border-bottom:1px solid var(--border-color);';
                     item.addEventListener('click', (e) => { 
-                        e.preventDefault();
-                        document.getElementById('edit-name-input').value = name;
-                        list.style.display = 'none';
+                        e.preventDefault(); document.getElementById('edit-name-input').value = name; list.style.display = 'none';
                     });
                     item.addEventListener('mouseover', () => item.style.background = 'rgba(128, 128, 128, 0.1)');
                     item.addEventListener('mouseout', () => item.style.background = '');
@@ -1897,391 +1393,49 @@
                 if (newName && id) {
                     const participant = participants.find(p => p.id === id);
                     if (participant) { 
-                        participant.name = newName; 
-                        hideAllModals(); 
-                        renderParticipants();
-                        saveStateToFirestore();
+                        participant.name = newName; hideAllModals(); renderParticipants(); saveStateToFirestore();
                     }
                 }
             });
             
             function handleDeleteParticipant(id) {
-                confirmTitle.textContent = "Delete Participant";
-                const participant = participants.find(p => p.id === id);
-                if (participant) {
-                    confirmMessage.textContent = `Are you sure you want to remove "${participant.name}"?`;
-                    confirmOkBtn.onclick = () => {
-                        participants = participants.filter(p => p.id !== id);
-                        renderParticipants();
-                        saveStateToFirestore();
-                        hideAllModals();
-                    };
-                    confirmModal.classList.remove('hidden');
-                }
+                // To keep it seamless when in Edit Mode, we delete instantly without annoying confirm dialogs.
+                // It works just like Seating Plan.
+                participants = participants.filter(p => p.id !== id);
+                renderParticipants();
+                saveStateToFirestore();
+                showToast("ลบรายชื่อแล้ว", "info");
             }
             
             clearAllBtn.addEventListener('click', () => {
-                if (participants.length === 0) {
-                    showToast("No participants to clear", "info");
-                    return;
-                }
+                if (participants.length === 0) { showToast("No participants to clear", "info"); return; }
                 confirmTitle.textContent = "Clear All";
                 confirmMessage.textContent = "Remove all participants? This cannot be undone.";
                 confirmOkBtn.onclick = () => {
-                    participants = [];
-                    activeParticipantId = null;
-                    nextId = 1;
-                    renderParticipants();
-                    saveStateToFirestore();
-                    hideAllModals();
-                    showToast("Participants cleared", "success");
+                    participants = []; activeParticipantId = null; nextId = 1;
+                    renderParticipants(); saveStateToFirestore(); hideAllModals(); showToast("Participants cleared", "success");
                 };
                 confirmModal.classList.remove('hidden');
             });
             
             saveListBtn.addEventListener('click', () => {
                 toolsDropdown.classList.add('hidden'); 
-                if (participants.length === 0) {
-                    showToast("No participants to save", "info");
-                    return;
-                }
-                saveListNameInput.value = '';
-                saveListModal.classList.remove('hidden');
+                if (participants.length === 0) { showToast("No participants to save", "info"); return; }
+                saveListNameInput.value = ''; saveListModal.classList.remove('hidden');
             });
 
             saveListConfirmBtn.addEventListener('click', async () => {
                 const listName = saveListNameInput.value.trim();
-                if (!listName) {
-                    showToast("Please enter a name", "error");
-                    return;
-                }
+                if (!listName) { showToast("Please enter a name", "error"); return; }
                 if (!userId) return;
                 try {
                     const listRef = collection(db, getBasePath(userId), 'participant_lists');
-                    await addDoc(listRef, {
-                        name: listName,
-                        participants: participants,
-                        createdAt: serverTimestamp()
-                    });
-                    hideAllModals();
-                    showToast(`Group "${listName}" saved`, "success");
-                    await loadAllNamesCache(); 
-                } catch (error) {
-                    console.error("Error saving list:", error);
-                    showToast("Error saving group", "error");
-                }
+                    await addDoc(listRef, { name: listName, participants: participants, createdAt: serverTimestamp() });
+                    hideAllModals(); showToast(`Group "${listName}" saved`, "success"); await loadAllNamesCache(); 
+                } catch (error) { showToast("Error saving group", "error"); }
             });
 
-            loadListBtn.addEventListener('click', async () => {
-                toolsDropdown.classList.add('hidden'); 
-                loadListModal.classList.remove('hidden');
-                savedListsContainer.innerHTML = '<p class="text-center text-gray-500 font-mono text-sm">Loading...</p>';
-                if (!userId) return;
-                
-                try {
-                    const listRef = collection(db, getBasePath(userId), 'participant_lists');
-                    const q = query(listRef, orderBy('createdAt', 'desc'));
-                    const querySnapshot = await getDocs(q);
-                    
-                    savedListsContainer.innerHTML = '';
-                    if (querySnapshot.empty) {
-                        savedListsContainer.innerHTML = '<p class="text-center text-gray-500 font-mono text-sm">No saved groups</p>';
-                        return;
-                    }
-
-                    querySnapshot.forEach((docSnap) => {
-                        const listData = docSnap.data();
-                        const listId = docSnap.id;
-                        
-                        const itemDiv = document.createElement('div');
-                        itemDiv.className = 'saved-list-item flex justify-between items-center p-4 rounded-lg transition cursor-pointer mb-2';
-                        
-                        itemDiv.onclick = () => loadGroupAction(listData.participants);
-
-                        const nameSpan = document.createElement('span');
-                        nameSpan.className = 'font-bold flex-grow text-sm uppercase tracking-wide';
-                        nameSpan.textContent = listData.name + ` (${listData.participants ? listData.participants.length : 0})`;
-
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'list-item-action text-gray-500 hover:text-white p-2 rounded-full transition';
-                        deleteBtn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
-                        deleteBtn.onclick = (e) => {
-                            e.stopPropagation();
-                            deleteGroupAction(listId, itemDiv);
-                        };
-
-                        itemDiv.appendChild(nameSpan);
-                        itemDiv.appendChild(deleteBtn);
-                        savedListsContainer.appendChild(itemDiv);
-                    });
-                } catch (error) {
-                    console.error("Error loading lists:", error);
-                    savedListsContainer.innerHTML = '<p class="text-center text-red-500">Failed to load</p>';
-                }
-            });
-
-            function loadGroupAction(loadedParticipants) {
-                 if (!loadedParticipants || !Array.isArray(loadedParticipants)) {
-                     showToast("Invalid group data", "error");
-                     return;
-                 }
-                 
-                 loadListModal.classList.add('hidden');
-
-                 confirmTitle.textContent = "Load Group";
-                 confirmMessage.textContent = "This will replace current participants. Continue?";
-                 confirmOkBtn.onclick = () => {
-                     participants = JSON.parse(JSON.stringify(loadedParticipants));
-                     const maxId = participants.reduce((max, p) => p.id > max ? p.id : max, 0);
-                     nextId = maxId + 1;
-                     
-                     renderParticipants();
-                     saveStateToFirestore();
-                     hideAllModals();
-                     showToast("Group loaded", "success");
-                 };
-                 confirmModal.classList.remove('hidden');
-            }
-
-            async function deleteGroupAction(docId, elementToRemove) {
-                confirmTitle.textContent = "Delete Group";
-                confirmMessage.textContent = "Delete this group permanently?";
-                confirmOkBtn.onclick = async () => {
-                    try {
-                        if (!userId) return;
-                        await deleteDoc(doc(db, getBasePath(userId), 'participant_lists', docId));
-                        elementToRemove.remove();
-                        if (savedListsContainer.children.length === 0) {
-                            savedListsContainer.innerHTML = '<p class="text-center text-gray-500">No saved groups</p>';
-                        }
-                        hideAllModals();
-                    } catch(error) {
-                         console.error("Error deleting list:", error);
-                         showToast("Failed to delete", "error");
-                    }
-                };
-                confirmModal.classList.remove('hidden');
-            }
-
-            transcriptTextarea.addEventListener('scroll', () => {
-                transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
-            });
-            
-            addParticipantBtn.addEventListener('click', () => {
-                const newParticipant = { id: nextId, name: `ผู้มาชี้แจง ${nextId}` };
-                nextId++;
-                participants.push(newParticipant);
-                renderParticipants();
-                saveStateToFirestore();
-            });
-            
-            bulkAddBtn.addEventListener('click', () => {
-                toolsDropdown.classList.add('hidden'); 
-                bulkAddTextarea.value = '';
-                bulkAddModal.classList.remove('hidden');
-                bulkAddTextarea.focus();
-            });
-
-            bulkAddConfirmBtn.addEventListener('click', () => {
-                const text = bulkAddTextarea.value;
-                const names = text.split('\n').map(n => n.trim()).filter(n => n);
-                
-                if (names.length === 0) {
-                    showToast("No names entered", "info");
-                    return;
-                }
-
-                let addedCount = 0;
-                names.forEach(name => {
-                    participants.push({ id: nextId, name: name });
-                    nextId++;
-                    addedCount++;
-                });
-
-                renderParticipants();
-                saveStateToFirestore();
-                hideAllModals();
-                showToast(`Added ${addedCount} participants`, "success");
-            });
-            
-            bulkAddCancelBtn.addEventListener('click', hideAllModals);
-
-            importExcelBtn.addEventListener('click', () => {
-                excelInput.click();
-            });
-
-            excelInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const data = new Uint8Array(event.target.result);
-                    try {
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheetName = workbook.SheetNames[0];
-                        const worksheet = workbook.Sheets[firstSheetName];
-                        
-                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-                        
-                        let addedCount = 0;
-                        if (jsonData && jsonData.length > 0) {
-                            jsonData.forEach(row => {
-                                if (row.length > 0 && row[0]) {
-                                    const name = String(row[0]).trim();
-                                    if (name) {
-                                        participants.push({ id: nextId, name: name });
-                                        nextId++;
-                                        addedCount++;
-                                    }
-                                }
-                            });
-                            
-                            if (addedCount > 0) {
-                                renderParticipants();
-                                saveStateToFirestore();
-                                showToast(`Imported ${addedCount} members`, "success");
-                            } else {
-                                showToast("No names found", "info");
-                            }
-                        } else {
-                            showToast("File is empty", "info");
-                        }
-                    } catch (error) {
-                        console.error("Excel Import Error:", error);
-                        showToast("Import error", "error");
-                    }
-                    excelInput.value = ''; 
-                };
-                reader.readAsArrayBuffer(file);
-            });
-
-            increaseColsBtn.addEventListener('click', () => { 
-                if (columnCount < 10) {
-                    updateColumnLayout(columnCount + 1);
-                    saveStateToFirestore();
-                }
-            });
-            
-            decreaseColsBtn.addEventListener('click', () => { 
-                if (columnCount > 1) {
-                    updateColumnLayout(columnCount - 1);
-                    saveStateToFirestore();
-                }
-            });
-
-            saveBtn.addEventListener('click', () => {
-                saveStateToFirestore();
-                showToast("Saved successfully", "success");
-            });
-
-            downloadBtn.addEventListener('click', () => {
-                const text = transcriptTextarea.value;
-                if (text.trim() === '') {
-                    showToast('Nothing to download', "info");
-                    return;
-                }
-                
-                function escapeHtml(str) {
-                    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-                }
-
-                const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
-                    "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-                    "xmlns='http://www.w3.org/TR/REC-html40'>"+
-                    "<head><meta charset='utf-8'><title>Meeting Notes</title></head><body>";
-                const footer = "</body></html>";
-                const content = `<pre>${escapeHtml(text).replace(/\t/g, '&#9;')}</pre>`;
-                const sourceHTML = header + content + footer;
-
-                const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
-                const fileDownload = document.createElement("a");
-                document.body.appendChild(fileDownload);
-                fileDownload.href = source;
-                fileDownload.download = `meeting-notes-${new Date().toISOString().slice(0,10)}.doc`;
-                fileDownload.click();
-                document.body.removeChild(fileDownload);
-                showToast("Downloading Word doc...", "success");
-            });
-            
-            copyAllBtn.addEventListener('click', () => {
-                const textToCopy = transcriptTextarea.value;
-                if (textToCopy.trim() === '') { showToast('Nothing to copy', 'info'); return; }
-                
-                // Fallback for iframe execution
-                const textAreaFallback = document.createElement("textarea");
-                textAreaFallback.value = textToCopy;
-                document.body.appendChild(textAreaFallback);
-                textAreaFallback.select();
-                try {
-                    document.execCommand('copy');
-                    showToast('Copied to clipboard', 'success');
-                } catch (err) {
-                    showToast('Copy failed', 'error');
-                }
-                document.body.removeChild(textAreaFallback);
-            });
-
-            let isHResizing = false;
-            const hResizer = document.getElementById('horizontal-resizer');
-
-            const handleHMouseMove = (e) => {
-                if (!isHResizing) return;
-                const event = e.touches ? e.touches[0] : e;
-                const container = document.getElementById('main-container');
-                const containerRect = container.getBoundingClientRect();
-                
-                let newTopHeight = event.clientY - containerRect.top;
-                
-                const minTop = 80;
-                const minBottom = 120;
-                const maxTop = containerRect.height - minBottom;
-                
-                newTopHeight = Math.max(minTop, Math.min(newTopHeight, maxTop));
-                leftPanel.style.height = `${newTopHeight}px`;
-                leftPanel.style.flexBasis = `${newTopHeight}px`;
-                leftPanel.style.flexGrow = '0';
-                leftPanel.style.flexShrink = '0';
-            };
-
-            const stopHResizing = () => {
-                isHResizing = false;
-                hResizer.classList.remove('resizing');
-                document.removeEventListener('mousemove', handleHMouseMove);
-                document.removeEventListener('mouseup', stopHResizing);
-                document.removeEventListener('touchmove', handleHMouseMove);
-                document.removeEventListener('touchend', stopHResizing);
-            };
-
-            // ── SEATING RESIZER LOGIC ──
-            const seatingResizer = document.getElementById('seating-resizer');
-            let isSeatingResizing = false;
-
-            const handleSeatingMouseMove = (e) => {
-                if (!isSeatingResizing) return;
-                const event = e.touches ? e.touches[0] : e;
-                const sPanel = document.getElementById('seating-panel');
-                const panelTop = sPanel.getBoundingClientRect().top;
-                
-                let newHeight = event.clientY - panelTop;
-                const minHeight = 120; 
-                const maxHeight = window.innerHeight * 0.75; 
-                newHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
-                
-                sPanel.style.maxHeight = 'none'; 
-                sPanel.style.height = `${newHeight}px`;
-                sPanel.style.flexBasis = `${newHeight}px`;
-            };
-
-            const stopSeatingResizing = () => {
-                isSeatingResizing = false;
-                seatingResizer.classList.remove('resizing');
-                document.removeEventListener('mousemove', handleSeatingMouseMove);
-                document.removeEventListener('mouseup', stopSeatingResizing);
-                document.removeEventListener('touchmove', handleSeatingMouseMove);
-                document.removeEventListener('touchend', stopSeatingResizing);
-            };
-
+            // ── SEATING PLAN ──
             async function loadSeatingLayout() {
                 if (!meetingDocRef) return;
                 try {
@@ -2294,95 +1448,48 @@
 
             async function saveSeatingLayout() {
                 if (!meetingDocRef) return;
-                try {
-                    await updateDoc(meetingDocRef, { seatingLayout });
-                } catch(e) { console.error('Seating save error', e); }
+                try { await updateDoc(meetingDocRef, { seatingLayout }); } catch(e) { console.error('Seating save error', e); }
             }
 
             function resetSeatingPanelHeight() {
-                seatingPanel.style.height = '';
-                seatingPanel.style.flexBasis = '';
-                seatingPanel.style.maxHeight = '';
+                seatingPanel.style.height = ''; seatingPanel.style.flexBasis = ''; seatingPanel.style.maxHeight = '';
             }
 
             function renderSeatingPanel() {
                 seatingPanel.innerHTML = '';
-
-                // Controls bar
                 const controls = document.createElement('div');
                 controls.className = 'seating-controls';
                 controls.style.cssText = 'display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem;width:100%;';
 
-                // แถวบน
-                const topGroup = document.createElement('div');
-                topGroup.className = 'seating-control-group';
-                topGroup.innerHTML = `
-                    <span>บน</span>
-                    <button class="seating-ctrl-btn" id="top-minus">−</button>
-                    <span id="top-count">${seatingLayout.rowsTop}</span>
-                    <button class="seating-ctrl-btn" id="top-plus">+</button>
-                `;
+                const topGroup = document.createElement('div'); topGroup.className = 'seating-control-group';
+                topGroup.innerHTML = `<span>บน</span><button class="seating-ctrl-btn" id="top-minus">−</button><span id="top-count">${seatingLayout.rowsTop}</span><button class="seating-ctrl-btn" id="top-plus">+</button>`;
+                
+                const botGroup = document.createElement('div'); botGroup.className = 'seating-control-group';
+                botGroup.innerHTML = `<span>ล่าง</span><button class="seating-ctrl-btn" id="bot-minus">−</button><span id="bot-count">${seatingLayout.rowsBottom}</span><button class="seating-ctrl-btn" id="bot-plus">+</button>`;
+                
+                const seatGroup = document.createElement('div'); seatGroup.className = 'seating-control-group';
+                seatGroup.innerHTML = `<span>ที่นั่ง/แถว</span><button class="seating-ctrl-btn" id="seat-minus">−</button><span id="seat-count">${seatingLayout.seatsPerRow}</span><button class="seating-ctrl-btn" id="seat-plus">+</button>`;
 
-                // แถวล่าง
-                const botGroup = document.createElement('div');
-                botGroup.className = 'seating-control-group';
-                botGroup.innerHTML = `
-                    <span>ล่าง</span>
-                    <button class="seating-ctrl-btn" id="bot-minus">−</button>
-                    <span id="bot-count">${seatingLayout.rowsBottom}</span>
-                    <button class="seating-ctrl-btn" id="bot-plus">+</button>
-                `;
+                const sizeGroup = document.createElement('div'); sizeGroup.className = 'seating-control-group';
+                sizeGroup.innerHTML = `<span>ขนาด</span><button class="seating-ctrl-btn" id="size-minus">−</button><button class="seating-ctrl-btn" id="size-plus">+</button>`;
 
-                // ที่นั่งต่อแถว
-                const seatGroup = document.createElement('div');
-                seatGroup.className = 'seating-control-group';
-                seatGroup.innerHTML = `
-                    <span>ที่นั่ง/แถว</span>
-                    <button class="seating-ctrl-btn" id="seat-minus">−</button>
-                    <span id="seat-count">${seatingLayout.seatsPerRow}</span>
-                    <button class="seating-ctrl-btn" id="seat-plus">+</button>
-                `;
-
-                // ขนาดที่นั่ง
-                const sizeGroup = document.createElement('div');
-                sizeGroup.className = 'seating-control-group';
-                sizeGroup.innerHTML = `
-                    <span>ขนาด</span>
-                    <button class="seating-ctrl-btn" id="size-minus">−</button>
-                    <button class="seating-ctrl-btn" id="size-plus">+</button>
-                `;
-
-                // ประธานซ้าย/ขวา
-                const chairBtn = document.createElement('button');
-                chairBtn.className = 'chairman-side-btn';
+                const chairBtn = document.createElement('button'); chairBtn.className = 'chairman-side-btn';
                 chairBtn.textContent = seatingLayout.chairmanSide === 'left' ? 'ประธาน ← ซ้าย' : 'ประธาน → ขวา';
                 chairBtn.addEventListener('click', () => {
                     seatingLayout.chairmanSide = seatingLayout.chairmanSide === 'left' ? 'right' : 'left';
-                    saveSeatingLayout();
-                    resetSeatingPanelHeight();
-                    renderSeatingPanel();
+                    saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel();
                 });
 
-                // Drag mode
-                const dragBtn = document.createElement('button');
-                dragBtn.className = `drag-mode-btn ${isDragMode ? 'active' : ''}`;
+                const dragBtn = document.createElement('button'); dragBtn.className = `drag-mode-btn ${isDragMode ? 'active' : ''}`;
                 dragBtn.textContent = isDragMode ? '✦ DRAG ON' : 'DRAG';
                 dragBtn.addEventListener('click', () => {
-                    isDragMode = !isDragMode;
-                    seatingPanel.classList.toggle('drag-mode', isDragMode);
-                    renderSeatingPanel();
-                    if (isDragMode) showToast('โหมดลากวาง — ลากชื่อไปวางได้เลย', 'info');
-                    else showToast('ออกจากโหมดลากวาง', 'info');
+                    isDragMode = !isDragMode; seatingPanel.classList.toggle('drag-mode', isDragMode); renderSeatingPanel();
+                    if (isDragMode) showToast('โหมดลากวาง — ลากชื่อสลับที่ หรือ กด X เพื่อลบ', 'info'); else showToast('ออกจากโหมดลากวาง', 'info');
                 });
 
-                controls.appendChild(topGroup);
-                controls.appendChild(botGroup);
-                controls.appendChild(seatGroup);
-                controls.appendChild(sizeGroup);
-                controls.appendChild(chairBtn);
-                controls.appendChild(dragBtn);
+                controls.appendChild(topGroup); controls.appendChild(botGroup); controls.appendChild(seatGroup);
+                controls.appendChild(sizeGroup); controls.appendChild(chairBtn); controls.appendChild(dragBtn);
 
-                // ── BUILD LAYOUT ──
                 const tableWrapper = document.createElement('div');
                 tableWrapper.style.cssText = 'display:flex;flex-direction:row;align-items:stretch;gap:6px;flex:1;min-width:0;overflow-x:auto;';
 
@@ -2390,138 +1497,64 @@
                 const tableArea = document.createElement('div');
                 tableArea.style.cssText = 'display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;';
 
-                // แถวบน
-                for (let r = 0; r < seatingLayout.rowsTop; r++) {
-                    tableArea.appendChild(buildRow('top', r));
-                }
+                for (let r = 0; r < seatingLayout.rowsTop; r++) tableArea.appendChild(buildRow('top', r));
+                const divider = document.createElement('div'); divider.className = 'table-divider'; tableArea.appendChild(divider);
+                for (let r = 0; r < seatingLayout.rowsBottom; r++) tableArea.appendChild(buildRow('bottom', r));
 
-                // โต๊ะ
-                const divider = document.createElement('div');
-                divider.className = 'table-divider';
-                tableArea.appendChild(divider);
+                if (seatingLayout.chairmanSide === 'left') { tableWrapper.appendChild(chairmanEl); tableWrapper.appendChild(tableArea); } 
+                else { tableWrapper.appendChild(tableArea); tableWrapper.appendChild(chairmanEl); }
 
-                // แถวล่าง
-                for (let r = 0; r < seatingLayout.rowsBottom; r++) {
-                    tableArea.appendChild(buildRow('bottom', r));
-                }
+                seatingPanel.appendChild(controls); seatingPanel.appendChild(tableWrapper);
 
-                if (seatingLayout.chairmanSide === 'left') {
-                    tableWrapper.appendChild(chairmanEl);
-                    tableWrapper.appendChild(tableArea);
-                } else {
-                    tableWrapper.appendChild(tableArea);
-                    tableWrapper.appendChild(chairmanEl);
-                }
-
-                seatingPanel.appendChild(controls);
-                seatingPanel.appendChild(tableWrapper);
-
-                // Control events
-                seatingPanel.querySelector('#top-minus').addEventListener('click', () => {
-                    if (seatingLayout.rowsTop > 1) { seatingLayout.rowsTop--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
-                });
-                seatingPanel.querySelector('#top-plus').addEventListener('click', () => {
-                    if (seatingLayout.rowsTop < 4) { seatingLayout.rowsTop++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
-                });
-                seatingPanel.querySelector('#bot-minus').addEventListener('click', () => {
-                    if (seatingLayout.rowsBottom > 1) { seatingLayout.rowsBottom--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
-                });
-                seatingPanel.querySelector('#bot-plus').addEventListener('click', () => {
-                    if (seatingLayout.rowsBottom < 4) { seatingLayout.rowsBottom++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
-                });
-                seatingPanel.querySelector('#seat-minus').addEventListener('click', () => {
-                    if (seatingLayout.seatsPerRow > 1) { seatingLayout.seatsPerRow--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
-                });
-                seatingPanel.querySelector('#seat-plus').addEventListener('click', () => {
-                    if (seatingLayout.seatsPerRow < 18) { seatingLayout.seatsPerRow++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }
-                });
-                
-                seatingPanel.querySelector('#size-minus').addEventListener('click', () => {
-                    if (seatingLayout.seatHeight > 32) {
-                        seatingLayout.seatHeight -= 8;
-                        saveSeatingLayout();
-                        resetSeatingPanelHeight();
-                        renderSeatingPanel();
-                    }
-                });
-                seatingPanel.querySelector('#size-plus').addEventListener('click', () => {
-                    if (seatingLayout.seatHeight < 80) {
-                        seatingLayout.seatHeight += 8;
-                        saveSeatingLayout();
-                        resetSeatingPanelHeight();
-                        renderSeatingPanel();
-                    }
-                });
+                seatingPanel.querySelector('#top-minus').addEventListener('click', () => { if (seatingLayout.rowsTop > 1) { seatingLayout.rowsTop--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                seatingPanel.querySelector('#top-plus').addEventListener('click', () => { if (seatingLayout.rowsTop < 4) { seatingLayout.rowsTop++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                seatingPanel.querySelector('#bot-minus').addEventListener('click', () => { if (seatingLayout.rowsBottom > 1) { seatingLayout.rowsBottom--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                seatingPanel.querySelector('#bot-plus').addEventListener('click', () => { if (seatingLayout.rowsBottom < 4) { seatingLayout.rowsBottom++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                seatingPanel.querySelector('#seat-minus').addEventListener('click', () => { if (seatingLayout.seatsPerRow > 1) { seatingLayout.seatsPerRow--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                seatingPanel.querySelector('#seat-plus').addEventListener('click', () => { if (seatingLayout.seatsPerRow < 18) { seatingLayout.seatsPerRow++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                seatingPanel.querySelector('#size-minus').addEventListener('click', () => { if (seatingLayout.seatHeight > 32) { seatingLayout.seatHeight -= 8; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                seatingPanel.querySelector('#size-plus').addEventListener('click', () => { if (seatingLayout.seatHeight < 80) { seatingLayout.seatHeight += 8; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
 
                 if (isDragMode) seatingPanel.classList.add('drag-mode');
             }
 
             function buildChairmanSlot() {
-                const slot = document.createElement('div');
-                slot.className = 'chairman-slot';
+                const slot = document.createElement('div'); slot.className = 'chairman-slot';
                 slot.style.minHeight = `${seatingLayout.seatHeight * 3}px`;
                 const chairId = seatingLayout.seats['chairman'];
                 const chairP = chairId ? participants.find(p => p.id === chairId) : null;
 
                 if (chairP) {
                     slot.classList.add('filled');
-                    if (chairP.color) {
-                        slot.style.borderColor = chairP.color;
-                        slot.style.background = `${chairP.color}18`;
-                    }
-                    const nameEl = document.createElement('div');
-                    nameEl.className = 'chairman-name';
-                    nameEl.textContent = chairP.name;
-                    slot.appendChild(nameEl);
+                    if (chairP.color) { slot.style.borderColor = chairP.color; slot.style.background = `${chairP.color}18`; }
+                    const nameEl = document.createElement('div'); nameEl.className = 'chairman-name'; nameEl.textContent = chairP.name; slot.appendChild(nameEl);
                 } else {
-                    const emptyEl = document.createElement('div');
-                    emptyEl.className = 'chairman-empty';
-                    emptyEl.textContent = 'ประธาน';
-                    slot.appendChild(emptyEl);
+                    const emptyEl = document.createElement('div'); emptyEl.className = 'chairman-empty'; emptyEl.textContent = 'ประธาน'; slot.appendChild(emptyEl);
                 }
-
                 slot.dataset.seatKey = 'chairman';
                 setupSeatEvents(slot, 'chairman', chairId);
                 return slot;
             }
 
             function buildRow(zone, rowIndex) {
-                const row = document.createElement('div');
-                row.className = 'seating-row';
-
+                const row = document.createElement('div'); row.className = 'seating-row';
                 for (let c = 0; c < seatingLayout.seatsPerRow; c++) {
                     const key = `${zone}-${rowIndex}-${c}`;
                     const pId = seatingLayout.seats[key];
                     const p = pId ? participants.find(x => x.id === pId) : null;
 
-                    const seat = document.createElement('div');
-                    seat.className = 'seat-card';
-                    seat.style.minHeight = `${seatingLayout.seatHeight}px`;
-                    seat.style.height = `${seatingLayout.seatHeight}px`;
+                    const seat = document.createElement('div'); seat.className = 'seat-card';
+                    seat.style.minHeight = `${seatingLayout.seatHeight}px`; seat.style.height = `${seatingLayout.seatHeight}px`;
 
                     if (p) {
                         seat.classList.add('filled');
-                        if (p.color) {
-                            seat.style.borderColor = p.color;
-                            seat.style.background = `${p.color}0A`;
-                        }
+                        if (p.color) { seat.style.borderColor = p.color; seat.style.background = `${p.color}0A`; }
                         if (p.id === activeParticipantId) seat.classList.add('active-speaker');
-                        
-                        const fontSize = seatingLayout.seatHeight < 40 ? '0.55rem' 
-                                       : seatingLayout.seatHeight < 56 ? '0.62rem' 
-                                       : '0.72rem';
-                        const nameEl = document.createElement('div');
-                        nameEl.className = 'seat-name';
-                        nameEl.style.fontSize = fontSize;
-                        nameEl.textContent = p.name;
-                        seat.appendChild(nameEl);
+                        const fontSize = seatingLayout.seatHeight < 40 ? '0.55rem' : seatingLayout.seatHeight < 56 ? '0.62rem' : '0.72rem';
+                        const nameEl = document.createElement('div'); nameEl.className = 'seat-name'; nameEl.style.fontSize = fontSize; nameEl.textContent = p.name; seat.appendChild(nameEl);
                     } else {
-                        const icon = document.createElement('div');
-                        icon.className = 'seat-empty-icon';
-                        icon.textContent = '+';
-                        seat.appendChild(icon);
+                        const icon = document.createElement('div'); icon.className = 'seat-empty-icon'; icon.textContent = '+'; seat.appendChild(icon);
                     }
-
                     seat.dataset.seatKey = key;
                     setupSeatEvents(seat, key, pId);
                     row.appendChild(seat);
@@ -2531,733 +1564,306 @@
 
             function setupSeatEvents(el, key, currentPId) {
                 if (isDragMode) {
-                    el.dataset.seatKey = key;
+                    el.style.cursor = 'grab'; el.style.borderStyle = 'dashed';
 
-                    // Drag source (รองรับทั้งเมาส์และหน้าจอสัมผัส)
-                    el.addEventListener('pointerdown', (e) => {
-                        // ป้องกันการลากถ้ากดโดนปุ่มลบ
-                        if (e.target.closest('.seat-remove-btn')) return;
-                        if (!currentPId) return;
-                        
-                        dragSourceKey = key;
-                        el.style.opacity = '0.5';
-
-                        const onMove = (ev) => {
-                            // ป้องกันหน้าจอเลื่อนเวลาลากนิ้วบนมือถือ
-                            if (ev.cancelable) ev.preventDefault();
-                            
-                            let clientX, clientY;
-                            if (ev.touches && ev.touches.length > 0) {
-                                clientX = ev.touches[0].clientX;
-                                clientY = ev.touches[0].clientY;
-                            } else {
-                                clientX = ev.clientX;
-                                clientY = ev.clientY;
-                            }
-
-                            // ลบคลาส drag-over อันเก่าออกก่อน
-                            document.querySelectorAll('.drag-over').forEach(n => n.classList.remove('drag-over'));
-
-                            // ค้นหา Element ที่อยู่ใต้นิ้ว/เมาส์
-                            const targetEl = document.elementFromPoint(clientX, clientY);
-                            if (targetEl) {
-                                const seatTarget = targetEl.closest('.seat-card, .chairman-slot');
-                                if (seatTarget && seatTarget.dataset.seatKey && seatTarget.dataset.seatKey !== dragSourceKey) {
-                                    seatTarget.classList.add('drag-over');
-                                }
-                            }
-                        };
-
-                        const onUp = (ev) => {
-                            el.style.opacity = '';
-                            
-                            let clientX, clientY;
-                            if (ev.changedTouches && ev.changedTouches.length > 0) {
-                                clientX = ev.changedTouches[0].clientX;
-                                clientY = ev.changedTouches[0].clientY;
-                            } else {
-                                clientX = ev.clientX;
-                                clientY = ev.clientY;
-                            }
-
-                            // ค้นหาตำแหน่งที่ปล่อยนิ้วว่าลงที่นั่งไหน
-                            const targetEl = document.elementFromPoint(clientX, clientY);
-                            let targetKey = null;
-                            if (targetEl) {
-                                const seatTarget = targetEl.closest('.seat-card, .chairman-slot');
-                                if (seatTarget) {
-                                    targetKey = seatTarget.dataset.seatKey;
-                                }
-                            }
-
-                            // ถ้าตำแหน่งที่ปล่อยไม่ใช่ที่เดิม ให้สลับที่
-                            if (targetKey && targetKey !== dragSourceKey) {
-                                const temp = seatingLayout.seats[dragSourceKey];
-                                seatingLayout.seats[dragSourceKey] = seatingLayout.seats[targetKey] || null;
-                                seatingLayout.seats[targetKey] = temp || null;
-                                
-                                if (!seatingLayout.seats[dragSourceKey]) delete seatingLayout.seats[dragSourceKey];
-                                if (!seatingLayout.seats[targetKey]) delete seatingLayout.seats[targetKey];
-                                
-                                saveSeatingLayout();
-                                renderSeatingPanel();
-                            }
-
-                            // ล้างค่าสถานะการลากทั้งหมด
-                            document.querySelectorAll('.drag-over').forEach(n => n.classList.remove('drag-over'));
-                            dragSourceKey = null;
-
-                            // ถอด Event Listeners ออกเพื่อไม่ให้ค้างในหน่วยความจำ
-                            document.removeEventListener('pointermove', onMove);
-                            document.removeEventListener('pointerup', onUp);
-                            document.removeEventListener('touchmove', onMove);
-                            document.removeEventListener('touchend', onUp);
-                        };
-
-                        // ผูก Event ติดตามการเคลื่อนไหวของนิ้วและเมาส์
-                        document.addEventListener('pointermove', onMove, { passive: false });
-                        document.addEventListener('pointerup', onUp);
-                        document.addEventListener('touchmove', onMove, { passive: false });
-                        document.addEventListener('touchend', onUp);
-                    });
-
-                    // เพิ่มปุ่ม X ถ้ามีคนนั่งอยู่ (ทำงานเฉพาะในโหมด Drag)
                     if (currentPId) {
-                        el.style.overflow = 'visible'; // ป้องกันปุ่ม X ถูกซ่อนตามขอบของการ์ด
                         const removeBtn = document.createElement('div');
-                        removeBtn.className = 'seat-remove-btn';
-                        removeBtn.style.cssText = `
-                            position: absolute;
-                            top: -6px;
-                            right: -6px;
-                            width: 18px;
-                            height: 18px;
-                            border-radius: 50%;
-                            background: #ef4444;
-                            color: white;
-                            font-size: 0.65rem;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            cursor: pointer;
-                            z-index: 20;
-                            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-                            font-weight: bold;
-                            line-height: 1;
-                        `;
+                        removeBtn.style.cssText = `position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:white;font-size:0.65rem;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;box-shadow:0 2px 4px rgba(0,0,0,0.3);font-weight:bold;line-height:1;`;
                         removeBtn.textContent = '×';
-                        
-                        // ป้องกันไม่ให้การกดปุ่ม X ไปเผลอกระตุ้นการลาก (Drag)
-                        removeBtn.addEventListener('pointerdown', (e) => e.stopPropagation());
-                        removeBtn.addEventListener('mousedown', (e) => e.stopPropagation());
-                        removeBtn.addEventListener('touchstart', (e) => e.stopPropagation());
-                        
                         removeBtn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            delete seatingLayout.seats[key];
-                            saveSeatingLayout();
-                            renderSeatingPanel();
-                            showToast('ลบออกจากที่นั่งแล้ว', 'info');
+                            e.stopPropagation(); delete seatingLayout.seats[key]; saveSeatingLayout(); renderSeatingPanel(); showToast('ลบออกจากที่นั่งแล้ว', 'info');
                         });
                         el.appendChild(removeBtn);
                     }
 
-                } else {
-                    // Normal mode
-                    el.addEventListener('click', () => {
-                        if (currentPId) {
-                            // มีชื่อ → log ใน transcript
-                            handleParticipantSelect(currentPId);
-                        } else {
-                            // ว่าง → เลือกชื่อมาวาง
-                            showSeatAssignPicker(key);
-                        }
+                    el.addEventListener('pointerdown', (e) => {
+                        if (!currentPId || e.target.closest('div[style*="background: #ef4444"]')) return;
+                        dragSourceKey = key; el.style.opacity = '0.5'; e.preventDefault();
+
+                        const onPointerUp = (ev) => {
+                            el.style.opacity = '';
+                            let clientX, clientY;
+                            if (ev.changedTouches) { clientX = ev.changedTouches[0].clientX; clientY = ev.changedTouches[0].clientY; } 
+                            else { clientX = ev.clientX; clientY = ev.clientY; }
+
+                            el.style.visibility = 'hidden';
+                            const dropTarget = document.elementFromPoint(clientX, clientY);
+                            el.style.visibility = 'visible';
+
+                            const targetSeat = dropTarget ? dropTarget.closest('[data-seat-key]') : null;
+                            if (targetSeat) {
+                                const targetKey = targetSeat.dataset.seatKey;
+                                if (targetKey && targetKey !== dragSourceKey) {
+                                    const temp = seatingLayout.seats[dragSourceKey];
+                                    seatingLayout.seats[dragSourceKey] = seatingLayout.seats[targetKey] || null;
+                                    seatingLayout.seats[targetKey] = temp || null;
+                                    if (!seatingLayout.seats[dragSourceKey]) delete seatingLayout.seats[dragSourceKey];
+                                    if (!seatingLayout.seats[targetKey]) delete seatingLayout.seats[targetKey];
+                                    saveSeatingLayout(); renderSeatingPanel();
+                                }
+                            }
+                            dragSourceKey = null;
+                            document.removeEventListener('pointerup', onPointerUp); document.removeEventListener('touchend', onPointerUp);
+                        };
+                        document.addEventListener('pointerup', onPointerUp, {once:true}); document.addEventListener('touchend', onPointerUp, {once:true});
                     });
-                    
-                    // (ลบส่วนของการกดค้าง 800ms ทิ้งไปทั้งหมดตามที่คุณออกแบบไว้แล้ว)
+                } else {
+                    el.addEventListener('click', () => {
+                        if (currentPId) handleParticipantSelect(currentPId); else showSeatAssignPicker(key);
+                    });
                 }
             }
 
             function showSeatAssignPicker(key) {
-                // สร้าง popup เลือกชื่อ
                 document.querySelectorAll('.seat-assign-popup').forEach(el => el.remove());
+                const popup = document.createElement('div'); popup.className = 'seat-assign-popup';
+                popup.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-panel-solid);border:1px solid var(--border-color);border-radius:16px;padding:1rem;z-index:200;width:min(320px,90vw);max-height:60vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5);backdrop-filter:blur(20px);`;
 
-                const popup = document.createElement('div');
-                popup.className = 'seat-assign-popup';
-                popup.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: var(--bg-panel-solid);
-                    border: 1px solid var(--border-color);
-                    border-radius: 16px;
-                    padding: 1rem;
-                    z-index: 200;
-                    width: min(320px, 90vw);
-                    max-height: 60vh;
-                    overflow-y: auto;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-                    backdrop-filter: blur(20px);
-                `;
+                const title = document.createElement('p'); title.style.cssText = 'font-family:DM Mono,monospace;font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.75rem;letter-spacing:0.05em;'; title.textContent = 'เลือกชื่อที่จะวาง'; popup.appendChild(title);
 
-                const title = document.createElement('p');
-                title.style.cssText = 'font-family:DM Mono,monospace;font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.75rem;letter-spacing:0.05em;';
-                title.textContent = 'เลือกชื่อที่จะวาง';
-                popup.appendChild(title);
-
-                // ปุ่มล้างที่นั่ง
-                const clearBtn = document.createElement('div');
-                clearBtn.style.cssText = 'padding:0.5rem 0.75rem;border-radius:10px;border:1px dashed var(--border-color);cursor:pointer;font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.5rem;text-align:center;';
-                clearBtn.textContent = '— ล้างที่นั่ง —';
-                clearBtn.addEventListener('click', () => {
-                    delete seatingLayout.seats[key];
-                    saveSeatingLayout();
-                    renderSeatingPanel();
-                    popup.remove();
-                    overlay.remove();
-                });
+                const clearBtn = document.createElement('div'); clearBtn.style.cssText = 'padding:0.5rem 0.75rem;border-radius:10px;border:1px dashed var(--border-color);cursor:pointer;font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.5rem;text-align:center;'; clearBtn.textContent = '— ล้างที่นั่ง —';
+                clearBtn.addEventListener('click', () => { delete seatingLayout.seats[key]; saveSeatingLayout(); renderSeatingPanel(); popup.remove(); overlay.remove(); });
                 popup.appendChild(clearBtn);
 
                 participants.forEach(p => {
                     const item = document.createElement('div');
-                    item.style.cssText = `
-                        padding: 0.6rem 0.75rem;
-                        border-radius: 10px;
-                        border: 1px solid ${p.color || 'var(--border-color)'};
-                        background: ${p.color ? p.color + '0A' : 'transparent'};
-                        cursor: pointer;
-                        font-size: 0.78rem;
-                        font-weight: 500;
-                        margin-bottom: 0.35rem;
-                        color: var(--text-primary);
-                        transition: all 0.15s;
-                    `;
+                    item.style.cssText = `padding:0.6rem 0.75rem;border-radius:10px;border:1px solid ${p.color || 'var(--border-color)'};background:${p.color ? p.color + '0A' : 'transparent'};cursor:pointer;font-size:0.78rem;font-weight:500;margin-bottom:0.35rem;color:var(--text-primary);transition:all 0.15s;`;
                     item.textContent = p.name;
-                    item.addEventListener('click', () => {
-                        seatingLayout.seats[key] = p.id;
-                        saveSeatingLayout();
-                        renderSeatingPanel();
-                        popup.remove();
-                        overlay.remove();
-                    });
+                    item.addEventListener('click', () => { seatingLayout.seats[key] = p.id; saveSeatingLayout(); renderSeatingPanel(); popup.remove(); overlay.remove(); });
                     popup.appendChild(item);
                 });
 
-                const overlay = document.createElement('div');
-                overlay.style.cssText = 'position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
+                const overlay = document.createElement('div'); overlay.style.cssText = 'position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
                 overlay.addEventListener('click', () => { popup.remove(); overlay.remove(); });
-
-                document.body.appendChild(overlay);
-                document.body.appendChild(popup);
+                document.body.appendChild(overlay); document.body.appendChild(popup);
             }
 
-            // Escape ออกจาก drag mode
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && isDragMode) {
-                    isDragMode = false;
-                    seatingPanel.classList.remove('drag-mode');
-                    renderSeatingPanel();
-                    showToast('ออกจากโหมดลากวาง', 'info');
+                    isDragMode = false; seatingPanel.classList.remove('drag-mode'); renderSeatingPanel(); showToast('ออกจากโหมดลากวาง', 'info');
                 }
             });
-
-            seatingResizer.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                isSeatingResizing = true;
-                seatingResizer.classList.add('resizing');
-                document.addEventListener('mousemove', handleSeatingMouseMove);
-                document.addEventListener('mouseup', stopSeatingResizing);
-            });
-
-            seatingResizer.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                isSeatingResizing = true;
-                seatingResizer.classList.add('resizing');
-                document.addEventListener('touchmove', handleSeatingMouseMove, { passive: false });
-                document.addEventListener('touchend', stopSeatingResizing);
-            }, { passive: false });
-
-            hResizer.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                isHResizing = true;
-                hResizer.classList.add('resizing');
-                document.addEventListener('mousemove', handleHMouseMove);
-                document.addEventListener('mouseup', stopHResizing);
-            });
-
-            hResizer.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                isHResizing = true;
-                hResizer.classList.add('resizing');
-                document.addEventListener('touchmove', handleHMouseMove, { passive: false });
-                document.addEventListener('touchend', stopHResizing);
-            }, { passive: false });
 
             layoutToggleBtn.addEventListener('click', async () => {
                 layoutModeIndex = (layoutModeIndex + 1) % 3;
                 appContainer.classList.remove('meeting-mode', 'seating-mode');
                 
                 if (layoutModeIndex === 0) {
-                    layoutToggleBtn.textContent = 'NORMAL';
-                    layoutToggleBtn.style.color = 'var(--text-secondary)';
-                    layoutToggleBtn.style.borderColor = 'var(--border-color)';
-                    
-                    leftPanel.style.height = '';
-                    leftPanel.style.flexBasis = '33%';
-                    
-                    isDragMode = false;
-                    showToast('โหมดปกติ', 'info');
+                    layoutToggleBtn.textContent = 'NORMAL'; layoutToggleBtn.style.color = 'var(--text-secondary)'; layoutToggleBtn.style.borderColor = 'var(--border-color)';
+                    leftPanel.style.height = ''; leftPanel.style.flexBasis = '33%'; isDragMode = false; showToast('โหมดปกติ', 'info');
                 } else if (layoutModeIndex === 1) {
                     appContainer.classList.add('meeting-mode');
-                    layoutToggleBtn.textContent = 'FOCUS';
-                    layoutToggleBtn.style.color = 'var(--accent-color)';
-                    layoutToggleBtn.style.borderColor = 'var(--accent-color)';
-                    
-                    const rowHeight = 73;
-                    const rows = 4;
-                    const padding = 65; 
-                    leftPanel.style.height = `${rowHeight * rows + padding}px`;
-                    leftPanel.style.flexBasis = `${rowHeight * rows + padding}px`;
+                    layoutToggleBtn.textContent = 'FOCUS'; layoutToggleBtn.style.color = 'var(--accent-color)'; layoutToggleBtn.style.borderColor = 'var(--accent-color)';
+                    const rowHeight = 73, rows = 4, padding = 65; 
+                    leftPanel.style.height = `${rowHeight * rows + padding}px`; leftPanel.style.flexBasis = `${rowHeight * rows + padding}px`;
                 } else if (layoutModeIndex === 2) {
                     appContainer.classList.add('seating-mode');
-                    layoutToggleBtn.textContent = 'SEATING';
-                    layoutToggleBtn.style.color = 'var(--accent-color)';
-                    layoutToggleBtn.style.borderColor = 'var(--accent-color)';
+                    layoutToggleBtn.textContent = 'SEATING'; layoutToggleBtn.style.color = 'var(--accent-color)'; layoutToggleBtn.style.borderColor = 'var(--accent-color)';
+                    await loadSeatingLayout(); resetSeatingPanelHeight();
 
-                    await loadSeatingLayout();
-                    resetSeatingPanelHeight();
-
-                    // ── AUTO-FILL LOGIC ──
                     let layoutChanged = false;
-
-                    // 1. ล้างที่นั่งของคนที่ถูกลบออกจากระบบไปแล้ว
                     Object.keys(seatingLayout.seats).forEach(key => {
-                        const pId = seatingLayout.seats[key];
-                        if (!participants.find(p => p.id === pId)) {
-                            delete seatingLayout.seats[key];
-                            layoutChanged = true;
-                        }
+                        if (!participants.find(p => p.id === seatingLayout.seats[key])) { delete seatingLayout.seats[key]; layoutChanged = true; }
                     });
 
-                    // 2. สร้างลำดับที่นั่งทั้งหมดที่สามารถนั่งได้
                     const allSeatKeys = ['chairman'];
-                    for (let r = 0; r < seatingLayout.rowsTop; r++) {
-                        for (let c = 0; c < seatingLayout.seatsPerRow; c++) {
-                            allSeatKeys.push(`top-${r}-${c}`);
-                        }
-                    }
-                    for (let r = 0; r < seatingLayout.rowsBottom; r++) {
-                        for (let c = 0; c < seatingLayout.seatsPerRow; c++) {
-                            allSeatKeys.push(`bottom-${r}-${c}`);
-                        }
-                    }
+                    for (let r = 0; r < seatingLayout.rowsTop; r++) for (let c = 0; c < seatingLayout.seatsPerRow; c++) allSeatKeys.push(`top-${r}-${c}`);
+                    for (let r = 0; r < seatingLayout.rowsBottom; r++) for (let c = 0; c < seatingLayout.seatsPerRow; c++) allSeatKeys.push(`bottom-${r}-${c}`);
 
-                    // 3. เอาคนที่ยังไม่มีที่นั่ง ไปใส่ในที่นั่งว่าง
                     participants.forEach(p => {
                         const isSeated = Object.values(seatingLayout.seats).includes(p.id);
                         if (!isSeated) {
                             const emptyKey = allSeatKeys.find(key => !seatingLayout.seats[key]);
-                            if (emptyKey) {
-                                seatingLayout.seats[emptyKey] = p.id;
-                                layoutChanged = true;
-                            }
+                            if (emptyKey) { seatingLayout.seats[emptyKey] = p.id; layoutChanged = true; }
                         }
                     });
 
-                    if (layoutChanged) {
-                        await saveSeatingLayout();
-                    }
-
-                    renderSeatingPanel();
-                    showToast('โหมดผังที่นั่ง', 'info');
+                    if (layoutChanged) await saveSeatingLayout();
+                    renderSeatingPanel(); showToast('โหมดผังที่นั่ง', 'info');
                 }
-                
-                // บันทึก Layout Mode ลง localStorage
                 localStorage.setItem('layoutMode', layoutModeIndex);
             });
 
-            ratioToggleBtn.addEventListener('click', () => {
-                currentRatioIndex = (currentRatioIndex + 1) % ratios.length;
-                const newRatio = ratios[currentRatioIndex];
-                ratioToggleBtn.textContent = newRatio.toUpperCase();
-                
-                appContainer.classList.remove('ratio-mode', 'ratio-16-9', 'ratio-4-3', 'h-screen');
-                document.body.classList.remove('has-ratio');
+            let isResizing = false, isHResizing = false, isSeatingResizing = false;
+            const hResizer = document.getElementById('horizontal-resizer'), seatingResizer = document.getElementById('seating-resizer');
 
-                if (newRatio === 'Auto') {
-                    appContainer.classList.add('h-screen'); 
-                    showToast("Auto Ratio (Full Screen)");
-                } else {
-                    appContainer.classList.add('ratio-mode');
-                    document.body.classList.add('has-ratio');
-                    if (newRatio === '16:9') {
-                        appContainer.classList.add('ratio-16-9');
-                        showToast("16:9 Aspect Ratio");
-                    } else if (newRatio === '4:3') {
-                        appContainer.classList.add('ratio-4-3');
-                        showToast("4:3 Aspect Ratio");
-                    }
-                }
-            });
+            const handleSeatingMouseMove = (e) => {
+                if (!isSeatingResizing) return;
+                const event = e.touches ? e.touches[0] : e;
+                let newHeight = event.clientY - seatingPanel.getBoundingClientRect().top;
+                newHeight = Math.max(120, Math.min(newHeight, window.innerHeight * 0.75));
+                seatingPanel.style.maxHeight = 'none'; seatingPanel.style.height = `${newHeight}px`; seatingPanel.style.flexBasis = `${newHeight}px`;
+            };
+            const stopSeatingResizing = () => { isSeatingResizing = false; seatingResizer.classList.remove('resizing'); document.removeEventListener('mousemove', handleSeatingMouseMove); document.removeEventListener('mouseup', stopSeatingResizing); document.removeEventListener('touchmove', handleSeatingMouseMove); document.removeEventListener('touchend', stopSeatingResizing); };
+            seatingResizer.addEventListener('mousedown', (e) => { e.preventDefault(); isSeatingResizing = true; seatingResizer.classList.add('resizing'); document.addEventListener('mousemove', handleSeatingMouseMove); document.addEventListener('mouseup', stopSeatingResizing); });
+            seatingResizer.addEventListener('touchstart', (e) => { e.preventDefault(); isSeatingResizing = true; seatingResizer.classList.add('resizing'); document.addEventListener('touchmove', handleSeatingMouseMove, { passive: false }); document.addEventListener('touchend', stopSeatingResizing); }, { passive: false });
 
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark');
-                document.getElementById('theme-icon-light').classList.toggle('hidden');
-                document.getElementById('theme-icon-dark').classList.toggle('hidden');
-                localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-            });
-            
-            if (localStorage.getItem('theme') === 'dark') {
-                document.body.classList.add('dark');
-                document.getElementById('theme-icon-light').classList.add('hidden');
-                document.getElementById('theme-icon-dark').classList.remove('hidden');
-            } else if (localStorage.getItem('theme') === 'light') {
-                document.body.classList.remove('dark');
-                document.getElementById('theme-icon-light').classList.remove('hidden');
-                document.getElementById('theme-icon-dark').classList.add('hidden');
-            }
+            const handleHMouseMove = (e) => {
+                if (!isHResizing) return;
+                const event = e.touches ? e.touches[0] : e;
+                let newTopHeight = event.clientY - document.getElementById('main-container').getBoundingClientRect().top;
+                newTopHeight = Math.max(80, Math.min(newTopHeight, document.getElementById('main-container').getBoundingClientRect().height - 120));
+                leftPanel.style.height = `${newTopHeight}px`; leftPanel.style.flexBasis = `${newTopHeight}px`; leftPanel.style.flexGrow = '0'; leftPanel.style.flexShrink = '0';
+            };
+            const stopHResizing = () => { isHResizing = false; hResizer.classList.remove('resizing'); document.removeEventListener('mousemove', handleHMouseMove); document.removeEventListener('mouseup', stopHResizing); document.removeEventListener('touchmove', handleHMouseMove); document.removeEventListener('touchend', stopHResizing); };
+            hResizer.addEventListener('mousedown', (e) => { e.preventDefault(); isHResizing = true; hResizer.classList.add('resizing'); document.addEventListener('mousemove', handleHMouseMove); document.addEventListener('mouseup', stopHResizing); });
+            hResizer.addEventListener('touchstart', (e) => { e.preventDefault(); isHResizing = true; hResizer.classList.add('resizing'); document.addEventListener('touchmove', handleHMouseMove, { passive: false }); document.addEventListener('touchend', stopHResizing); }, { passive: false });
 
-            timestampBtn.addEventListener('click', insertTimestamp);
-            function insertTimestamp() {
-                if (isInterimActive) {
-                    transcriptTextarea.value = sttStableText;
-                    isInterimActive = false;
-                }
-
-                saveToHistory(transcriptTextarea.value); 
-                const now = new Date();
-                const timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}] `;
-                const start = transcriptTextarea.selectionStart;
-                const end = transcriptTextarea.selectionEnd;
-                transcriptTextarea.value = transcriptTextarea.value.substring(0, start) + timeString + transcriptTextarea.value.substring(end);
-                
-                sttStableText = transcriptTextarea.value; 
-                saveToHistory(transcriptTextarea.value);
-
-                transcriptTextarea.selectionStart = transcriptTextarea.selectionEnd = start + timeString.length;
-                transcriptTextarea.focus();
-                saveStateToFirestore();
-                updateTranscriptHighlight(); 
-            }
-            
-            toolsMenuBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toolsDropdown.classList.toggle('hidden');
-            });
-
-            document.addEventListener('click', (e) => {
-                if (!toolsDropdown.classList.contains('hidden') && !toolsDropdown.contains(e.target) && !toolsMenuBtn.contains(e.target)) {
-                    toolsDropdown.classList.add('hidden');
-                }
-            });
-
-            document.addEventListener('keydown', (e) => {
-                if (e.ctrlKey) {
-                    if (e.key === 's') { e.preventDefault(); saveBtn.click(); } 
-                    else if (e.key === 't') { e.preventDefault(); insertTimestamp(); } 
-                    else if (e.key === 'z') { e.preventDefault(); undoBtn.click(); } 
-                    else if (e.key === 'y') { e.preventDefault(); redoBtn.click(); } 
-                    else if (e.key === 'k') { e.preventDefault(); openSearchModal(); }
-                    else if (!isNaN(parseInt(e.key)) && e.key >= '1' && e.key <= '9') {
-                        e.preventDefault();
-                        const participantIndex = parseInt(e.key) - 1;
-                        if (participants && participants[participantIndex]) {
-                            handleParticipantSelect(participants[participantIndex].id);
-                        }
-                    }
-                } else if (e.key === '/' && document.activeElement !== transcriptTextarea && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                    e.preventDefault();
-                    openSearchModal();
-                }
-            });
-
-            function openSearchModal() {
-                document.getElementById('search-modal').classList.remove('hidden');
-                document.getElementById('search-input').value = '';
-                document.getElementById('search-results').innerHTML = '';
-                document.getElementById('search-input').focus();
-                renderSearchResults('');
-            }
-
-            function renderSearchResults(term) {
-                const results = document.getElementById('search-results');
-                results.innerHTML = '';
-                const matches = term 
-                    ? allNamesCache.filter(n => n.toLowerCase().includes(term.toLowerCase()))
-                    : allNamesCache;
-                    
-                if (!matches.length) {
-                    results.innerHTML = `<p style="font-size:0.75rem;color:var(--text-secondary);text-align:center;padding:0.5rem;">ไม่พบชื่อ</p>`;
-                    return;
-                }
-                matches.slice(0, 20).forEach(name => {
-                    const item = document.createElement('div');
-                    item.textContent = name;
-                    item.style.cssText = 'padding:0.6rem 0.75rem;cursor:pointer;font-size:0.82rem;border:1px solid var(--border-color);border-radius:0.4rem;transition:all 0.15s;';
-                    item.addEventListener('mouseover', () => item.style.borderColor = 'var(--text-secondary)');
-                    item.addEventListener('mouseout', () => item.style.borderColor = 'var(--border-color)');
-                    item.addEventListener('click', () => {
-                        const exists = participants.find(p => p.name === name);
-                        if (exists) {
-                            showToast(`"${name}" มีอยู่แล้ว`, 'info');
-                        } else {
-                            participants.push({ id: nextId, name });
-                            nextId++;
-                            renderParticipants();
-                            saveStateToFirestore();
-                            showToast(`เพิ่ม "${name}" แล้ว`, 'success');
-                        }
-                        document.getElementById('search-modal').classList.add('hidden');
-                    });
-                    results.appendChild(item);
-                });
-            }
-
-            document.getElementById('search-input').addEventListener('input', function() {
-                renderSearchResults(this.value.trim());
-            });
-
-            let isResizing = false;
             const handleMouseMove = (e) => {
                 if (!isResizing) return;
                 const event = e.touches ? e.touches[0] : e;
-                const container = document.getElementById('main-container');
-                const containerRect = container.getBoundingClientRect();
-                
-                let newLeftWidth = event.clientX - containerRect.left;
-                
-                const minLeft = 80;
-                const minRight = 80;
-                const maxLeft = containerRect.width - minRight - resizer.offsetWidth;
-                
-                newLeftWidth = Math.max(minLeft, Math.min(newLeftWidth, maxLeft));
-                
-                leftPanel.style.flexBasis = `${newLeftWidth}px`;
-                leftPanel.style.flexGrow = '0';    
-                leftPanel.style.flexShrink = '0'; 
+                let newLeftWidth = event.clientX - document.getElementById('main-container').getBoundingClientRect().left;
+                newLeftWidth = Math.max(80, Math.min(newLeftWidth, document.getElementById('main-container').getBoundingClientRect().width - 80 - resizer.offsetWidth));
+                leftPanel.style.flexBasis = `${newLeftWidth}px`; leftPanel.style.flexGrow = '0'; leftPanel.style.flexShrink = '0';
             };
-            const stopResizing = () => {
-                isResizing = false;
-                resizer.classList.remove('resizing');
-                document.removeEventListener('mousemove', handleMouseMove);
-                document.removeEventListener('mouseup', stopResizing);
-                document.removeEventListener('touchmove', handleMouseMove);
-                document.removeEventListener('touchend', stopResizing);
-            };
-            resizer.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                isResizing = true;
-                resizer.classList.add('resizing');
-                document.addEventListener('mousemove', handleMouseMove);
-                document.addEventListener('mouseup', stopResizing);
+            const stopResizing = () => { isResizing = false; resizer.classList.remove('resizing'); document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', stopResizing); document.removeEventListener('touchmove', handleMouseMove); document.removeEventListener('touchend', stopResizing); };
+            resizer.addEventListener('mousedown', (e) => { e.preventDefault(); isResizing = true; resizer.classList.add('resizing'); document.addEventListener('mousemove', handleMouseMove); document.addEventListener('mouseup', stopResizing); });
+            resizer.addEventListener('touchstart', (e) => { e.preventDefault(); isResizing = true; resizer.classList.add('resizing'); document.addEventListener('touchmove', handleMouseMove); document.addEventListener('touchend', stopResizing); });
+
+            // Tools and Features
+            addParticipantBtn.addEventListener('click', () => { participants.push({ id: nextId++, name: `ผู้มาชี้แจง ${nextId}` }); renderParticipants(); saveStateToFirestore(); });
+            bulkAddBtn.addEventListener('click', () => { toolsDropdown.classList.add('hidden'); bulkAddTextarea.value = ''; bulkAddModal.classList.remove('hidden'); bulkAddTextarea.focus(); });
+            bulkAddConfirmBtn.addEventListener('click', () => {
+                const names = bulkAddTextarea.value.split('\n').map(n => n.trim()).filter(n => n);
+                if (names.length === 0) { showToast("No names entered", "info"); return; }
+                let addedCount = 0; names.forEach(name => { participants.push({ id: nextId++, name }); addedCount++; });
+                renderParticipants(); saveStateToFirestore(); hideAllModals(); showToast(`Added ${addedCount} participants`, "success");
             });
-            resizer.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                isResizing = true;
-                resizer.classList.add('resizing');
-                document.addEventListener('touchmove', handleMouseMove);
-                document.addEventListener('touchend', stopResizing);
+            importExcelBtn.addEventListener('click', () => excelInput.click());
+            excelInput.addEventListener('change', (e) => {
+                const file = e.target.files[0]; if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const data = new Uint8Array(event.target.result);
+                    try {
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+                        let addedCount = 0;
+                        if (jsonData && jsonData.length > 0) {
+                            jsonData.forEach(row => { if (row.length > 0 && row[0]) { participants.push({ id: nextId++, name: String(row[0]).trim() }); addedCount++; } });
+                            if (addedCount > 0) { renderParticipants(); saveStateToFirestore(); showToast(`Imported ${addedCount} members`, "success"); } 
+                            else showToast("No names found", "info");
+                        } else showToast("File is empty", "info");
+                    } catch (error) { showToast("Import error", "error"); }
+                    excelInput.value = ''; 
+                }; reader.readAsArrayBuffer(file);
             });
+
+            increaseColsBtn.addEventListener('click', () => { if (columnCount < 10) { updateColumnLayout(columnCount + 1); saveStateToFirestore(); }});
+            decreaseColsBtn.addEventListener('click', () => { if (columnCount > 1) { updateColumnLayout(columnCount - 1); saveStateToFirestore(); }});
+            saveBtn.addEventListener('click', () => { saveStateToFirestore(); showToast("Saved successfully", "success"); });
+            downloadBtn.addEventListener('click', () => {
+                const text = transcriptTextarea.value; if (text.trim() === '') { showToast('Nothing to download', "info"); return; }
+                const sourceHTML = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Meeting Notes</title></head><body><pre>${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/\t/g, '&#9;')}</pre></body></html>`;
+                const fileDownload = document.createElement("a"); document.body.appendChild(fileDownload);
+                fileDownload.href = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML); fileDownload.download = `meeting-notes-${new Date().toISOString().slice(0,10)}.doc`; fileDownload.click(); document.body.removeChild(fileDownload); showToast("Downloading Word doc...", "success");
+            });
+            copyAllBtn.addEventListener('click', () => {
+                const textAreaFallback = document.createElement("textarea"); textAreaFallback.value = transcriptTextarea.value; document.body.appendChild(textAreaFallback); textAreaFallback.select();
+                try { document.execCommand('copy'); showToast('Copied to clipboard', 'success'); } catch (err) { showToast('Copy failed', 'error'); }
+                document.body.removeChild(textAreaFallback);
+            });
+            ratioToggleBtn.addEventListener('click', () => {
+                currentRatioIndex = (currentRatioIndex + 1) % ratios.length; const newRatio = ratios[currentRatioIndex]; ratioToggleBtn.textContent = newRatio.toUpperCase();
+                appContainer.classList.remove('ratio-mode', 'ratio-16-9', 'ratio-4-3', 'h-screen'); document.body.classList.remove('has-ratio');
+                if (newRatio === 'Auto') { appContainer.classList.add('h-screen'); showToast("Auto Ratio (Full Screen)"); }
+                else { appContainer.classList.add('ratio-mode'); document.body.classList.add('has-ratio'); appContainer.classList.add(newRatio === '16:9' ? 'ratio-16-9' : 'ratio-4-3'); showToast(`${newRatio} Aspect Ratio`); }
+            });
+            themeToggle.addEventListener('click', () => { document.body.classList.toggle('dark'); document.getElementById('theme-icon-light').classList.toggle('hidden'); document.getElementById('theme-icon-dark').classList.toggle('hidden'); localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light'); });
+            if (localStorage.getItem('theme') === 'light') { document.body.classList.remove('dark'); document.getElementById('theme-icon-light').classList.remove('hidden'); document.getElementById('theme-icon-dark').classList.add('hidden'); }
             
+            timestampBtn.addEventListener('click', insertTimestamp);
+            function insertTimestamp() {
+                if (isInterimActive) { transcriptTextarea.value = sttStableText; isInterimActive = false; }
+                saveToHistory(transcriptTextarea.value); 
+                const now = new Date(), timeString = `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}] `;
+                const start = transcriptTextarea.selectionStart, end = transcriptTextarea.selectionEnd;
+                transcriptTextarea.value = transcriptTextarea.value.substring(0, start) + timeString + transcriptTextarea.value.substring(end);
+                sttStableText = transcriptTextarea.value; saveToHistory(transcriptTextarea.value);
+                transcriptTextarea.selectionStart = transcriptTextarea.selectionEnd = start + timeString.length; transcriptTextarea.focus(); saveStateToFirestore(); updateTranscriptHighlight(); 
+            }
+            
+            toolsMenuBtn.addEventListener('click', (e) => { e.stopPropagation(); toolsDropdown.classList.toggle('hidden'); });
+            document.addEventListener('click', (e) => { if (!toolsDropdown.classList.contains('hidden') && !toolsDropdown.contains(e.target) && !toolsMenuBtn.contains(e.target)) toolsDropdown.classList.add('hidden'); });
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey) {
+                    if (e.key === 's') { e.preventDefault(); saveBtn.click(); } else if (e.key === 't') { e.preventDefault(); insertTimestamp(); } else if (e.key === 'z') { e.preventDefault(); undoBtn.click(); } else if (e.key === 'y') { e.preventDefault(); redoBtn.click(); } else if (e.key === 'k') { e.preventDefault(); openSearchModal(); }
+                    else if (!isNaN(parseInt(e.key)) && e.key >= '1' && e.key <= '9') { e.preventDefault(); const pIndex = parseInt(e.key) - 1; if (participants && participants[pIndex]) handleParticipantSelect(participants[pIndex].id); }
+                } else if (e.key === '/' && document.activeElement !== transcriptTextarea && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') { e.preventDefault(); openSearchModal(); }
+            });
+
+            function openSearchModal() { document.getElementById('search-modal').classList.remove('hidden'); document.getElementById('search-input').value = ''; document.getElementById('search-results').innerHTML = ''; document.getElementById('search-input').focus(); renderSearchResults(''); }
+            function renderSearchResults(term) {
+                const results = document.getElementById('search-results'); results.innerHTML = '';
+                const matches = term ? allNamesCache.filter(n => n.toLowerCase().includes(term.toLowerCase())) : allNamesCache;
+                if (!matches.length) { results.innerHTML = `<p style="font-size:0.75rem;color:var(--text-secondary);text-align:center;padding:0.5rem;">ไม่พบชื่อ</p>`; return; }
+                matches.slice(0, 20).forEach(name => {
+                    const item = document.createElement('div'); item.textContent = name; item.style.cssText = 'padding:0.6rem 0.75rem;cursor:pointer;font-size:0.82rem;border:1px solid var(--border-color);border-radius:0.4rem;transition:all 0.15s;';
+                    item.addEventListener('mouseover', () => item.style.borderColor = 'var(--text-secondary)'); item.addEventListener('mouseout', () => item.style.borderColor = 'var(--border-color)');
+                    item.addEventListener('click', () => {
+                        if (participants.find(p => p.name === name)) showToast(`"${name}" มีอยู่แล้ว`, 'info');
+                        else { participants.push({ id: nextId++, name }); renderParticipants(); saveStateToFirestore(); showToast(`เพิ่ม "${name}" แล้ว`, 'success'); }
+                        document.getElementById('search-modal').classList.add('hidden');
+                    }); results.appendChild(item);
+                });
+            }
+            document.getElementById('search-input').addEventListener('input', function() { renderSearchResults(this.value.trim()); });
+
             setInterval(() => {
-                const now = new Date();
-                clockDiv.textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                
-                const elapsed = Date.now() - meetingStartTime;
-                const h = Math.floor(elapsed / 3600000).toString().padStart(2, '0');
-                const m = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0');
-                const s = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
+                const now = new Date(); clockDiv.textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const elapsed = Date.now() - meetingStartTime, h = Math.floor(elapsed / 3600000).toString().padStart(2, '0'), m = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0'), s = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
                 document.getElementById('duration-timer').textContent = `${h}:${m}:${s}`;
             }, 1000);
 
             document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', hideAllModals));
             allModals.forEach(modal => modal.addEventListener('click', (e) => { if(e.target === modal) hideAllModals(); }));
-            editNameCancelBtn.addEventListener('click', hideAllModals);
-            saveListCancelBtn.addEventListener('click', hideAllModals);
-            loadListCancelBtn.addEventListener('click', hideAllModals);
-            confirmCancelBtn.addEventListener('click', hideAllModals);
-            alertOkBtn.addEventListener('click', hideAllModals);
-
-            // ── MEETING HISTORY ──
-            const historyModal = document.getElementById('history-modal');
+            editNameCancelBtn.addEventListener('click', hideAllModals); saveListCancelBtn.addEventListener('click', hideAllModals); loadListCancelBtn.addEventListener('click', hideAllModals); confirmCancelBtn.addEventListener('click', hideAllModals); alertOkBtn.addEventListener('click', hideAllModals); bulkAddCancelBtn.addEventListener('click', hideAllModals); document.getElementById('history-close-btn').addEventListener('click', hideAllModals);
 
             async function saveCurrentMeetingToHistory(title) {
                 if (!transcriptTextarea.value.trim() && participants.length === 0) return;
                 if (!userId) return;
                 try {
-                    const historyRef = collection(db, getBasePath(userId), 'meeting_history');
-                    await addDoc(historyRef, {
-                        title: title || `การประชุม ${new Date().toLocaleDateString('th-TH')}`,
-                        transcript: transcriptTextarea.value,
-                        participants: participants,
-                        savedAt: serverTimestamp(),
-                        createdAt: new Date().toISOString()
-                    });
-                } catch(e) {
-                    console.error('Save history error:', e);
-                    showToast('บันทึกประวัติไม่สำเร็จ', 'error');
-                }
+                    await addDoc(collection(db, getBasePath(userId), 'meeting_history'), { title: title || `การประชุม ${new Date().toLocaleDateString('th-TH')}`, transcript: transcriptTextarea.value, participants: participants, savedAt: serverTimestamp(), createdAt: new Date().toISOString() });
+                } catch(e) { showToast('บันทึกประวัติไม่สำเร็จ', 'error'); }
             }
 
-            // ── SAVE ROOM BUTTON ──
-            document.getElementById('save-meeting-btn').addEventListener('click', async () => {
-                toolsDropdown.classList.add('hidden');
-                
-                if (!transcriptTextarea.value.trim() && participants.length === 0) {
-                    showToast('ไม่มีข้อมูลให้บันทึก', 'info');
-                    return;
-                }
-                
-                const currentTitle = document.getElementById('meeting-title')?.textContent || 'Meeting Notes';
-                await saveCurrentMeetingToHistory(currentTitle);
-                showToast(`บันทึก "${currentTitle}" แล้ว`, 'success');
-            });
-
-            // ── NEW MEETING BUTTON (Clear Room) ──
-            document.getElementById('new-meeting-btn').addEventListener('click', () => {
-                toolsDropdown.classList.add('hidden'); 
-                
-                confirmTitle.textContent = "New Meeting";
-                confirmMessage.textContent = "Start a new meeting? The current board will be cleared.";
-                confirmOkBtn.onclick = () => {
-                    transcriptTextarea.value = '';
-                    sttStableText = '';
-                    isInterimActive = false;
-                    participants = [];
-                    activeParticipantId = null;
-                    nextId = 1;
-                    textHistory = [];
-                    historyIndex = -1;
-                    updateUndoRedoButtons();
-                    renderParticipants();
-                    updateTranscriptHighlight(); 
-                    
-                    const titleEl = document.getElementById('meeting-title');
-                    if (titleEl && titleEl.tagName === 'H1') {
-                        titleEl.textContent = 'Meeting Notes';
-                    }
-
-                    meetingStartTime = Date.now();
-                    saveStateToFirestore();
-                    hideAllModals();
-                    showToast(`เริ่มการประชุมใหม่`, 'success');
-                };
+            document.getElementById('save-meeting-btn').addEventListener('click', async () => { toolsDropdown.classList.add('hidden'); if (!transcriptTextarea.value.trim() && participants.length === 0) { showToast('ไม่มีข้อมูลให้บันทึก', 'info'); return; } const currentTitle = document.getElementById('meeting-title')?.textContent || 'Meeting Notes'; await saveCurrentMeetingToHistory(currentTitle); showToast(`บันทึก "${currentTitle}" แล้ว`, 'success'); });
+            
+            clearTextBtn.addEventListener('click', () => {
+                if (transcriptTextarea.value.trim() === '') { showToast("Transcript is already empty", "info"); return; }
+                confirmTitle.textContent = "Clear Transcript"; confirmMessage.textContent = "Delete all text in the transcript? You can Undo this action.";
+                confirmOkBtn.onclick = () => { isInterimActive = false; transcriptTextarea.value = ''; sttStableText = ''; saveToHistory(''); debouncedSave(); updateTranscriptHighlight(); hideAllModals(); showToast("Transcript cleared", "success"); };
                 confirmModal.classList.remove('hidden');
             });
 
-            // ── LOAD ROOM (HISTORY) BUTTON ──
-            document.getElementById('history-btn').addEventListener('click', async () => {
-                toolsDropdown.classList.add('hidden'); 
-                
-                historyModal.classList.remove('hidden');
-                const container = document.getElementById('history-list-container');
-                container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
-                if (!userId) return;
-                
-                try {
-                    const q = query(
-                        collection(db, getBasePath(userId), 'meeting_history'),
-                        orderBy('savedAt', 'desc')
-                    );
-                    const snap = await getDocs(q);
-                    container.innerHTML = '';
-                    
-                    if (snap.empty) {
-                        container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>';
-                        return;
-                    }
-                    
-                    snap.forEach(d => {
-                        const data = d.data();
-                        const docId = d.id;
-                        const date = data.createdAt 
-                            ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'})
-                            : 'ไม่ทราบวันที่';
-                        
-                        const item = document.createElement('div');
-                        item.className = 'saved-list-item rounded-lg p-4 cursor-pointer';
-                        item.style.cssText = 'border:1px solid var(--border-color);background:var(--bg-panel-solid);';
-                        item.innerHTML = `
-                            <div class="flex justify-between items-start gap-3">
-                                <div class="flex-grow min-w-0">
-                                    <p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'ไม่มีชื่อ'}</p>
-                                    <p class="text-xs mt-1" style="color:var(--text-secondary);">${date}</p>
-                                    <p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">
-                                        ${data.participants?.length || 0} คน · ${data.transcript?.length || 0} ตัวอักษร
-                                    </p>
-                                </div>
-                                <div class="flex gap-2 flex-shrink-0">
-                                    <button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button>
-                                    <button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button>
-                                </div>
-                            </div>
-                        `;
-                        
-                        item.querySelector('.load-history-btn').addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            confirmTitle.textContent = 'Load Meeting';
-                            confirmMessage.textContent = `โหลด "${data.title}" กลับมา? ข้อมูลปัจจุบันจะถูกแทนที่`;
-                            confirmOkBtn.onclick = async () => {
-                                transcriptTextarea.value = data.transcript || '';
-                                sttStableText = transcriptTextarea.value;
-                                isInterimActive = false;
-                                participants = JSON.parse(JSON.stringify(data.participants || []));
-                                nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1;
-                                textHistory = [];
-                                historyIndex = -1;
-                                saveToHistory(transcriptTextarea.value);
-                                renderParticipants();
-                                updateTranscriptHighlight(); 
-                                
-                                const titleEl = document.getElementById('meeting-title');
-                                if (titleEl && titleEl.tagName === 'H1') {
-                                    titleEl.textContent = data.title;
-                                }
-
-                                await saveStateToFirestore();
-                                hideAllModals();
-                                showToast(`โหลด "${data.title}" แล้ว`, 'success');
-                            };
-                            confirmModal.classList.remove('hidden');
-                        });
-                        
-                        item.querySelector('.delete-history-btn').addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            confirmTitle.textContent = "Delete History";
-                            confirmMessage.textContent = `ลบ "${data.title}" ออกจากประวัติ?`;
-                            confirmOkBtn.onclick = async () => {
-                                try {
-                                    await deleteDoc(doc(db, getBasePath(userId), 'meeting_history', docId));
-                                    item.remove();
-                                    if (container.children.length === 0) {
-                                        container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>';
-                                    }
-                                    showToast('ลบแล้ว', 'success');
-                                    hideAllModals();
-                                } catch(err) {
-                                    showToast('ลบไม่สำเร็จ', 'error');
-                                }
-                            };
-                            confirmModal.classList.remove('hidden');
-                        });
-                        container.appendChild(item);
-                    });
-                } catch(e) {
-                    console.error(e);
-                    container.innerHTML = '<p class="text-center text-red-500 text-sm">โหลดไม่สำเร็จ</p>';
-                }
+            document.getElementById('new-meeting-btn').addEventListener('click', () => {
+                toolsDropdown.classList.add('hidden'); confirmTitle.textContent = "New Meeting"; confirmMessage.textContent = "Start a new meeting? The current board will be cleared.";
+                confirmOkBtn.onclick = () => { transcriptTextarea.value = ''; sttStableText = ''; isInterimActive = false; participants = []; activeParticipantId = null; nextId = 1; textHistory = []; historyIndex = -1; updateUndoRedoButtons(); renderParticipants(); updateTranscriptHighlight(); const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = 'Meeting Notes'; meetingStartTime = Date.now(); saveStateToFirestore(); hideAllModals(); showToast(`เริ่มการประชุมใหม่`, 'success'); };
+                confirmModal.classList.remove('hidden');
             });
 
-            document.getElementById('history-close-btn').addEventListener('click', hideAllModals);
+            document.getElementById('history-btn').addEventListener('click', async () => {
+                toolsDropdown.classList.add('hidden'); document.getElementById('history-modal').classList.remove('hidden'); const container = document.getElementById('history-list-container'); container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
+                if (!userId) return;
+                try {
+                    const snap = await getDocs(query(collection(db, getBasePath(userId), 'meeting_history'), orderBy('savedAt', 'desc')));
+                    container.innerHTML = '';
+                    if (snap.empty) { container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; return; }
+                    snap.forEach(d => {
+                        const data = d.data(), docId = d.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'ไม่ทราบวันที่';
+                        const item = document.createElement('div'); item.className = 'saved-list-item rounded-lg p-4 cursor-pointer'; item.style.cssText = 'border:1px solid var(--border-color);background:var(--bg-panel-solid);';
+                        item.innerHTML = `<div class="flex justify-between items-start gap-3"><div class="flex-grow min-w-0"><p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'ไม่มีชื่อ'}</p><p class="text-xs mt-1" style="color:var(--text-secondary);">${date}</p><p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">${data.participants?.length || 0} คน · ${data.transcript?.length || 0} ตัวอักษร</p></div><div class="flex gap-2 flex-shrink-0"><button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button><button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button></div></div>`;
+                        item.querySelector('.load-history-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmTitle.textContent = 'Load Meeting'; confirmMessage.textContent = `โหลด "${data.title}" กลับมา? ข้อมูลปัจจุบันจะถูกแทนที่`; confirmOkBtn.onclick = async () => { transcriptTextarea.value = data.transcript || ''; sttStableText = transcriptTextarea.value; isInterimActive = false; participants = JSON.parse(JSON.stringify(data.participants || [])); nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1; textHistory = []; historyIndex = -1; saveToHistory(transcriptTextarea.value); renderParticipants(); updateTranscriptHighlight(); const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = data.title; await saveStateToFirestore(); hideAllModals(); showToast(`โหลด "${data.title}" แล้ว`, 'success'); }; confirmModal.classList.remove('hidden'); });
+                        item.querySelector('.delete-history-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmTitle.textContent = "Delete History"; confirmMessage.textContent = `ลบ "${data.title}" ออกจากประวัติ?`; confirmOkBtn.onclick = async () => { try { await deleteDoc(doc(db, getBasePath(userId), 'meeting_history', docId)); item.remove(); if (container.children.length === 0) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; showToast('ลบแล้ว', 'success'); hideAllModals(); } catch(err) { showToast('ลบไม่สำเร็จ', 'error'); } }; confirmModal.classList.remove('hidden'); });
+                        container.appendChild(item);
+                    });
+                } catch(e) { container.innerHTML = '<p class="text-center text-red-500 text-sm">โหลดไม่สำเร็จ</p>'; }
+            });
 
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'visible' && userId) {
                     if (unsubscribeMeeting) unsubscribeMeeting();
-                    if (sortableInstance) {
-                        sortableInstance.destroy();
-                        sortableInstance = null;
-                    }
+                    if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
                     initializeLogic(); 
                 }
             });
