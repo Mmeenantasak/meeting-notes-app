@@ -182,7 +182,7 @@
         /* When edit mode is active */
         #participants-grid.edit-cards-mode .participant-box {
             border-style: dashed !important;
-            cursor: default;
+            cursor: grab;
         }
         #participants-grid.edit-cards-mode .participant-box:active {
             transform: none; /* disable scale down */
@@ -489,14 +489,8 @@
                         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Participants</h2>
                         <div class="flex items-center gap-1 grid-controls">
                             <!-- ปุ่ม Edit Mode -->
-                            <button id="edit-cards-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500" title="Edit Mode">
+                            <button id="edit-cards-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500" title="Edit & Reorder">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                            </button>
-                            <!-- ปุ่ม Reorder Mode -->
-                            <button id="reorder-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500" title="Reorder">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                                </svg>
                             </button>
                             <button id="decrease-cols-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500">-</button>
                             <span id="cols-count" class="font-mono text-xs w-6 text-center text-gray-500">2</span>
@@ -663,7 +657,7 @@
             projectId: "my-meeting-notes-dbcb4",
             storageBucket: "my-meeting-notes-dbcb4.firebasestorage.app",
             messagingSenderId: "518603776860",
-            appId: "1:518603776860:web:0c1297f45a3a8c75809799"
+            appId: "1:1234567890:web:abcdef123"
         };
         // =========================================================================================
 
@@ -756,8 +750,8 @@
             const ratios = ['Auto', '16:9', '4:3'];
             let currentRatioIndex = 0;
             let layoutModeIndex = 0; // 0 = Normal, 1 = Focus, 2 = Seating
-            let isReorderMode = false;
             let isEditCardsMode = false;
+            let currentRoomId = null; // เก็บ ID ห้องปัจจุบัน
 
             let textHistory = [];
             let historyIndex = -1;
@@ -918,8 +912,9 @@
                         if (JSON.stringify(participants) !== JSON.stringify(data.participants)) {
                             participants = data.participants || [
                                 { id: 1, name: 'ประธาน' },
-                                { id: 2, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
-                                { id: 3, name: 'ผู้ชี้แจง' }
+                                { id: 2, name: 'เลขานุการ' },
+                                { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
+                                { id: 4, name: 'ผู้ชี้แจง' }
                             ];
                             renderParticipants();
                         }
@@ -956,8 +951,9 @@
                             createdAt: new Date().toISOString(),
                             participants: [
                                 { id: 1, name: 'ประธาน' },
-                                { id: 2, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
-                                { id: 3, name: 'ผู้ชี้แจง' }
+                                { id: 2, name: 'เลขานุการ' },
+                                { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
+                                { id: 4, name: 'ผู้ชี้แจง' }
                             ],
                             transcript: '',
                             columnCount: columnCount
@@ -1089,7 +1085,7 @@
                     ghostClass: 'sortable-ghost',
                     dragClass: 'sortable-drag',
                     delay: 0,
-                    disabled: !isReorderMode,
+                    disabled: !isEditCardsMode,
                     onEnd: (evt) => {
                         const { oldIndex, newIndex } = evt;
                         const [movedItem] = participants.splice(oldIndex, 1);
@@ -1100,24 +1096,17 @@
             }
 
             // ── REORDER & EDIT BUTTONS ──
-            document.getElementById('reorder-btn').addEventListener('click', () => {
-                isReorderMode = !isReorderMode;
-                if (sortableInstance) sortableInstance.option('disabled', !isReorderMode);
-                const reorderBtn = document.getElementById('reorder-btn');
-                reorderBtn.style.color = isReorderMode ? 'var(--accent-color)' : '';
-                reorderBtn.style.borderColor = isReorderMode ? 'var(--accent-color)' : '';
-                showToast(isReorderMode ? 'โหมดเรียงลำดับ — ลากสลับตำแหน่งได้เลย' : 'ออกจากโหมดเรียงลำดับ', 'info');
-            });
-
             document.getElementById('edit-cards-btn').addEventListener('click', () => {
                 isEditCardsMode = !isEditCardsMode;
+                if (sortableInstance) sortableInstance.option('disabled', !isEditCardsMode);
+                
                 const btn = document.getElementById('edit-cards-btn');
                 btn.style.color = isEditCardsMode ? '#ef4444' : '';
                 btn.style.borderColor = isEditCardsMode ? '#ef4444' : '';
                 
                 if (isEditCardsMode) {
                     participantsGrid.classList.add('edit-cards-mode');
-                    showToast('เข้าสู่โหมดแก้ไข (ลากวาง หรือ พิมพ์ ไม่ได้ในโหมดนี้)', 'info');
+                    showToast('โหมดแก้ไข: ลากสลับตำแหน่ง เปลี่ยนชื่อ หรือลบได้', 'info');
                 } else {
                     participantsGrid.classList.remove('edit-cards-mode');
                     showToast('ออกจากโหมดแก้ไข', 'info');
@@ -1823,8 +1812,34 @@
                 if (!transcriptTextarea.value.trim() && participants.length === 0) return;
                 if (!userId) return;
                 try {
-                    await addDoc(collection(db, getBasePath(userId), 'meeting_history'), { title: title || `การประชุม ${new Date().toLocaleDateString('th-TH')}`, transcript: transcriptTextarea.value, participants: participants, savedAt: serverTimestamp(), createdAt: new Date().toISOString() });
-                } catch(e) { showToast('บันทึกประวัติไม่สำเร็จ', 'error'); }
+                    const historyRef = collection(db, getBasePath(userId), 'meeting_history');
+                    const saveData = {
+                        title: title || `การประชุม ${new Date().toLocaleDateString('th-TH')}`,
+                        transcript: transcriptTextarea.value,
+                        participants: participants,
+                        savedAt: serverTimestamp(),
+                        createdAt: currentRoomId ? undefined : new Date().toISOString()
+                    };
+
+                    if (currentRoomId) {
+                        const roomRef = doc(db, getBasePath(userId), 'meeting_history', currentRoomId);
+                        await updateDoc(roomRef, {
+                            title: saveData.title,
+                            transcript: saveData.transcript,
+                            participants: saveData.participants,
+                            savedAt: serverTimestamp()
+                        });
+                    } else {
+                        const docRef = await addDoc(historyRef, {
+                            ...saveData,
+                            createdAt: new Date().toISOString()
+                        });
+                        currentRoomId = docRef.id;
+                    }
+                } catch(e) { 
+                    console.error('Save history error:', e);
+                    showToast('บันทึกไม่สำเร็จ', 'error'); 
+                }
             }
 
             document.getElementById('save-meeting-btn').addEventListener('click', async () => { toolsDropdown.classList.add('hidden'); if (!transcriptTextarea.value.trim() && participants.length === 0) { showToast('ไม่มีข้อมูลให้บันทึก', 'info'); return; } const currentTitle = document.getElementById('meeting-title')?.textContent || 'Meeting Notes'; await saveCurrentMeetingToHistory(currentTitle); showToast(`บันทึก "${currentTitle}" แล้ว`, 'success'); });
@@ -1838,7 +1853,7 @@
 
             document.getElementById('new-meeting-btn').addEventListener('click', () => {
                 toolsDropdown.classList.add('hidden'); confirmTitle.textContent = "New Meeting"; confirmMessage.textContent = "Start a new meeting? The current board will be cleared.";
-                confirmOkBtn.onclick = () => { transcriptTextarea.value = ''; sttStableText = ''; isInterimActive = false; participants = []; activeParticipantId = null; nextId = 1; textHistory = []; historyIndex = -1; updateUndoRedoButtons(); renderParticipants(); updateTranscriptHighlight(); const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = 'Meeting Notes'; meetingStartTime = Date.now(); saveStateToFirestore(); hideAllModals(); showToast(`เริ่มการประชุมใหม่`, 'success'); };
+                confirmOkBtn.onclick = () => { transcriptTextarea.value = ''; sttStableText = ''; isInterimActive = false; participants = [ { id: 1, name: 'ประธาน' }, { id: 2, name: 'เลขานุการ' }, { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' }, { id: 4, name: 'ผู้ชี้แจง' } ]; activeParticipantId = null; nextId = 5; textHistory = []; historyIndex = -1; updateUndoRedoButtons(); renderParticipants(); updateTranscriptHighlight(); const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = 'Meeting Notes'; meetingStartTime = Date.now(); currentRoomId = null; saveStateToFirestore(); hideAllModals(); showToast(`เริ่มการประชุมใหม่`, 'success'); };
                 confirmModal.classList.remove('hidden');
             });
 
@@ -1853,8 +1868,8 @@
                         const data = d.data(), docId = d.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'ไม่ทราบวันที่';
                         const item = document.createElement('div'); item.className = 'saved-list-item rounded-lg p-4 cursor-pointer'; item.style.cssText = 'border:1px solid var(--border-color);background:var(--bg-panel-solid);';
                         item.innerHTML = `<div class="flex justify-between items-start gap-3"><div class="flex-grow min-w-0"><p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'ไม่มีชื่อ'}</p><p class="text-xs mt-1" style="color:var(--text-secondary);">${date}</p><p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">${data.participants?.length || 0} คน · ${data.transcript?.length || 0} ตัวอักษร</p></div><div class="flex gap-2 flex-shrink-0"><button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button><button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button></div></div>`;
-                        item.querySelector('.load-history-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmTitle.textContent = 'Load Meeting'; confirmMessage.textContent = `โหลด "${data.title}" กลับมา? ข้อมูลปัจจุบันจะถูกแทนที่`; confirmOkBtn.onclick = async () => { transcriptTextarea.value = data.transcript || ''; sttStableText = transcriptTextarea.value; isInterimActive = false; participants = JSON.parse(JSON.stringify(data.participants || [])); nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1; textHistory = []; historyIndex = -1; saveToHistory(transcriptTextarea.value); renderParticipants(); updateTranscriptHighlight(); const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = data.title; await saveStateToFirestore(); hideAllModals(); showToast(`โหลด "${data.title}" แล้ว`, 'success'); }; confirmModal.classList.remove('hidden'); });
-                        item.querySelector('.delete-history-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmTitle.textContent = "Delete History"; confirmMessage.textContent = `ลบ "${data.title}" ออกจากประวัติ?`; confirmOkBtn.onclick = async () => { try { await deleteDoc(doc(db, getBasePath(userId), 'meeting_history', docId)); item.remove(); if (container.children.length === 0) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; showToast('ลบแล้ว', 'success'); hideAllModals(); } catch(err) { showToast('ลบไม่สำเร็จ', 'error'); } }; confirmModal.classList.remove('hidden'); });
+                        item.querySelector('.load-history-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmTitle.textContent = 'Load Meeting'; confirmMessage.textContent = `โหลด "${data.title}" กลับมา? ข้อมูลปัจจุบันจะถูกแทนที่`; confirmOkBtn.onclick = async () => { transcriptTextarea.value = data.transcript || ''; sttStableText = transcriptTextarea.value; isInterimActive = false; participants = JSON.parse(JSON.stringify(data.participants || [])); nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1; textHistory = []; historyIndex = -1; saveToHistory(transcriptTextarea.value); renderParticipants(); updateTranscriptHighlight(); const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = data.title; currentRoomId = docId; await saveStateToFirestore(); hideAllModals(); showToast(`โหลด "${data.title}" แล้ว`, 'success'); }; confirmModal.classList.remove('hidden'); });
+                        item.querySelector('.delete-history-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmTitle.textContent = "Delete History"; confirmMessage.textContent = `ลบ "${data.title}" ออกจากประวัติ?`; confirmOkBtn.onclick = async () => { try { await deleteDoc(doc(db, getBasePath(userId), 'meeting_history', docId)); item.remove(); if (container.children.length === 0) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; showToast('ลบแล้ว', 'success'); hideAllModals(); if(currentRoomId === docId) currentRoomId = null; } catch(err) { showToast('ลบไม่สำเร็จ', 'error'); } }; confirmModal.classList.remove('hidden'); });
                         container.appendChild(item);
                     });
                 } catch(e) { container.innerHTML = '<p class="text-center text-red-500 text-sm">โหลดไม่สำเร็จ</p>'; }
