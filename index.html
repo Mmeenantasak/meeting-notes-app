@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>แอปบันทึกการประชุม (Minimalist Dark)</title>
+    <title>แอปบันทึกการประชุม (Performance & Touch Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -15,18 +15,18 @@
         :root {
             --bg-gradient-start: #faf8f5;
             --bg-gradient-end:   #f2ede6;
-            --bg-panel:          rgba(255, 252, 247, 0.75);
-            --bg-panel-solid:    rgba(255, 252, 247, 0.9);
+            --bg-panel:          #ffffff;
+            --bg-panel-solid:    #ffffff;
             --text-primary:      #1c1917;
             --text-secondary:    #78716c;
-            --border-color:      rgba(168, 155, 138, 0.3);
+            --border-color:      rgba(168, 155, 138, 0.4);
             --accent-color:      #44403c;
             --focus-ring:        rgba(68, 64, 60, 0.15);
             --btn-base-bg:       #44403c;
             --btn-base-hover:    #1c1917;
             --btn-text:          #faf8f5;
-            --card-shadow:       0 2px 12px rgba(28, 25, 23, 0.08);
-            --card-shadow-hover: 0 8px 32px rgba(28, 25, 23, 0.12);
+            --card-shadow:       0 2px 8px rgba(28, 25, 23, 0.05);
+            --card-shadow-hover: 0 4px 16px rgba(28, 25, 23, 0.1);
             --radius-card:       16px;
             --radius-btn:        12px;
         }
@@ -34,58 +34,21 @@
         .dark {
             --bg-gradient-start: #141210;
             --bg-gradient-end:   #1a1815;
-            --bg-panel:          rgba(30, 27, 24, 0.65);
-            --bg-panel-solid:    rgba(36, 33, 29, 0.9);
+            --bg-panel:          #1e1b18;
+            --bg-panel-solid:    #24211d;
             --text-primary:      #e8e3dc;
             --text-secondary:    #8a8278;
-            --border-color:      rgba(138, 130, 120, 0.18);
+            --border-color:      rgba(138, 130, 120, 0.25);
             --accent-color:      #b8a898;
             --focus-ring:        rgba(184, 168, 152, 0.2);
-            --btn-base-bg:       rgba(50, 46, 42, 0.8);
-            --btn-base-hover:    rgba(65, 60, 55, 0.9);
+            --btn-base-bg:       rgba(50, 46, 42, 0.9);
+            --btn-base-hover:    rgba(65, 60, 55, 1);
             --btn-text:          #e8e3dc;
-            --card-shadow:       0 2px 12px rgba(0, 0, 0, 0.5);
-            --card-shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.7);
-            --radius-card:       16px;
-            --radius-btn:        12px;
+            --card-shadow:       0 2px 8px rgba(0, 0, 0, 0.4);
+            --card-shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.6);
         }
 
-        /* ── AURORA BACKGROUND ── */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .dark body::before, .dark::before {
-            background:
-                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 80% 20%, rgba(168, 85, 247, 0.1) 0%, transparent 55%),
-                radial-gradient(ellipse 70% 60% at 10% 80%, rgba(20, 184, 166, 0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 40% at 90% 85%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
-                radial-gradient(ellipse 90% 70% at 50% 50%, rgba(30, 27, 24, 0) 0%, transparent 100%);
-            animation: aurora-shift 20s ease-in-out infinite alternate;
-        }
-
-        body:not(.dark)::before {
-            background:
-                radial-gradient(ellipse 80% 60% at 15% 10%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 50% at 85% 15%, rgba(236, 72, 153, 0.06) 0%, transparent 55%),
-                radial-gradient(ellipse 70% 60% at 10% 85%, rgba(20, 184, 166, 0.07) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 40% at 88% 80%, rgba(245, 158, 11, 0.05) 0%, transparent 50%);
-            animation: aurora-shift 25s ease-in-out infinite alternate;
-        }
-
-        @keyframes aurora-shift {
-            0%   { transform: scale(1)    translate(0px, 0px); }
-            33%  { transform: scale(1.05) translate(-15px, 10px); }
-            66%  { transform: scale(0.98) translate(10px, -8px); }
-            100% { transform: scale(1.03) translate(-8px, 15px); }
-        }
-
-        /* ── ROUNDED EVERYTHING ── */
+        /* ── ROUNDED EVERYTHING & SOLID PERF UI ── */
         .participant-box     { border-radius: 16px !important; }
         .bg-panel            { border-radius: 16px !important; }
         .tool-btn            { border-radius: 12px !important; }
@@ -112,7 +75,7 @@
             font-family: 'Sarabun', sans-serif;
             font-weight: 300;
             letter-spacing: 0.01em;
-            background: linear-gradient(180deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            background: var(--bg-gradient-start);
             color: var(--text-primary);
             transition: color 0.3s, background 0.3s;
         }
@@ -131,7 +94,7 @@
         /* Ratio Mode */
         body.has-ratio { display: flex; align-items: center; justify-content: center; background: #000 !important; }
         #app-container.ratio-mode {
-            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            background: var(--bg-gradient-start);
             box-shadow: 0 0 0 1px var(--border-color), 0 0 60px rgba(0,0,0,0.8);
             max-width: none !important; height: auto !important; border-radius: 12px;
             overflow: hidden; display: flex; flex-direction: column;
@@ -140,9 +103,9 @@
         #app-container.ratio-4-3 { width: min(98vw, calc(98vh * 4 / 3)) !important; height: min(98vh, calc(98vw * 3 / 4)) !important; }
 
         .bg-panel {
-            background-color: var(--bg-panel); backdrop-filter: blur(24px) saturate(160%);
-            -webkit-backdrop-filter: blur(24px) saturate(160%);
-            border: 1px solid var(--border-color); transition: background-color 0.3s, border-color 0.3s;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color); 
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
         /* Participant Cards */
@@ -152,78 +115,65 @@
             -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; height: auto; min-height: 75px;
         }
         .participant-box:active {
-            transform: scale(0.96); border-color: var(--accent-color); background-color: rgba(255, 255, 255, 0.05);
+            transform: scale(0.96); border-color: var(--accent-color); background-color: rgba(128, 128, 128, 0.05);
         }
         .participant-box:hover { border-color: var(--accent-color); box-shadow: var(--card-shadow-hover); }
         .participant-box.active {
-            border-color: var(--accent-color); background-color: rgba(255, 255, 255, 0.05); box-shadow: inset 0 0 0 1px var(--accent-color);
+            border-color: var(--accent-color); background-color: rgba(128, 128, 128, 0.05); box-shadow: inset 0 0 0 1px var(--accent-color);
         }
 
         .sortable-ghost { opacity: 0.3; background: var(--accent-color); }
         .sortable-drag { opacity: 1 !important; cursor: grabbing; }
 
         textarea, select, input[type="text"] {
-            background-color: transparent; border: 1px solid var(--border-color); color: var(--text-primary);
+            background-color: var(--bg-panel-solid); border: 1px solid var(--border-color); color: var(--text-primary);
             border-radius: 0.5rem; transition: all 0.2s;
         }
         textarea:focus, select:focus, input[type="text"]:focus {
             box-shadow: 0 0 0 2px var(--focus-ring); border-color: var(--accent-color);
-            background-color: var(--bg-panel-solid); outline: none;
+            outline: none;
         }
 
         /* ── EDIT MODE FOR CARDS ── */
         .card-action-icon {
-            position: absolute; width: 28px; height: 28px; display: none; align-items: center; justify-content: center;
-            border-radius: 50%; color: var(--text-secondary); transition: all 0.2s; opacity: 0.6; z-index: 10;
+            position: absolute; width: 34px; height: 34px; display: none; align-items: center; justify-content: center;
+            border-radius: 50%; color: var(--text-secondary); transition: all 0.2s; opacity: 0.7; z-index: 10;
         }
         .card-action-icon:hover, .card-action-icon:active { opacity: 1; background-color: rgba(128, 128, 128, 0.1); color: var(--text-primary); }
-        .edit-icon { bottom: 2px; right: 2px; }
+        .edit-icon { bottom: 4px; right: 4px; }
 
-        /* When edit mode is active */
         #participants-grid.edit-cards-mode .participant-box {
             border-style: dashed !important;
             cursor: grab;
+            touch-action: none; /* Prevent scroll on touch devices while drag sorting */
         }
         #participants-grid.edit-cards-mode .participant-box:active {
-            transform: none; /* disable scale down */
+            transform: none; 
         }
         #participants-grid.edit-cards-mode .card-action-icon {
             display: flex;
         }
         #participants-grid.edit-cards-mode .delete-icon {
-            position: absolute; top: -6px; right: -6px; width: 22px; height: 22px;
+            position: absolute; top: -8px; right: -8px; width: 28px; height: 28px;
             border-radius: 50%; background: #ef4444; color: white; opacity: 1;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         }
         #participants-grid.edit-cards-mode .delete-icon:hover { background-color: #dc2626; }
-        #participants-grid.edit-cards-mode .delete-icon svg { width: 14px; height: 14px; }
 
-        .color-picker-popup {
-            position: fixed; z-index: 999; background: var(--bg-panel-solid); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 0.5rem; display: flex; gap: 0.35rem; flex-wrap: wrap; width: 140px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .color-dot {
-            width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
-            transition: transform 0.15s, border-color 0.15s; flex-shrink: 0;
-        }
-        .color-dot:hover { transform: scale(1.2); }
-        .color-dot.selected { border-color: var(--text-primary); }
-
-        /* ── MODERN MODALS ── */
+        /* ── MODERN MODALS (Solid Perf) ── */
         .modal-overlay { 
-            backdrop-filter: blur(16px) saturate(120%); 
-            -webkit-backdrop-filter: blur(16px) saturate(120%);
-            background-color: rgba(0, 0, 0, 0.5); 
+            background-color: rgba(0, 0, 0, 0.65); 
             transition: all 0.3s ease; 
         }
         .modal-overlay:not(.hidden) > div {
-            animation: modal-pop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: modal-pop 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             border-radius: 24px !important;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            background: var(--bg-panel-solid);
         }
         @keyframes modal-pop {
-            0% { opacity: 0; transform: scale(0.92) translateY(20px); }
+            0% { opacity: 0; transform: scale(0.95) translateY(10px); }
             100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         
@@ -255,8 +205,8 @@
 
         #seating-panel {
             display: none; flex-direction: row; align-items: stretch; gap: 0.5rem; padding: 0.75rem;
-            background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px;
-            backdrop-filter: blur(24px); overflow: hidden; flex-shrink: 0;
+            background: var(--bg-panel-solid); border: 1px solid var(--border-color); border-radius: 16px;
+            overflow: hidden; flex-shrink: 0;
         }
         #app-container.seating-mode #seating-panel { display: flex; }
 
@@ -292,28 +242,31 @@
         }
         .seat-card .seat-empty-icon { color: var(--text-secondary); opacity: 0.3; font-size: 1rem; pointer-events: none; }
 
-        .drag-mode .seat-card, .drag-mode .chairman-slot { cursor: grab; border-style: dashed !important; opacity: 0.85; }
+        .drag-mode .seat-card, .drag-mode .chairman-slot { 
+            cursor: grab; border-style: dashed !important; opacity: 0.85; 
+            touch-action: none; /* Fix scroll issue on touch devices */
+        }
         .drag-mode .seat-card:active { cursor: grabbing; opacity: 0.6; transform: scale(0.95); }
-        .seat-card.drag-over { border-color: var(--accent-color); background: rgba(184, 168, 152, 0.15); transform: scale(1.05); }
+        .seat-card.drag-over { border-color: var(--accent-color); background: rgba(128, 128, 128, 0.15); transform: scale(1.05); }
 
         .seating-controls {
             display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border-color);
         }
         .seating-control-group { display: flex; align-items: center; gap: 0.35rem; font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--text-secondary); }
         .seating-ctrl-btn {
-            width: 20px; height: 20px; border-radius: 6px; border: 1px solid var(--border-color); background: transparent;
-            color: var(--text-secondary); font-size: 0.7rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
+            width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--border-color); background: transparent;
+            color: var(--text-secondary); font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s;
         }
         .seating-ctrl-btn:hover { border-color: var(--accent-color); color: var(--text-primary); }
         
         .drag-mode-btn {
-            padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-color); background: transparent;
-            color: var(--text-secondary); font-family: 'DM Mono', monospace; font-size: 0.65rem; cursor: pointer; transition: all 0.2s; margin-left: auto;
+            padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border-color); background: transparent;
+            color: var(--text-secondary); font-family: 'DM Mono', monospace; font-size: 0.7rem; cursor: pointer; transition: all 0.2s; margin-left: auto;
         }
-        .drag-mode-btn.active { border-color: #f4a7b9; color: #f4a7b9; background: rgba(244, 167, 185, 0.1); }
+        .drag-mode-btn.active { border-color: #3b82f6; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
         .chairman-side-btn {
-            padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border-color); background: transparent;
-            color: var(--text-secondary); font-family: 'DM Mono', monospace; font-size: 0.65rem; cursor: pointer; transition: all 0.15s;
+            padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border-color); background: transparent;
+            color: var(--text-secondary); font-family: 'DM Mono', monospace; font-size: 0.7rem; cursor: pointer; transition: all 0.15s;
         }
         .chairman-side-btn:hover { border-color: var(--accent-color); color: var(--text-primary); }
 
@@ -347,8 +300,11 @@
         #save-status {
             font-size: 0.75rem; color: var(--text-secondary); display: flex; align-items: center; gap: 0.35rem; opacity: 0.8;
             background: var(--bg-panel-solid); border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 999px;
+            cursor: pointer; transition: all 0.2s;
         }
+        #save-status:hover { opacity: 1; transform: scale(1.05); }
         #save-status.saving { color: var(--text-primary); border-color: var(--text-primary); }
+        #save-status.unsaved { color: #f59e0b; border-color: #f59e0b; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -356,13 +312,13 @@
         ::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
         #transcript-wrapper { position: relative; display: flex; flex: 1; min-height: 0; overflow: hidden; }
-        #transcript-overlay {
-            will-change: contents; contain: content; pointer-events: none; outline: none !important;
-            -webkit-tap-highlight-color: transparent; user-select: none;
+        #transcript-textarea {
+            width: 100%; height: 100%; padding: 1rem; border-radius: 0.5rem; 
+            resize: none; font-size: 16px; /* 16px prevents iOS auto-zoom */
+            line-height: 1.6; font-family: 'Sarabun', sans-serif;
+            background-color: transparent !important; color: var(--text-primary) !important;
         }
-        #transcript-textarea:focus { outline: none !important; box-shadow: none !important; border-color: transparent !important; background-color: transparent !important; }
-        #transcript-overlay span { color: transparent; }
-        #transcript-overlay span[style*="color:"] { color: revert !important; -webkit-text-fill-color: revert !important; }
+        #transcript-textarea:focus { outline: none !important; box-shadow: none !important; border-color: transparent !important; }
 
         /* ── LAYOUT MODES ── */
         #app-container.seating-mode { flex-direction: column; }
@@ -393,38 +349,6 @@
     </style>
 </head>
 <body class="dark">
-    <script>
-        window.onerror = function(message, source, lineno, colno, error) {
-            document.body.innerHTML += `
-            <div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(20,18,16,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;font-family:sans-serif;">
-               <div style="background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:12px; padding:30px; max-width:600px; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
-                  <h2 style="color:#ef4444; font-size: 24px; margin-bottom:10px;">⚠️ พบข้อผิดพลาดทำให้หน้าเว็บขาว/ดำ</h2>
-                  <p style="color:#fff; font-size: 16px;"><strong>บรรทัดที่:</strong> ${lineno}</p>
-                  <p style="color:#fff; font-size: 16px; margin-bottom:20px;"><strong>รายละเอียด:</strong> ${message}</p>
-                  <p style="color:#fca5a5; font-size:14px; margin:0; line-height:1.5;">สาเหตุ 90% เกิดจากการคัดลอก Firebase Config มาวางผิดพลาด (เช่น ลืมลูกน้ำ ลืมเครื่องหมายคำพูด หรือลบโค้ดเกิน) กรุณากลับไปตรวจสอบโค้ดส่วน Config ครับ</p>
-               </div>
-            </div>`;
-        };
-    </script>
-
-    <div id="setup-instructions-container" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#141210; z-index:9999; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:rgba(239,68,68,0.1); border:1px solid #ef4444; border-radius:12px; padding:40px; max-width:600px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.5);">
-            <h2 style="color:#ef4444; font-size: 26px; font-weight:bold; margin-bottom:15px; font-family:'Sarabun',sans-serif;">⚠️ ขาดการเชื่อมต่อฐานข้อมูล Firebase</h2>
-            <p style="color:#fff; font-size: 16px; line-height:1.6; font-family:'Sarabun',sans-serif;">
-                หน้าจอนี้เกิดขึ้นเพราะคุณนำโค้ดไปรันบนเว็บจริง แต่ยังไม่ได้ใส่ค่า <strong>Firebase Config</strong> ของตัวเองลงไปในโค้ดครับ
-            </p>
-            <div style="background:rgba(0,0,0,0.3); border-radius:8px; padding:15px; margin-top:20px; text-align:left;">
-                <p style="color:#fca5a5; font-size:14px; margin:0; line-height:1.6; font-family:'Sarabun',sans-serif;">
-                    <strong>วิธีแก้ไข:</strong><br>
-                    1. เปิดไฟล์ <code>index.html</code> ในโปรแกรมเขียนโค้ดของคุณ<br>
-                    2. เลื่อนไปที่บรรทัดประมาณ <strong>570</strong> (ส่วนที่เขียนว่า <code>myFirebaseConfig</code>)<br>
-                    3. นำค่า Config จาก Firebase Console ของคุณมาวางทับคำว่า <code>"YOUR_API_KEY"</code> และค่าอื่นๆ ให้ครบถ้วน<br>
-                    4. เซฟไฟล์แล้ว Deploy ใหม่อีกครั้งครับ
-                </p>
-            </div>
-        </div>
-    </div>
-
     <div id="login-screen" style="display:flex; min-height:100vh; align-items:center; justify-content:center; flex-direction:column; gap:1.5rem; background:#141210;">
         <h1 style="color:#fff; font-size:2rem; font-weight:bold; font-family:'Sarabun',sans-serif;">Meeting Notes</h1>
         <div style="display:flex; flex-direction:column; gap:1rem; align-items:center;">
@@ -463,13 +387,13 @@
                             <button id="undo-btn" class="tool-btn" disabled>UNDO</button>
                             <button id="redo-btn" class="tool-btn" disabled>REDO</button>
                             <button id="timestamp-btn" class="tool-btn">TIME</button>
-                            <button id="copy-all-btn" class="tool-btn">COPY</button>
-                            <button id="save-btn" class="tool-btn">SAVE DOC</button>
-                            <button id="download-btn" class="tool-btn">DOWNLOAD</button>
+                            <button id="copy-all-btn" class="tool-btn">COPY DOC</button>
+                            <button id="copy-names-btn" class="tool-btn col-span-2 text-blue-400 hover:text-blue-300">COPY NAMES</button>
+                            <button id="download-btn" class="tool-btn col-span-2">DOWNLOAD (.doc)</button>
                             
                             <div class="col-span-2 h-px bg-gray-200 dark:bg-zinc-700/50 my-1"></div>
                             
-                            <button id="save-meeting-btn" class="tool-btn">SAVE ROOM</button>
+                            <button id="save-meeting-btn" class="tool-btn text-emerald-400 hover:text-emerald-300 border-emerald-900/30">SAVE ROOM</button>
                             <button id="history-btn" class="tool-btn">LOAD ROOM</button>
                             <button id="new-meeting-btn" class="tool-btn col-span-2">NEW MEETING</button>
 
@@ -483,7 +407,11 @@
                     <div id="clock" style="font-family:'DM Mono',monospace;font-size:1rem;font-weight:300;letter-spacing:0.08em;color:var(--text-primary);"></div>
                     <div id="duration-timer" style="font-family:'DM Mono',monospace;font-size:0.6rem;font-weight:300;letter-spacing:0.06em;color:var(--text-secondary);margin-top:1px;">00:00:00</div>
                 </div>
-                <span id="user-display" style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text-secondary);letter-spacing:0.03em;"></span>
+                <!-- Profile Avatar -->
+                <div class="flex items-center gap-2">
+                    <img id="user-avatar" class="w-6 h-6 rounded-full hidden" alt="Profile">
+                    <span id="user-display" style="font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--text-secondary);letter-spacing:0.03em;"></span>
+                </div>
             </div>
 
             <div class="absolute left-1/2 transform -translate-x-1/2 text-center">
@@ -491,7 +419,7 @@
             </div>
             
             <div class="flex items-center gap-3">
-                <button id="layout-toggle-btn" class="px-3 py-1 text-xs font-mono border rounded hover:bg-white dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);" title="สลับ Layout">NORMAL</button>
+                <button id="layout-toggle-btn" class="px-3 py-1 text-xs font-mono border rounded hover:bg-gray-200 dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);" title="สลับ Layout">NORMAL</button>
                 
                 <button id="ratio-toggle" class="px-3 py-1 text-xs font-mono border rounded hover:bg-white dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);">AUTO</button>
                 <button id="theme-toggle" class="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-800 transition text-gray-500 dark:text-gray-400">
@@ -511,17 +439,17 @@
         <main id="main-container" class="flex flex-grow min-h-0 gap-4">
             <!-- Left Column: Participants -->
             <div id="left-panel" class="flex flex-col gap-4 overflow-y-auto pr-1" style="flex-basis: 33%; min-width: 280px;">
-                <div class="bg-panel p-5 rounded-lg shadow-sm flex-shrink-0">
+                <div class="bg-panel p-5 rounded-lg flex-shrink-0 shadow-sm border">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Participants</h2>
                         <div class="flex items-center gap-1 grid-controls">
-                            <!-- ปุ่ม Edit Mode -->
-                            <button id="edit-cards-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500" title="Edit & Reorder">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            <!-- ปุ่ม Edit Mode (รวมลากวาง/ลบ/แก้ไข ในปุ่มเดียว) -->
+                            <button id="edit-cards-btn" class="w-7 h-7 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-gray-500" title="Edit & Reorder">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             </button>
-                            <button id="decrease-cols-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500">-</button>
-                            <span id="cols-count" class="font-mono text-xs w-6 text-center text-gray-500">2</span>
-                            <button id="increase-cols-btn" class="w-6 h-6 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-xs text-gray-500">+</button>
+                            <button id="decrease-cols-btn" class="w-7 h-7 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-gray-500">-</button>
+                            <span id="cols-count" class="font-mono text-sm w-6 text-center text-gray-500">2</span>
+                            <button id="increase-cols-btn" class="w-7 h-7 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-gray-500">+</button>
                         </div>
                     </div>
                     
@@ -536,17 +464,18 @@
 
             <!-- Right Column: Transcript Area -->
             <div id="right-panel" class="flex flex-col" style="flex: 1 1 0; min-width: 80px;">
-                 <div style="border: 1px solid var(--border-color); border-radius:0.5rem;" class="p-6 h-full flex flex-col relative overflow-hidden mt-4">
-                    <div id="save-status" class="absolute bottom-4 right-6 z-10 select-none">
-                         <svg class="w-3 h-3 animate-spin hidden" id="save-spinner" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                         <span id="save-text">READY</span>
+                 <div class="bg-panel rounded-lg h-full flex flex-col relative overflow-hidden mt-4 shadow-sm border" style="border-color: var(--border-color);">
+                    <div class="absolute bottom-4 right-6 z-10 flex items-center gap-2 select-none">
+                         <!-- เพิ่มปุ่ม Manual Save -->
+                         <button id="manual-save-btn" class="hidden text-[0.7rem] px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-mono font-bold shadow-md transition-all active:scale-95 border border-emerald-700/50">SAVE NOW</button>
+                         <div id="save-status">
+                             <svg class="w-3 h-3 animate-spin hidden" id="save-spinner" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                             <span id="save-text">SAVED</span>
+                         </div>
                     </div>
 
                     <div id="transcript-wrapper">
-                        <div style="position:relative;flex:1;min-width:0;">
-                            <textarea id="transcript-textarea" class="w-full h-full p-4 rounded-lg focus:outline-none resize-none absolute top-0 left-0 text-base leading-relaxed font-mono z-10 bg-transparent" placeholder="Start typing..."></textarea>
-                            <div id="transcript-overlay" class="w-full h-full p-4 rounded-lg pointer-events-none overflow-y-auto absolute top-0 left-0 text-transparent whitespace-pre-wrap break-words text-base leading-relaxed font-mono z-0"></div>
-                        </div>
+                        <textarea id="transcript-textarea" placeholder="Start typing..."></textarea>
                     </div>
                 </div>
             </div>
@@ -555,8 +484,8 @@
 
     <div id="toast-container"></div>
 
-    <div id="edit-name-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
+    <div id="edit-name-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-50">
+        <div class="w-full max-w-md">
             <div class="p-5 border-b flex justify-between items-center" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Edit Name</h3><button class="modal-close text-gray-500 hover:text-white transition">&times;</button></div>
             <div class="p-6">
                 <div style="position:relative;">
@@ -568,8 +497,8 @@
         </div>
     </div>
     
-    <div id="save-list-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
+    <div id="save-list-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-50">
+        <div class="w-full max-w-md">
             <div class="p-5 border-b" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Save Group</h3></div>
             <div class="p-6">
                 <input type="text" id="save-list-name-input" class="w-full p-3 border rounded-lg bg-transparent focus:ring-1" placeholder="Group Name" style="border-color: var(--border-color);">
@@ -581,8 +510,8 @@
         </div>
     </div>
     
-    <div id="bulk-add-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
+    <div id="bulk-add-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-50">
+        <div class="w-full max-w-md">
             <div class="p-5 border-b" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Paste List</h3></div>
             <div class="p-6">
                 <p class="text-xs text-gray-500 mb-2 font-mono">Enter names (one per line):</p>
@@ -595,8 +524,8 @@
         </div>
     </div>
 
-    <div id="load-list-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md flex flex-col max-h-[80vh]">
+    <div id="load-list-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-50">
+        <div class="w-full max-w-md flex flex-col max-h-[80vh]">
             <div class="p-5 border-b" style="border-color: var(--border-color);"><h3 class="text-lg font-bold">Load Group</h3></div>
             <div id="saved-lists-container" class="p-5 overflow-y-auto flex-grow flex flex-col gap-3">
                 <p class="text-center text-gray-500 text-sm font-mono">Loading...</p>
@@ -608,7 +537,7 @@
     </div>
 
     <div id="confirm-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-[100]">
-        <div class="bg-panel w-full max-w-sm text-center p-8 relative overflow-hidden">
+        <div class="w-full max-w-sm text-center p-8 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent opacity-30"></div>
             <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-gray-200/50 dark:bg-zinc-800/50 border border-gray-300/50 dark:border-zinc-700/50 mb-5 shadow-inner">
                 <svg class="h-7 w-7 text-gray-600 dark:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
@@ -622,20 +551,8 @@
         </div>
     </div>
     
-    <div id="alert-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-[100]">
-        <div class="bg-panel w-full max-w-sm text-center p-8 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-30"></div>
-            <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-blue-100/50 dark:bg-blue-900/20 border border-blue-200/50 dark:border-blue-500/20 mb-5 shadow-inner">
-                <svg class="h-7 w-7 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <h3 class="text-xl font-bold mb-2 tracking-wide">Notice</h3>
-            <p id="alert-modal-message" class="text-sm text-gray-600 dark:text-gray-400 mb-8 leading-relaxed"></p>
-            <button id="alert-ok" class="tool-btn w-full !rounded-full bg-black text-white dark:bg-white dark:text-black hover:opacity-80">OK</button>
-        </div>
-    </div>
-
-    <div id="history-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-panel rounded-lg shadow-2xl w-full max-w-lg flex flex-col max-h-[80vh]">
+    <div id="history-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-50">
+        <div class="w-full max-w-lg flex flex-col max-h-[80vh]">
             <div class="p-5 border-b flex justify-between items-center" style="border-color: var(--border-color);">
                 <h3 class="text-lg font-bold">Meeting History</h3>
                 <button class="modal-close modal-close-btn">&times;</button>
@@ -649,8 +566,8 @@
         </div>
     </div>
 
-    <div id="save-meeting-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-panel rounded-lg shadow-2xl w-full max-w-md">
+    <div id="save-meeting-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-50">
+        <div class="w-full max-w-md">
             <div class="p-5 border-b" style="border-color: var(--border-color);">
                 <h3 class="text-lg font-bold">Save Room</h3>
             </div>
@@ -660,13 +577,13 @@
             </div>
             <div class="p-5 border-t flex justify-end gap-3" style="border-color: var(--border-color);">
                 <button id="save-meeting-cancel" class="tool-btn">Cancel</button>
-                <button id="save-meeting-confirm" class="tool-btn bg-white text-black dark:bg-white dark:text-black">Save Room</button>
+                <button id="save-meeting-confirm" class="tool-btn bg-emerald-600 text-white dark:bg-emerald-500 hover:opacity-90">Save Room</button>
             </div>
         </div>
     </div>
 
-    <div id="search-modal" class="modal-overlay fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center p-4 hidden z-[70]" style="padding-top:15vh;">
-        <div class="bg-panel rounded-lg shadow-2xl w-full" style="max-width:480px;">
+    <div id="search-modal" class="modal-overlay fixed inset-0 flex items-start justify-center p-4 hidden z-[70]" style="padding-top:15vh;">
+        <div class="w-full" style="max-width:480px;">
             <div class="p-5 border-b flex justify-between items-center" style="border-color: var(--border-color);">
                 <h3 class="text-lg font-bold uppercase tracking-wider text-gray-500">Search Participants</h3>
                 <button class="modal-close text-gray-500 hover:text-white transition">&times;</button>
@@ -709,33 +626,25 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            if (activeConfig.apiKey === "YOUR_API_KEY" || !activeConfig.apiKey) {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('app-container').style.display = 'none';
-                document.getElementById('setup-instructions-container').style.display = 'flex';
-                return;
-            }
-
             const appContainer = document.getElementById('app-container');
             const layoutToggleBtn = document.getElementById('layout-toggle-btn');
             const ratioToggleBtn = document.getElementById('ratio-toggle');
             const participantsGrid = document.getElementById('participants-grid');
             const transcriptTextarea = document.getElementById('transcript-textarea');
-            const transcriptOverlay = document.getElementById('transcript-overlay');
             const addParticipantBtn = document.getElementById('add-participant-btn');
             const decreaseColsBtn = document.getElementById('decrease-cols-btn');
             const increaseColsBtn = document.getElementById('increase-cols-btn');
             const colsCountSpan = document.getElementById('cols-count');
-            const saveBtn = document.getElementById('save-btn');
-            const downloadBtn = document.getElementById('download-btn');
             const resizer = document.getElementById('resizer');
             const leftPanel = document.getElementById('left-panel');
             const rightPanel = document.getElementById('right-panel');
             const copyAllBtn = document.getElementById('copy-all-btn');
+            const copyNamesBtn = document.getElementById('copy-names-btn');
             const undoBtn = document.getElementById('undo-btn');
             const redoBtn = document.getElementById('redo-btn');
             const themeToggle = document.getElementById('theme-toggle');
             const timestampBtn = document.getElementById('timestamp-btn');
+            const downloadBtn = document.getElementById('download-btn');
             
             const clockDiv = document.getElementById('clock');
             const toolsMenuBtn = document.getElementById('tools-menu-btn');
@@ -748,6 +657,7 @@
             
             const saveSpinner = document.getElementById('save-spinner');
             const saveText = document.getElementById('save-text');
+            const saveStatusContainer = document.getElementById('save-status');
             const toastContainer = document.getElementById('toast-container');
             const clearTextBtn = document.getElementById('clear-text-btn');
             
@@ -767,8 +677,6 @@
             const confirmMessage = document.getElementById('confirm-modal-message');
             const confirmOkBtn = document.getElementById('confirm-ok');
             const confirmCancelBtn = document.getElementById('confirm-cancel');
-            const alertModal = document.getElementById('alert-modal');
-            const alertOkBtn = document.getElementById('alert-ok');
             
             const saveListModal = document.getElementById('save-list-modal');
             const saveListNameInput = document.getElementById('save-list-name-input');
@@ -786,11 +694,16 @@
             let currentRatioIndex = 0;
             let layoutModeIndex = 0; // 0 = Normal, 1 = Focus, 2 = Seating
             let isEditCardsMode = false;
-            let currentRoomId = null; // เก็บ ID ห้องปัจจุบัน
+            let currentRoomId = null; 
+
+            // ==========================================
+            // PERFORMANCE VARIABLES
+            let hasUnsavedChanges = false;
+            // ==========================================
 
             let textHistory = [];
             let historyIndex = -1;
-            const MAX_HISTORY = 50;
+            const MAX_HISTORY = 30; // Reduced for performance
             
             let allNamesCache = []; 
             let sttStableText = ''; 
@@ -810,10 +723,6 @@
             let dragSourceKey = null;
 
             const seatingPanel = document.getElementById('seating-panel');
-            const PRESET_COLORS = [
-                '#f4a7b9', '#f9c784', '#fdf08a', '#a8d8a8', '#80cbc4', 
-                '#90caf9', '#b39ddb', '#f48fb1', '#bcaaa4', '#e0e0e0', 
-            ];
 
             function hideAllModals() {
                 allModals.forEach(modal => modal.classList.add('hidden'));
@@ -846,6 +755,12 @@
                     const displayName = user.displayName || user.email || 'User';
                     document.getElementById('user-display').textContent = displayName;
                     
+                    if (user.photoURL) {
+                        const avatarEl = document.getElementById('user-avatar');
+                        avatarEl.src = user.photoURL;
+                        avatarEl.classList.remove('hidden');
+                    }
+                    
                     initializeLogic(); 
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('app-container').style.display = 'flex';
@@ -868,14 +783,7 @@
                     await signInWithPopup(auth, provider);
                 } catch (e) {
                     console.error("Login Error:", e);
-                    if (e.code === 'auth/unauthorized-domain') {
-                        const currentDomain = window.location.hostname || "โดเมนปัจจุบัน";
-                        const errorMsg = document.getElementById('domain-error-msg');
-                        errorMsg.innerHTML = `<strong>พบข้อผิดพลาด Unauthorized Domain</strong><br>โดเมน <code>${currentDomain}</code> ยังไม่ได้รับอนุญาตให้ใช้ Google Sign-in<br><br><span style="color:#a1a1aa; font-size:0.8rem;">วิธีแก้: ไปที่ Firebase Console > Authentication > Settings > Authorized domains แล้วกด Add domain เพื่อเพิ่มโดเมนนี้ลงไป</span>`;
-                        errorMsg.style.display = 'block';
-                    } else {
-                        showToast("เข้าสู่ระบบไม่สำเร็จ โปรดลองอีกครั้ง", "error");
-                    }
+                    showToast("เข้าสู่ระบบไม่สำเร็จ", "error");
                 }
             });
 
@@ -912,10 +820,8 @@
                         h1.textContent = input.value.trim() || 'Meeting Notes';
                         input.replaceWith(h1);
                         attachTitleEditListener(h1);
-                        
-                        if (meetingDocRef) {
-                            updateDoc(meetingDocRef, { meetingTitle: h1.textContent }).catch(() => {});
-                        }
+                        markUnsaved();
+                        debouncedSave();
                     }
                     input.addEventListener('blur', saveTitle);
                     input.addEventListener('keydown', (e) => {
@@ -969,17 +875,14 @@
                         const serverTranscript = data.transcript || '';
                         
                         if (document.activeElement !== transcriptTextarea) {
-                             if(transcriptTextarea.value !== serverTranscript) {
+                             if(transcriptTextarea.value !== serverTranscript && !hasUnsavedChanges) {
                                  transcriptTextarea.value = serverTranscript;
                                  sttStableText = serverTranscript;
                                  if (textHistory.length === 0) saveToHistory(serverTranscript);
-                                 updateTranscriptHighlight(); 
                              }
                         } else if (textHistory.length === 0 && serverTranscript) {
                              saveToHistory(serverTranscript);
                         }
-                        
-                        transcriptTextarea.placeholder = "Click a participant to log...";
                     } else {
                         const defaultData = {
                             meetingTitle: "Meeting Notes",
@@ -1000,11 +903,6 @@
                 }, (error) => {
                     console.error("Firestore Snapshot Error: ", error);
                     if (error.code === 'permission-denied') return; 
-                    showToast("Connection lost — reconnecting…", "error");
-                    setTimeout(() => {
-                        if (unsubscribeMeeting) unsubscribeMeeting();
-                        initializeLogic();
-                    }, 3000);
                 });
 
                 updateColumnLayout(getInitialColumnCount());
@@ -1027,7 +925,7 @@
                 toast.className = `toast ${type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : 'toast-info'}`;
                 
                 let iconHtml = '';
-                if(type === 'success') iconHtml = '<svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                if(type === 'success') iconHtml = '<svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
                 else if(type === 'error') iconHtml = '<svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
                 else iconHtml = '<svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
 
@@ -1038,6 +936,15 @@
                     toast.classList.remove('show');
                     setTimeout(() => toast.remove(), 300);
                 }, 3000);
+            }
+
+            function markUnsaved() {
+                hasUnsavedChanges = true;
+                saveText.textContent = "UNSAVED";
+                saveStatusContainer.classList.add('unsaved');
+                saveStatusContainer.classList.remove('saving');
+                const manualSaveBtn = document.getElementById('manual-save-btn');
+                if (manualSaveBtn) manualSaveBtn.classList.remove('hidden'); // แสดงปุ่ม Save
             }
 
             function saveToHistory(text) {
@@ -1061,7 +968,7 @@
                     isInterimActive = false; historyIndex--;
                     const prevText = textHistory[historyIndex];
                     transcriptTextarea.value = prevText; sttStableText = prevText;
-                    updateUndoRedoButtons(); debouncedSave(); updateTranscriptHighlight(); 
+                    updateUndoRedoButtons(); markUnsaved(); debouncedSave();
                 }
             });
 
@@ -1070,40 +977,17 @@
                     isInterimActive = false; historyIndex++;
                     const nextText = textHistory[historyIndex];
                     transcriptTextarea.value = nextText; sttStableText = nextText;
-                    updateUndoRedoButtons(); debouncedSave(); updateTranscriptHighlight(); 
+                    updateUndoRedoButtons(); markUnsaved(); debouncedSave();
                 }
             });
-
-            function updateTranscriptHighlight() {
-                if (!transcriptOverlay) return;
-                const coloredParticipants = participants.filter(p => p.name && p.color);
-                if (coloredParticipants.length === 0) {
-                    if (transcriptOverlay.innerHTML !== '') transcriptOverlay.innerHTML = '';
-                    return;
-                }
-                
-                let text = transcriptTextarea.value;
-                let html = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                
-                coloredParticipants.forEach(p => {
-                    const escaped = p.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    const regex = new RegExp(`(${escaped})(\\s*:\\s*)`, 'g');
-                    html = html.replace(regex, `<span style="color:${p.color};font-weight:600;">$1</span><span style="color:${p.color};opacity:0.7;">$2</span>`);
-                });
-                
-                const newHTML = `<span style="color:transparent;white-space:pre-wrap;word-break:break-word;display:block;">${html}</span>`;
-                if (transcriptOverlay.innerHTML !== newHTML) transcriptOverlay.innerHTML = newHTML;
-                transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
-            }
 
             let historyTimeout;
             transcriptTextarea.addEventListener('input', () => {
                 sttStableText = transcriptTextarea.value; 
                 clearTimeout(historyTimeout);
                 historyTimeout = setTimeout(() => saveToHistory(transcriptTextarea.value), 500); 
+                markUnsaved();
                 debouncedSave();
-                transcriptOverlay.scrollTop = transcriptTextarea.scrollTop;
-                updateTranscriptHighlight();
             });
 
             function getInitialColumnCount(){
@@ -1119,13 +1003,17 @@
                     animation: 150,
                     ghostClass: 'sortable-ghost',
                     dragClass: 'sortable-drag',
-                    delay: 0,
+                    delay: 200, 
+                    delayOnTouchOnly: true, 
                     disabled: !isEditCardsMode,
+                    filter: '.card-action-icon', // 🔥 ยกเว้นปุ่ม Action ไม่ให้โดนบล็อกการกด
+                    preventOnFilter: false,      // 🔥 อนุญาตให้กดปุ่มดินสอ/ลบ บนจอสัมผัสได้
                     onEnd: (evt) => {
                         const { oldIndex, newIndex } = evt;
                         const [movedItem] = participants.splice(oldIndex, 1);
                         participants.splice(newIndex, 0, movedItem);
-                        saveStateToFirestore();
+                        markUnsaved();
+                        debouncedSave();
                     },
                 });
             }
@@ -1152,7 +1040,11 @@
                 if (!meetingDocRef || !userId) return;
                 saveSpinner.classList.remove('hidden');
                 saveText.textContent = "SAVING";
-                saveText.parentNode.classList.add('saving');
+                saveStatusContainer.classList.add('saving');
+                saveStatusContainer.classList.remove('unsaved');
+                const manualSaveBtn = document.getElementById('manual-save-btn');
+                if (manualSaveBtn) manualSaveBtn.classList.add('hidden'); // ซ่อนปุ่มเมื่อกำลังเซฟ
+                
                 try {
                     await updateDoc(meetingDocRef, {
                         participants: participants,
@@ -1161,7 +1053,10 @@
                         columnCount: columnCount
                     });
                     setTimeout(() => {
-                         saveSpinner.classList.add('hidden'); saveText.textContent = "SAVED"; saveText.parentNode.classList.remove('saving');
+                         saveSpinner.classList.add('hidden'); 
+                         saveText.textContent = "SAVED"; 
+                         saveStatusContainer.classList.remove('saving');
+                         hasUnsavedChanges = false; // Mark as saved
                     }, 800);
                 } catch (error) {
                     if (error.code === 'not-found') {
@@ -1169,6 +1064,7 @@
                             participants: participants, transcript: transcriptTextarea.value,
                             meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes', columnCount: columnCount
                         }, { merge: true });
+                        hasUnsavedChanges = false;
                     } else {
                         console.error("Error saving state to Firestore: ", error);
                         saveText.textContent = "ERROR";
@@ -1183,70 +1079,33 @@
                     timeout = setTimeout(() => func(...args), wait);
                 };
             };
-            const debouncedSave = debounce(saveStateToFirestore, 1000); 
+            
+            // 🔥 ปรับ Auto-save เป็น 5 นาที (300000ms) ตามที่คุณต้องการ
+            const debouncedSave = debounce(saveStateToFirestore, 300000); 
 
-            function showColorPicker(e, p) {
-                document.querySelectorAll('.color-picker-popup').forEach(el => el.remove());
-                const popup = document.createElement('div');
-                popup.className = 'color-picker-popup';
-
-                let targetEl = e.target;
-                if (e.touches && e.touches.length > 0) targetEl = document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY) || e.target;
-                const btnRect = targetEl.getBoundingClientRect();
-                const finalTop = btnRect.top - 90 < 60 ? btnRect.bottom + 8 : btnRect.top - 90;
-                popup.style.top = `${finalTop}px`;
-                popup.style.left = `${Math.max(8, btnRect.left - 50)}px`;
-
-                PRESET_COLORS.forEach(color => {
-                    const dot = document.createElement('div');
-                    dot.className = 'color-dot'; dot.dataset.color = color;
-                    if (p.color === color) dot.classList.add('selected');
-                    dot.style.background = color;
-                    popup.appendChild(dot);
+            // ทำให้ปุ่ม Manual Save ทำงาน
+            const manualSaveBtnEl = document.getElementById('manual-save-btn');
+            if (manualSaveBtnEl) {
+                manualSaveBtnEl.addEventListener('click', () => {
+                    if (hasUnsavedChanges) saveStateToFirestore();
                 });
-
-                const clearDot = document.createElement('div');
-                clearDot.className = 'color-dot'; clearDot.dataset.color = 'clear';
-                clearDot.style.cssText = 'background:transparent;border:2px dashed var(--text-secondary);';
-                popup.appendChild(clearDot);
-                document.body.appendChild(popup);
-
-                let cleanup;
-                const applyColor = (target) => {
-                    if (!target || !target.classList.contains('color-dot')) return false;
-                    const color = target.dataset.color;
-                    if (color === 'clear') delete p.color; else p.color = color;
-                    cleanup(); renderParticipants(); saveStateToFirestore(); return true;
-                };
-
-                const onPointerUpOrTouchEnd = (ev) => {
-                    let clientX, clientY;
-                    if (ev.type.startsWith('touch') && ev.changedTouches && ev.changedTouches.length > 0) {
-                        clientX = ev.changedTouches[0].clientX; clientY = ev.changedTouches[0].clientY;
-                    } else if (ev.clientX !== undefined && ev.clientY !== undefined) {
-                        clientX = ev.clientX; clientY = ev.clientY;
-                    } else return;
-                    const target = document.elementFromPoint(clientX, clientY);
-                    if (applyColor(target)) { if (ev.cancelable) ev.preventDefault(); }
-                };
-
-                const onClickGlobal = (ev) => { if (!popup.contains(ev.target)) cleanup(); };
-                popup.addEventListener('click', (ev) => { ev.stopPropagation(); applyColor(ev.target); });
-
-                cleanup = () => {
-                    popup.remove();
-                    document.removeEventListener('pointerup', onPointerUpOrTouchEnd);
-                    document.removeEventListener('touchend', onPointerUpOrTouchEnd);
-                    document.removeEventListener('click', onClickGlobal, true);
-                };
-
-                setTimeout(() => {
-                    document.addEventListener('pointerup', onPointerUpOrTouchEnd);
-                    document.addEventListener('touchend', onPointerUpOrTouchEnd, { passive: false });
-                    document.addEventListener('click', onClickGlobal, true);
-                }, 100);
             }
             
+            // คงไว้เผื่อกดที่ตัวหนังสือสถานะ
+            saveStatusContainer.addEventListener('click', () => {
+                if (hasUnsavedChanges && !saveStatusContainer.classList.contains('saving')) {
+                    saveStateToFirestore();
+                }
+            });
+
+            // 🔥 WARNING ON UNLOAD
+            window.addEventListener('beforeunload', (e) => {
+                if (hasUnsavedChanges) {
+                    e.preventDefault();
+                    e.returnValue = ''; // Required for modern browsers
+                }
+            });
+
             function renderParticipants() {
                 participantsGrid.innerHTML = '';
                 if (!participants || participants.length === 0) {
@@ -1279,47 +1138,14 @@
                     box.appendChild(nameElement);
                     box.appendChild(editIcon);
 
-                    if (p.color) {
-                        box.style.borderColor = p.color; box.style.boxShadow = `inset 0 0 0 1px ${p.color}`; box.style.background = `${p.color}0A`; 
-                    }
-
-                    let startX = 0, startY = 0, isDragging = false, pressTimer = null;
-                    const dragThreshold = 10;
-
-                    box.addEventListener('pointerdown', (e) => {
-                        if (e.target.closest('.card-action-icon')) return;
-                        if (isEditCardsMode) return; // Disable color picker in edit mode
-                        startX = e.clientX; startY = e.clientY; isDragging = false;
-                        
-                        pressTimer = setTimeout(() => {
-                            if (!isDragging && !isEditCardsMode) showColorPicker(e, p);
-                        }, 600);
-                    });
-
-                    box.addEventListener('pointerup', () => clearTimeout(pressTimer));
-                    box.addEventListener('pointercancel', () => clearTimeout(pressTimer));
-                    box.addEventListener('pointermove', (e) => {
-                        if (!isDragging) {
-                            if (Math.abs(e.clientX - startX) > dragThreshold || Math.abs(e.clientY - startY) > dragThreshold) {
-                                isDragging = true; clearTimeout(pressTimer); 
-                            }
-                        }
-                    });
-
-                    box.addEventListener('contextmenu', (e) => e.preventDefault());
-
                     box.addEventListener('click', (e) => {
-                        if (isDragging) return;
-                        if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
-                        if (document.querySelector('.color-picker-popup')) return; 
-                        if (isEditCardsMode) return; // Prevent transcript logging in edit mode
+                        if (e.target.closest('.card-action-icon')) return;
+                        if (isEditCardsMode) return; 
                         handleParticipantSelect(p.id);
                     });
 
                     box.addEventListener('touchend', (e) => {
-                        if (isDragging) return;
-                        if (e.target.closest('.card-action-icon') || e.target.closest('.color-picker-popup')) return;
-                        if (document.querySelector('.color-picker-popup')) return;
+                        if (e.target.closest('.card-action-icon')) return;
                         if (isEditCardsMode) return; 
                         transcriptTextarea.focus();
                     }, { passive: true });
@@ -1337,7 +1163,6 @@
                     participantsGrid.appendChild(box);
                 });
                 if (!sortableInstance) initSortable();
-                updateTranscriptHighlight();
             }
             
             function updateColumnLayout(newCount) {
@@ -1365,7 +1190,7 @@
                     ? `${currentText}${textToInsert}` : `${currentText}${textToInsert.trimStart()}`;
                 
                 transcriptTextarea.value = newText; sttStableText = newText; 
-                saveToHistory(newText); debouncedSave(); updateTranscriptHighlight(); 
+                saveToHistory(newText); markUnsaved(); debouncedSave(); 
 
                 transcriptTextarea.focus();
                 transcriptTextarea.setSelectionRange(transcriptTextarea.value.length, transcriptTextarea.value.length);
@@ -1417,17 +1242,16 @@
                 if (newName && id) {
                     const participant = participants.find(p => p.id === id);
                     if (participant) { 
-                        participant.name = newName; hideAllModals(); renderParticipants(); saveStateToFirestore();
+                        participant.name = newName; hideAllModals(); renderParticipants(); markUnsaved(); debouncedSave();
                     }
                 }
             });
             
             function handleDeleteParticipant(id) {
-                // To keep it seamless when in Edit Mode, we delete instantly without annoying confirm dialogs.
-                // It works just like Seating Plan.
                 participants = participants.filter(p => p.id !== id);
                 renderParticipants();
-                saveStateToFirestore();
+                markUnsaved();
+                debouncedSave();
                 showToast("ลบรายชื่อแล้ว", "info");
             }
             
@@ -1437,7 +1261,7 @@
                 confirmMessage.textContent = "Remove all participants? This cannot be undone.";
                 confirmOkBtn.onclick = () => {
                     participants = []; activeParticipantId = null; nextId = 1;
-                    renderParticipants(); saveStateToFirestore(); hideAllModals(); showToast("Participants cleared", "success");
+                    renderParticipants(); markUnsaved(); debouncedSave(); hideAllModals(); showToast("Participants cleared", "success");
                 };
                 confirmModal.classList.remove('hidden');
             });
@@ -1457,6 +1281,50 @@
                     await addDoc(listRef, { name: listName, participants: participants, createdAt: serverTimestamp() });
                     hideAllModals(); showToast(`Group "${listName}" saved`, "success"); await loadAllNamesCache(); 
                 } catch (error) { showToast("Error saving group", "error"); }
+            });
+
+            // ── เพิ่ม LOGIC ดึงข้อมูลเข้า LOAD GROUP MODAL ──
+            document.getElementById('load-list-btn').addEventListener('click', async () => {
+                toolsDropdown.classList.add('hidden');
+                loadListModal.classList.remove('hidden');
+                savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
+                if (!userId) return;
+                try {
+                    const snap = await getDocs(query(collection(db, getBasePath(userId), 'participant_lists'), orderBy('createdAt', 'desc')));
+                    savedListsContainer.innerHTML = '';
+                    if (snap.empty) { savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีกลุ่มที่บันทึกไว้</p>'; return; }
+                    snap.forEach(d => {
+                        const data = d.data(), docId = d.id;
+                        const item = document.createElement('div');
+                        item.className = 'saved-list-item rounded-lg p-3 flex justify-between items-center mb-2';
+                        item.innerHTML = `<span class="font-bold text-sm truncate pr-2">${data.name} (${data.participants?.length || 0} คน)</span>
+                                          <div class="flex gap-2 flex-shrink-0">
+                                            <button class="load-group-btn tool-btn text-xs px-2 py-1 h-auto">LOAD</button>
+                                            <button class="delete-group-btn tool-btn text-xs px-2 py-1 h-auto text-red-400">DEL</button>
+                                          </div>`;
+                        item.querySelector('.load-group-btn').addEventListener('click', () => {
+                            confirmTitle.textContent = "Load Group";
+                            confirmMessage.textContent = `โหลดกลุ่ม "${data.name}"? รายชื่อปัจจุบันจะถูกลบและแทนที่ด้วยกลุ่มนี้`;
+                            confirmOkBtn.onclick = () => {
+                                participants = JSON.parse(JSON.stringify(data.participants || []));
+                                nextId = participants.reduce((m, p) => p.id > m ? p.id : m, 0) + 1;
+                                renderParticipants(); markUnsaved(); debouncedSave();
+                                hideAllModals(); showToast(`โหลดกลุ่ม "${data.name}" แล้ว`, 'success');
+                            };
+                            confirmModal.classList.remove('hidden');
+                        });
+                        item.querySelector('.delete-group-btn').addEventListener('click', () => {
+                            confirmTitle.textContent = "Delete Group";
+                            confirmMessage.textContent = `ยืนยันการลบกลุ่ม "${data.name}"?`;
+                            confirmOkBtn.onclick = async () => {
+                                try { await deleteDoc(doc(db, getBasePath(userId), 'participant_lists', docId)); item.remove(); showToast('ลบกลุ่มแล้ว', 'success'); hideAllModals(); } 
+                                catch(err) { showToast('ลบไม่สำเร็จ', 'error'); }
+                            };
+                            confirmModal.classList.remove('hidden');
+                        });
+                        savedListsContainer.appendChild(item);
+                    });
+                } catch(e) { savedListsContainer.innerHTML = '<p class="text-center text-red-500 text-sm">ดึงข้อมูลไม่สำเร็จ</p>'; }
             });
 
             // ── SEATING PLAN ──
@@ -1530,14 +1398,90 @@
 
                 seatingPanel.appendChild(controls); seatingPanel.appendChild(tableWrapper);
 
-                seatingPanel.querySelector('#top-minus').addEventListener('click', () => { if (seatingLayout.rowsTop > 1) { seatingLayout.rowsTop--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
-                seatingPanel.querySelector('#top-plus').addEventListener('click', () => { if (seatingLayout.rowsTop < 4) { seatingLayout.rowsTop++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                // 🔥 LOGIC การเพิ่ม/ลด ที่เช็คทิศทางตรงข้ามประธานและรักษากลางโต๊ะเสมอ
+                seatingPanel.querySelector('#top-minus').addEventListener('click', () => { 
+                    if (seatingLayout.rowsTop > 1) { 
+                        const newSeats = { ...seatingLayout.seats };
+                        for (let c = 0; c < 20; c++) delete newSeats[`top-0-${c}`]; // ลบแถวนอกสุด
+                        for (let r = 1; r < seatingLayout.rowsTop; r++) { // เลื่อนแถวที่ติดโต๊ะออกไป
+                            for (let c = 0; c < 20; c++) {
+                                if (newSeats[`top-${r}-${c}`]) {
+                                    newSeats[`top-${r - 1}-${c}`] = newSeats[`top-${r}-${c}`];
+                                    delete newSeats[`top-${r}-${c}`];
+                                }
+                            }
+                        }
+                        seatingLayout.seats = newSeats; seatingLayout.rowsTop--; 
+                        saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); 
+                    }
+                });
+                seatingPanel.querySelector('#top-plus').addEventListener('click', () => { 
+                    if (seatingLayout.rowsTop < 4) { 
+                        const newSeats = { ...seatingLayout.seats };
+                        for (let r = seatingLayout.rowsTop - 1; r >= 0; r--) { // ดันแถวเดิมเข้าหาโต๊ะ
+                            for (let c = 0; c < 20; c++) {
+                                if (newSeats[`top-${r}-${c}`]) {
+                                    newSeats[`top-${r + 1}-${c}`] = newSeats[`top-${r}-${c}`];
+                                    delete newSeats[`top-${r}-${c}`];
+                                }
+                            }
+                        }
+                        seatingLayout.seats = newSeats; seatingLayout.rowsTop++; 
+                        saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); 
+                    }
+                });
+                // แถวล่าง (Bottom) ทำงานถูกต้องตามโครงสร้าง Array อยู่แล้ว (0=ติดโต๊ะ)
                 seatingPanel.querySelector('#bot-minus').addEventListener('click', () => { if (seatingLayout.rowsBottom > 1) { seatingLayout.rowsBottom--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
                 seatingPanel.querySelector('#bot-plus').addEventListener('click', () => { if (seatingLayout.rowsBottom < 4) { seatingLayout.rowsBottom++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
-                seatingPanel.querySelector('#seat-minus').addEventListener('click', () => { if (seatingLayout.seatsPerRow > 1) { seatingLayout.seatsPerRow--; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
-                seatingPanel.querySelector('#seat-plus').addEventListener('click', () => { if (seatingLayout.seatsPerRow < 18) { seatingLayout.seatsPerRow++; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                
+                // การเพิ่มลดจำนวนที่นั่ง (ซ้าย-ขวา) ให้อิงจากฝั่งตรงข้ามประธาน
+                seatingPanel.querySelector('#seat-minus').addEventListener('click', () => { 
+                    if (seatingLayout.seatsPerRow > 1) { 
+                        const newSeats = { ...seatingLayout.seats };
+                        if (seatingLayout.chairmanSide === 'right') { // ประธานอยู่ขวา -> ลบซ้ายสุด (Col 0)
+                            for (let r = 0; r < 5; r++) {
+                                ['top', 'bottom'].forEach(zone => {
+                                    delete newSeats[`${zone}-${r}-0`];
+                                    for (let c = 1; c < seatingLayout.seatsPerRow; c++) {
+                                        if (newSeats[`${zone}-${r}-${c}`]) {
+                                            newSeats[`${zone}-${r}-${c - 1}`] = newSeats[`${zone}-${r}-${c}`];
+                                            delete newSeats[`${zone}-${r}-${c}`];
+                                        }
+                                    }
+                                });
+                            }
+                        } else { // ประธานอยู่ซ้าย -> ลบขวาสุด (Col Max) ปกติ
+                            for (let r = 0; r < 5; r++) {
+                                ['top', 'bottom'].forEach(zone => { delete newSeats[`${zone}-${r}-${seatingLayout.seatsPerRow - 1}`]; });
+                            }
+                        }
+                        seatingLayout.seats = newSeats; seatingLayout.seatsPerRow--; 
+                        saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); 
+                    }
+                });
+                seatingPanel.querySelector('#seat-plus').addEventListener('click', () => { 
+                    if (seatingLayout.seatsPerRow < 18) { 
+                        const newSeats = { ...seatingLayout.seats };
+                        if (seatingLayout.chairmanSide === 'right') { // ประธานอยู่ขวา -> เพิ่มซ้ายสุด (ดันทุกคนไปทางขวา)
+                            for (let r = 0; r < 5; r++) {
+                                ['top', 'bottom'].forEach(zone => {
+                                    for (let c = seatingLayout.seatsPerRow - 1; c >= 0; c--) {
+                                        if (newSeats[`${zone}-${r}-${c}`]) {
+                                            newSeats[`${zone}-${r}-${c + 1}`] = newSeats[`${zone}-${r}-${c}`];
+                                            delete newSeats[`${zone}-${r}-${c}`];
+                                        }
+                                    }
+                                });
+                            }
+                        } // ถ้าประธานอยู่ซ้าย Array จะเพิ่มขวาสุดให้อัตโนมัติอยู่แล้ว
+                        seatingLayout.seats = newSeats; seatingLayout.seatsPerRow++; 
+                        saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); 
+                    }
+                });
+
+                // 🔥 ปรับขีดจำกัดความสูงที่นั่งให้ขยายได้ใหญ่มาก (140px)
                 seatingPanel.querySelector('#size-minus').addEventListener('click', () => { if (seatingLayout.seatHeight > 32) { seatingLayout.seatHeight -= 8; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
-                seatingPanel.querySelector('#size-plus').addEventListener('click', () => { if (seatingLayout.seatHeight < 80) { seatingLayout.seatHeight += 8; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
+                seatingPanel.querySelector('#size-plus').addEventListener('click', () => { if (seatingLayout.seatHeight < 140) { seatingLayout.seatHeight += 8; saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel(); }});
 
                 if (isDragMode) seatingPanel.classList.add('drag-mode');
             }
@@ -1550,7 +1494,6 @@
 
                 if (chairP) {
                     slot.classList.add('filled');
-                    if (chairP.color) { slot.style.borderColor = chairP.color; slot.style.background = `${chairP.color}18`; }
                     const nameEl = document.createElement('div'); nameEl.className = 'chairman-name'; nameEl.textContent = chairP.name; slot.appendChild(nameEl);
                 } else {
                     const emptyEl = document.createElement('div'); emptyEl.className = 'chairman-empty'; emptyEl.textContent = 'ประธาน'; slot.appendChild(emptyEl);
@@ -1572,10 +1515,13 @@
 
                     if (p) {
                         seat.classList.add('filled');
-                        if (p.color) { seat.style.borderColor = p.color; seat.style.background = `${p.color}0A`; }
                         if (p.id === activeParticipantId) seat.classList.add('active-speaker');
-                        const fontSize = seatingLayout.seatHeight < 40 ? '0.55rem' : seatingLayout.seatHeight < 56 ? '0.62rem' : '0.72rem';
-                        const nameEl = document.createElement('div'); nameEl.className = 'seat-name'; nameEl.style.fontSize = fontSize; nameEl.textContent = p.name; seat.appendChild(nameEl);
+                        
+                        // 🔥 สูตรคำนวณฟอนต์ให้ใหญ่ตามความสูงกล่องได้อย่างอิสระ
+                        const calculatedSize = Math.max(0.6, seatingLayout.seatHeight * 0.018); 
+                        const nameEl = document.createElement('div'); nameEl.className = 'seat-name'; 
+                        nameEl.style.fontSize = `${calculatedSize}rem`; 
+                        nameEl.textContent = p.name; seat.appendChild(nameEl);
                     } else {
                         const icon = document.createElement('div'); icon.className = 'seat-empty-icon'; icon.textContent = '+'; seat.appendChild(icon);
                     }
@@ -1603,8 +1549,14 @@
                     el.addEventListener('pointerdown', (e) => {
                         if (!currentPId || e.target.closest('div[style*="background: #ef4444"]')) return;
                         dragSourceKey = key; el.style.opacity = '0.5'; e.preventDefault();
+                        
+                        // 🔥 LOCK SCROLL on iPhone during drag
+                        document.body.style.overflow = 'hidden'; 
 
                         const onPointerUp = (ev) => {
+                            // UNLOCK SCROLL
+                            document.body.style.overflow = '';
+                            
                             el.style.opacity = '';
                             let clientX, clientY;
                             if (ev.changedTouches) { clientX = ev.changedTouches[0].clientX; clientY = ev.changedTouches[0].clientY; } 
@@ -1641,7 +1593,7 @@
             function showSeatAssignPicker(key) {
                 document.querySelectorAll('.seat-assign-popup').forEach(el => el.remove());
                 const popup = document.createElement('div'); popup.className = 'seat-assign-popup';
-                popup.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-panel-solid);border:1px solid var(--border-color);border-radius:16px;padding:1rem;z-index:200;width:min(320px,90vw);max-height:60vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5);backdrop-filter:blur(20px);`;
+                popup.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-panel-solid);border:1px solid var(--border-color);border-radius:16px;padding:1rem;z-index:200;width:min(320px,90vw);max-height:60vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5);`;
 
                 const title = document.createElement('p'); title.style.cssText = 'font-family:DM Mono,monospace;font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.75rem;letter-spacing:0.05em;'; title.textContent = 'เลือกชื่อที่จะวาง'; popup.appendChild(title);
 
@@ -1651,13 +1603,13 @@
 
                 participants.forEach(p => {
                     const item = document.createElement('div');
-                    item.style.cssText = `padding:0.6rem 0.75rem;border-radius:10px;border:1px solid ${p.color || 'var(--border-color)'};background:${p.color ? p.color + '0A' : 'transparent'};cursor:pointer;font-size:0.78rem;font-weight:500;margin-bottom:0.35rem;color:var(--text-primary);transition:all 0.15s;`;
+                    item.style.cssText = `padding:0.6rem 0.75rem;border-radius:10px;border:1px solid var(--border-color);background:transparent;cursor:pointer;font-size:0.78rem;font-weight:500;margin-bottom:0.35rem;color:var(--text-primary);transition:all 0.15s;`;
                     item.textContent = p.name;
                     item.addEventListener('click', () => { seatingLayout.seats[key] = p.id; saveSeatingLayout(); renderSeatingPanel(); popup.remove(); overlay.remove(); });
                     popup.appendChild(item);
                 });
 
-                const overlay = document.createElement('div'); overlay.style.cssText = 'position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.4);backdrop-filter:blur(4px);';
+                const overlay = document.createElement('div'); overlay.style.cssText = 'position:fixed;inset:0;z-index:199;background:rgba(0,0,0,0.6);';
                 overlay.addEventListener('click', () => { popup.remove(); overlay.remove(); });
                 document.body.appendChild(overlay); document.body.appendChild(popup);
             }
@@ -1745,13 +1697,13 @@
             resizer.addEventListener('touchstart', (e) => { e.preventDefault(); isResizing = true; resizer.classList.add('resizing'); document.addEventListener('touchmove', handleMouseMove); document.addEventListener('touchend', stopResizing); });
 
             // Tools and Features
-            addParticipantBtn.addEventListener('click', () => { participants.push({ id: nextId++, name: `ผู้มาชี้แจง ${nextId}` }); renderParticipants(); saveStateToFirestore(); });
+            addParticipantBtn.addEventListener('click', () => { participants.push({ id: nextId++, name: `ผู้มาชี้แจง ${nextId}` }); renderParticipants(); markUnsaved(); debouncedSave(); });
             bulkAddBtn.addEventListener('click', () => { toolsDropdown.classList.add('hidden'); bulkAddTextarea.value = ''; bulkAddModal.classList.remove('hidden'); bulkAddTextarea.focus(); });
             bulkAddConfirmBtn.addEventListener('click', () => {
                 const names = bulkAddTextarea.value.split('\n').map(n => n.trim()).filter(n => n);
                 if (names.length === 0) { showToast("No names entered", "info"); return; }
                 let addedCount = 0; names.forEach(name => { participants.push({ id: nextId++, name }); addedCount++; });
-                renderParticipants(); saveStateToFirestore(); hideAllModals(); showToast(`Added ${addedCount} participants`, "success");
+                renderParticipants(); markUnsaved(); debouncedSave(); hideAllModals(); showToast(`Added ${addedCount} participants`, "success");
             });
             importExcelBtn.addEventListener('click', () => excelInput.click());
             excelInput.addEventListener('change', (e) => {
@@ -1765,7 +1717,7 @@
                         let addedCount = 0;
                         if (jsonData && jsonData.length > 0) {
                             jsonData.forEach(row => { if (row.length > 0 && row[0]) { participants.push({ id: nextId++, name: String(row[0]).trim() }); addedCount++; } });
-                            if (addedCount > 0) { renderParticipants(); saveStateToFirestore(); showToast(`Imported ${addedCount} members`, "success"); } 
+                            if (addedCount > 0) { renderParticipants(); markUnsaved(); debouncedSave(); showToast(`Imported ${addedCount} members`, "success"); } 
                             else showToast("No names found", "info");
                         } else showToast("File is empty", "info");
                     } catch (error) { showToast("Import error", "error"); }
@@ -1773,20 +1725,35 @@
                 }; reader.readAsArrayBuffer(file);
             });
 
-            increaseColsBtn.addEventListener('click', () => { if (columnCount < 10) { updateColumnLayout(columnCount + 1); saveStateToFirestore(); }});
-            decreaseColsBtn.addEventListener('click', () => { if (columnCount > 1) { updateColumnLayout(columnCount - 1); saveStateToFirestore(); }});
-            saveBtn.addEventListener('click', () => { saveStateToFirestore(); showToast("Saved successfully", "success"); });
+            increaseColsBtn.addEventListener('click', () => { if (columnCount < 10) { updateColumnLayout(columnCount + 1); markUnsaved(); debouncedSave(); }});
+            decreaseColsBtn.addEventListener('click', () => { if (columnCount > 1) { updateColumnLayout(columnCount - 1); markUnsaved(); debouncedSave(); }});
+            
+            // DOWNLOAD DOC
             downloadBtn.addEventListener('click', () => {
                 const text = transcriptTextarea.value; if (text.trim() === '') { showToast('Nothing to download', "info"); return; }
                 const sourceHTML = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Meeting Notes</title></head><body><pre>${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/\t/g, '&#9;')}</pre></body></html>`;
                 const fileDownload = document.createElement("a"); document.body.appendChild(fileDownload);
                 fileDownload.href = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML); fileDownload.download = `meeting-notes-${new Date().toISOString().slice(0,10)}.doc`; fileDownload.click(); document.body.removeChild(fileDownload); showToast("Downloading Word doc...", "success");
             });
+            
+            // COPY DOC
             copyAllBtn.addEventListener('click', () => {
                 const textAreaFallback = document.createElement("textarea"); textAreaFallback.value = transcriptTextarea.value; document.body.appendChild(textAreaFallback); textAreaFallback.select();
                 try { document.execCommand('copy'); showToast('Copied to clipboard', 'success'); } catch (err) { showToast('Copy failed', 'error'); }
                 document.body.removeChild(textAreaFallback);
             });
+
+            // COPY NAMES (NEW)
+            copyNamesBtn.addEventListener('click', () => {
+                const namesList = participants.map(p => p.name).join('\n');
+                if(!namesList) { showToast('ไม่มีรายชื่อ', 'info'); return; }
+                const textArea = document.createElement("textarea");
+                textArea.value = namesList; document.body.appendChild(textArea); textArea.select();
+                try { document.execCommand('copy'); showToast('คัดลอกรายชื่อแล้ว', 'success'); }
+                catch (err) { showToast('คัดลอกไม่สำเร็จ', 'error'); }
+                document.body.removeChild(textArea);
+            });
+
             ratioToggleBtn.addEventListener('click', () => {
                 currentRatioIndex = (currentRatioIndex + 1) % ratios.length; const newRatio = ratios[currentRatioIndex]; ratioToggleBtn.textContent = newRatio.toUpperCase();
                 appContainer.classList.remove('ratio-mode', 'ratio-16-9', 'ratio-4-3', 'h-screen'); document.body.classList.remove('has-ratio');
@@ -1804,14 +1771,15 @@
                 const start = transcriptTextarea.selectionStart, end = transcriptTextarea.selectionEnd;
                 transcriptTextarea.value = transcriptTextarea.value.substring(0, start) + timeString + transcriptTextarea.value.substring(end);
                 sttStableText = transcriptTextarea.value; saveToHistory(transcriptTextarea.value);
-                transcriptTextarea.selectionStart = transcriptTextarea.selectionEnd = start + timeString.length; transcriptTextarea.focus(); saveStateToFirestore(); updateTranscriptHighlight(); 
+                transcriptTextarea.selectionStart = transcriptTextarea.selectionEnd = start + timeString.length; transcriptTextarea.focus(); 
+                markUnsaved(); debouncedSave(); 
             }
             
             toolsMenuBtn.addEventListener('click', (e) => { e.stopPropagation(); toolsDropdown.classList.toggle('hidden'); });
             document.addEventListener('click', (e) => { if (!toolsDropdown.classList.contains('hidden') && !toolsDropdown.contains(e.target) && !toolsMenuBtn.contains(e.target)) toolsDropdown.classList.add('hidden'); });
             document.addEventListener('keydown', (e) => {
                 if (e.ctrlKey) {
-                    if (e.key === 's') { e.preventDefault(); saveBtn.click(); } else if (e.key === 't') { e.preventDefault(); insertTimestamp(); } else if (e.key === 'z') { e.preventDefault(); undoBtn.click(); } else if (e.key === 'y') { e.preventDefault(); redoBtn.click(); } else if (e.key === 'k') { e.preventDefault(); openSearchModal(); }
+                    if (e.key === 's') { e.preventDefault(); saveStateToFirestore(); } else if (e.key === 't') { e.preventDefault(); insertTimestamp(); } else if (e.key === 'z') { e.preventDefault(); undoBtn.click(); } else if (e.key === 'y') { e.preventDefault(); redoBtn.click(); } else if (e.key === 'k') { e.preventDefault(); openSearchModal(); }
                     else if (!isNaN(parseInt(e.key)) && e.key >= '1' && e.key <= '9') { e.preventDefault(); const pIndex = parseInt(e.key) - 1; if (participants && participants[pIndex]) handleParticipantSelect(participants[pIndex].id); }
                 } else if (e.key === '/' && document.activeElement !== transcriptTextarea && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') { e.preventDefault(); openSearchModal(); }
             });
@@ -1826,7 +1794,7 @@
                     item.addEventListener('mouseover', () => item.style.borderColor = 'var(--text-secondary)'); item.addEventListener('mouseout', () => item.style.borderColor = 'var(--border-color)');
                     item.addEventListener('click', () => {
                         if (participants.find(p => p.name === name)) showToast(`"${name}" มีอยู่แล้ว`, 'info');
-                        else { participants.push({ id: nextId++, name }); renderParticipants(); saveStateToFirestore(); showToast(`เพิ่ม "${name}" แล้ว`, 'success'); }
+                        else { participants.push({ id: nextId++, name }); renderParticipants(); markUnsaved(); debouncedSave(); showToast(`เพิ่ม "${name}" แล้ว`, 'success'); }
                         document.getElementById('search-modal').classList.add('hidden');
                     }); results.appendChild(item);
                 });
@@ -1841,7 +1809,7 @@
 
             document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', hideAllModals));
             allModals.forEach(modal => modal.addEventListener('click', (e) => { if(e.target === modal) hideAllModals(); }));
-            editNameCancelBtn.addEventListener('click', hideAllModals); saveListCancelBtn.addEventListener('click', hideAllModals); loadListCancelBtn.addEventListener('click', hideAllModals); confirmCancelBtn.addEventListener('click', hideAllModals); alertOkBtn.addEventListener('click', hideAllModals); bulkAddCancelBtn.addEventListener('click', hideAllModals); document.getElementById('history-close-btn').addEventListener('click', hideAllModals);
+            editNameCancelBtn.addEventListener('click', hideAllModals); saveListCancelBtn.addEventListener('click', hideAllModals); loadListCancelBtn.addEventListener('click', hideAllModals); confirmCancelBtn.addEventListener('click', hideAllModals); bulkAddCancelBtn.addEventListener('click', hideAllModals); document.getElementById('history-close-btn').addEventListener('click', hideAllModals);
 
             async function saveCurrentMeetingToHistory(title) {
                 if (!transcriptTextarea.value.trim() && participants.length === 0) return;
@@ -1877,18 +1845,48 @@
                 }
             }
 
-            document.getElementById('save-meeting-btn').addEventListener('click', async () => { toolsDropdown.classList.add('hidden'); if (!transcriptTextarea.value.trim() && participants.length === 0) { showToast('ไม่มีข้อมูลให้บันทึก', 'info'); return; } const currentTitle = document.getElementById('meeting-title')?.textContent || 'Meeting Notes'; await saveCurrentMeetingToHistory(currentTitle); showToast(`บันทึก "${currentTitle}" แล้ว`, 'success'); });
+            document.getElementById('save-meeting-btn').addEventListener('click', async () => { 
+                toolsDropdown.classList.add('hidden'); 
+                if (!transcriptTextarea.value.trim() && participants.length === 0) { showToast('ไม่มีข้อมูลให้บันทึก', 'info'); return; } 
+                const currentTitle = document.getElementById('meeting-title')?.textContent || 'Meeting Notes'; 
+                await saveCurrentMeetingToHistory(currentTitle); 
+                showToast(`บันทึก "${currentTitle}" แล้ว`, 'success'); 
+            });
             
             clearTextBtn.addEventListener('click', () => {
                 if (transcriptTextarea.value.trim() === '') { showToast("Transcript is already empty", "info"); return; }
                 confirmTitle.textContent = "Clear Transcript"; confirmMessage.textContent = "Delete all text in the transcript? You can Undo this action.";
-                confirmOkBtn.onclick = () => { isInterimActive = false; transcriptTextarea.value = ''; sttStableText = ''; saveToHistory(''); debouncedSave(); updateTranscriptHighlight(); hideAllModals(); showToast("Transcript cleared", "success"); };
+                confirmOkBtn.onclick = () => { 
+                    isInterimActive = false; transcriptTextarea.value = ''; sttStableText = ''; 
+                    saveToHistory(''); markUnsaved(); debouncedSave(); hideAllModals(); showToast("Transcript cleared", "success"); 
+                };
                 confirmModal.classList.remove('hidden');
             });
 
             document.getElementById('new-meeting-btn').addEventListener('click', () => {
-                toolsDropdown.classList.add('hidden'); confirmTitle.textContent = "New Meeting"; confirmMessage.textContent = "Start a new meeting? The current board will be cleared.";
-                confirmOkBtn.onclick = () => { transcriptTextarea.value = ''; sttStableText = ''; isInterimActive = false; participants = [ { id: 1, name: 'ประธาน' }, { id: 2, name: 'เลขานุการ' }, { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' }, { id: 4, name: 'ผู้ชี้แจง' } ]; activeParticipantId = null; nextId = 5; textHistory = []; historyIndex = -1; updateUndoRedoButtons(); renderParticipants(); updateTranscriptHighlight(); const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = 'Meeting Notes'; meetingStartTime = Date.now(); currentRoomId = null; saveStateToFirestore(); hideAllModals(); showToast(`เริ่มการประชุมใหม่`, 'success'); };
+                toolsDropdown.classList.add('hidden'); 
+                
+                // ดักจับกรณีที่ยังไม่ได้บันทึก
+                if (hasUnsavedChanges) {
+                    confirmTitle.textContent = "Unsaved Changes!"; 
+                    confirmMessage.textContent = "คุณยังมีข้อมูลที่ยังไม่ได้เซฟ ต้องการเริ่มห้องใหม่และทิ้งข้อมูลเดิมหรือไม่?";
+                } else {
+                    confirmTitle.textContent = "New Meeting"; 
+                    confirmMessage.textContent = "Start a new meeting? The current board will be cleared.";
+                }
+                
+                confirmOkBtn.onclick = () => { 
+                    transcriptTextarea.value = ''; sttStableText = ''; isInterimActive = false; 
+                    participants = [ { id: 1, name: 'ประธาน' }, { id: 2, name: 'เลขานุการ' }, { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' }, { id: 4, name: 'ผู้ชี้แจง' } ]; 
+                    activeParticipantId = null; nextId = 5; textHistory = []; historyIndex = -1; 
+                    updateUndoRedoButtons(); renderParticipants(); 
+                    const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = 'Meeting Notes'; 
+                    meetingStartTime = Date.now(); currentRoomId = null; 
+                    
+                    hasUnsavedChanges = false; // Reset warning flag
+                    saveStateToFirestore(); 
+                    hideAllModals(); showToast(`เริ่มการประชุมใหม่`, 'success'); 
+                };
                 confirmModal.classList.remove('hidden');
             });
 
@@ -1903,20 +1901,35 @@
                         const data = d.data(), docId = d.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'ไม่ทราบวันที่';
                         const item = document.createElement('div'); item.className = 'saved-list-item rounded-lg p-4 cursor-pointer'; item.style.cssText = 'border:1px solid var(--border-color);background:var(--bg-panel-solid);';
                         item.innerHTML = `<div class="flex justify-between items-start gap-3"><div class="flex-grow min-w-0"><p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'ไม่มีชื่อ'}</p><p class="text-xs mt-1" style="color:var(--text-secondary);">${date}</p><p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">${data.participants?.length || 0} คน · ${data.transcript?.length || 0} ตัวอักษร</p></div><div class="flex gap-2 flex-shrink-0"><button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button><button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button></div></div>`;
-                        item.querySelector('.load-history-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmTitle.textContent = 'Load Meeting'; confirmMessage.textContent = `โหลด "${data.title}" กลับมา? ข้อมูลปัจจุบันจะถูกแทนที่`; confirmOkBtn.onclick = async () => { transcriptTextarea.value = data.transcript || ''; sttStableText = transcriptTextarea.value; isInterimActive = false; participants = JSON.parse(JSON.stringify(data.participants || [])); nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1; textHistory = []; historyIndex = -1; saveToHistory(transcriptTextarea.value); renderParticipants(); updateTranscriptHighlight(); const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = data.title; currentRoomId = docId; await saveStateToFirestore(); hideAllModals(); showToast(`โหลด "${data.title}" แล้ว`, 'success'); }; confirmModal.classList.remove('hidden'); });
-                        item.querySelector('.delete-history-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmTitle.textContent = "Delete History"; confirmMessage.textContent = `ลบ "${data.title}" ออกจากประวัติ?`; confirmOkBtn.onclick = async () => { try { await deleteDoc(doc(db, getBasePath(userId), 'meeting_history', docId)); item.remove(); if (container.children.length === 0) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; showToast('ลบแล้ว', 'success'); hideAllModals(); if(currentRoomId === docId) currentRoomId = null; } catch(err) { showToast('ลบไม่สำเร็จ', 'error'); } }; confirmModal.classList.remove('hidden'); });
+                        item.querySelector('.load-history-btn').addEventListener('click', (e) => { 
+                            e.stopPropagation(); 
+                            confirmTitle.textContent = 'Load Meeting'; confirmMessage.textContent = `โหลด "${data.title}" กลับมา? ข้อมูลปัจจุบันจะถูกแทนที่`; 
+                            confirmOkBtn.onclick = async () => { 
+                                transcriptTextarea.value = data.transcript || ''; sttStableText = transcriptTextarea.value; isInterimActive = false; 
+                                participants = JSON.parse(JSON.stringify(data.participants || [])); nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1; 
+                                textHistory = []; historyIndex = -1; saveToHistory(transcriptTextarea.value); renderParticipants(); 
+                                const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = data.title; 
+                                currentRoomId = docId; 
+                                hasUnsavedChanges = false;
+                                await saveStateToFirestore(); 
+                                hideAllModals(); showToast(`โหลด "${data.title}" แล้ว`, 'success'); 
+                            }; 
+                            confirmModal.classList.remove('hidden'); 
+                        });
+                        item.querySelector('.delete-history-btn').addEventListener('click', (e) => { 
+                            e.stopPropagation(); confirmTitle.textContent = "Delete History"; confirmMessage.textContent = `ลบ "${data.title}" ออกจากประวัติ?`; 
+                            confirmOkBtn.onclick = async () => { 
+                                try { await deleteDoc(doc(db, getBasePath(userId), 'meeting_history', docId)); item.remove(); if (container.children.length === 0) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; showToast('ลบแล้ว', 'success'); hideAllModals(); if(currentRoomId === docId) currentRoomId = null; } 
+                                catch(err) { showToast('ลบไม่สำเร็จ', 'error'); } 
+                            }; 
+                            confirmModal.classList.remove('hidden'); 
+                        });
                         container.appendChild(item);
                     });
                 } catch(e) { container.innerHTML = '<p class="text-center text-red-500 text-sm">โหลดไม่สำเร็จ</p>'; }
             });
 
-            document.addEventListener('visibilitychange', () => {
-                if (document.visibilityState === 'visible' && userId) {
-                    if (unsubscribeMeeting) unsubscribeMeeting();
-                    if (sortableInstance) { sortableInstance.destroy(); sortableInstance = null; }
-                    initializeLogic(); 
-                }
-            });
+            // ลบ event visibilitychange ทิ้งไปเลย ป้องกัน Listener ซ้อนกัน
         });
     </script>
 </body>
