@@ -2334,7 +2334,7 @@
                     }
                     if (!userId) return;
                     try {
-                        const snap = await getDocs(query(collection(db, getBasePath(userId), 'meeting_history'), orderBy('savedAt', 'desc')));
+                        const snap = await getDocs(collection(db, getBasePath(userId), 'meeting_history'));
                         if (container) {
                             container.innerHTML = '';
                             if (snap.empty) { container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; return; }
