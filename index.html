@@ -61,7 +61,7 @@
             height: 100%;
             height: 100dvh;
             max-height: 100dvh;
-            /* ป้องกันการทับซ้อนรอยบากและแถบโฮมบาร์บน iPhone 11 */
+            /* ป้องกันการทับซ้อนรอยบากและแถบโฮมบาร์บน iPhone */
             padding-top: max(0.5rem, env(safe-area-inset-top));
             padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
             padding-left: max(0.5rem, env(safe-area-inset-left));
@@ -78,7 +78,7 @@
             transition: color 0.3s, background 0.3s;
         }
 
-        /* แก้ไขบัค iOS Auto-Zoom ด้วยการล็อกขนาดฟอนต์ Input ไว้ที่ 16px */
+        /* ป้องกัน iOS Auto-Zoom ด้วยการกำหนดขนาดฟอนต์ของ Input และ Textarea ไม่ให้ต่ำกว่า 16px */
         textarea, select, input[type="text"] {
             font-size: 16px !important; 
             background-color: var(--bg-panel-solid); 
@@ -130,7 +130,7 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
 
-        /* ปรับปรุง Transition เจาะจงลดภาระ GPU ของเบราว์เซอร์ iOS */
+        /* การทำ Transition ที่ช่วยลดภาระ GPU บนอุปกรณ์พกพา */
         .participant-box {
             background-color: var(--bg-panel-solid); 
             border: 1px solid var(--border-color); 
@@ -340,7 +340,7 @@
         #transcript-wrapper { position: relative; display: flex; flex: 1; min-height: 0; overflow: hidden; }
         #transcript-textarea {
             width: 100%; height: 100%; padding: 1rem; border-radius: 0.5rem; 
-            resize: none; font-size: 16px; /* ป้องกัน iOS ซูมขยายจอเอง */
+            resize: none; font-size: 16px; 
             line-height: 1.6; font-family: 'Sarabun', sans-serif;
             background-color: transparent !important; color: var(--text-primary) !important;
         }
@@ -574,7 +574,7 @@
         </div>
     </div>
 
-    <!-- z-index ของ Confirm modal เป็น z-[200] เสมอเพื่อให้อยู่เหนือกทุกอย่างรวมถึงประวัติ -->
+    <!-- z-index ของ Confirm modal เป็น z-[200] เสมอเพื่อให้ทับซ้อนอยู่หน้าสุดเสมอ -->
     <div id="confirm-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-[200]">
         <div class="w-full max-w-sm text-center p-8 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent opacity-30"></div>
@@ -594,7 +594,7 @@
         <div class="w-full max-w-lg flex flex-col max-h-[80vh]">
             <div class="p-5 border-b flex justify-between items-center" style="border-color: var(--border-color);">
                 <h3 class="text-lg font-bold">Meeting History</h3>
-                <button class="modal-close modal-close-btn">&times;</button>
+                <button class="modal-close text-gray-500 hover:text-white transition">&times;</button>
             </div>
             <div id="history-list-container" class="p-5 overflow-y-auto flex-grow flex flex-col gap-3">
                 <p class="text-center text-gray-500 text-sm font-mono">Loading...</p>
@@ -637,7 +637,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const myFirebaseConfig = {
             apiKey: "AIzaSyBe1IRZCwUy-1TlP97RRp5biHCu-surkao",
@@ -654,8 +654,9 @@
         }
 
         const getBasePath = (uid) => {
-            if (typeof window.__app_id !== 'undefined' && window.__app_id) {
-                return `artifacts/${window.__app_id}/users/${uid}`;
+            const currentAppId = typeof window.__app_id !== 'undefined' ? window.__app_id : (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
+            if (currentAppId) {
+                return `artifacts/${currentAppId}/users/${uid}`;
             }
             return `users/${uid}`;
         };
@@ -722,8 +723,11 @@
             const savedListsContainer = document.getElementById('saved-lists-container');
             const loadListCancelBtn = document.getElementById('load-list-cancel');
 
+            const historyModal = document.getElementById('history-modal');
+
             let app, auth, db, userId, meetingDocRef;
             let unsubscribeMeeting = null;
+            let isOfflineMode = false;
         
             const ratios = ['Auto', '16:9', '4:3'];
             let currentRatioIndex = 0;
@@ -762,7 +766,7 @@
                 });
             }
 
-            // แก้ไขบัค iOS Keyboard Scroll Shift Bug (ดึงตำแหน่งจอกลับมาพิกัดเดิมหลังจบคีย์บอร์ดเสมือน)
+            // ดึงหน้าจอกลับมาตำแหน่งเดิมเมื่อยกเลิก Virtual Keyboard บน iOS
             const preventKeyboardStickyShift = () => {
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                 if (isIOS) {
@@ -774,71 +778,291 @@
                 }
             };
 
-            try {
-                app = initializeApp(activeConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    signInWithCustomToken(auth, __initial_auth_token).catch(e => console.error("Custom token error", e));
+            // ระบบ Authentication ก่อน และเฝ้าระวังความพร้อมของ Firebase
+            const initFirebaseAndAuth = async () => {
+                try {
+                    // Force Offline Mode if running via local file:/// protocol,
+                    // as Firebase Auth does not support local file origins.
+                    if (window.location.protocol === 'file:') {
+                        console.warn("Running via local file protocol. Switching to Local Offline Mode.");
+                        isOfflineMode = true;
+                        return;
+                    }
+
+                    if (!activeConfig.apiKey) {
+                        throw new Error("Firebase API key is missing. Switching to Offline Mode.");
+                    }
+                    app = initializeApp(activeConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    }
+                } catch (error) {
+                    console.warn("Firebase Initialization failed. Switching to Local Offline Mode:", error);
+                    isOfflineMode = true;
                 }
-            } catch (error) {
-                console.error("Firebase Initialization Error:", error);
-                showToast("การตั้งค่า Firebase ไม่ถูกต้อง", "error");
-                return;
+            };
+
+            initFirebaseAndAuth().then(() => {
+                if (isOfflineMode) {
+                    setupOfflineMode();
+                    return;
+                }
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        const displayName = user.displayName || user.email || 'User';
+                        const userDisplay = document.getElementById('user-display');
+                        if (userDisplay) userDisplay.textContent = displayName;
+                        
+                        if (user.photoURL) {
+                            const avatarEl = document.getElementById('user-avatar');
+                            if (avatarEl) {
+                                avatarEl.src = user.photoURL;
+                                avatarEl.classList.remove('hidden');
+                            }
+                        }
+                        
+                        initializeLogic(); 
+                        preventKeyboardStickyShift();
+
+                        const loginScreen = document.getElementById('login-screen');
+                        const appCont = document.getElementById('app-container');
+                        if (loginScreen) loginScreen.style.display = 'none';
+                        if (appCont) appCont.style.display = 'flex';
+
+                        const savedLayout = parseInt(localStorage.getItem('layoutMode') || '0');
+                        if (savedLayout > 0 && layoutModeIndex === 0) {
+                            layoutModeIndex = savedLayout - 1;
+                            if (layoutToggleBtn) layoutToggleBtn.click();
+                        }
+                    } else {
+                        const appCont = document.getElementById('app-container');
+                        const loginScreen = document.getElementById('login-screen');
+                        if (appCont) appCont.style.display = 'none';
+                        if (loginScreen) loginScreen.style.display = 'flex';
+                        if (unsubscribeMeeting) unsubscribeMeeting();
+                    }
+                });
+            });
+
+            // ── LOCAL OFFLINE FALLBACK MODE FUNCTIONS ──
+            function setupOfflineMode() {
+                userId = 'local-offline-user';
+                const userDisplay = document.getElementById('user-display');
+                if (userDisplay) userDisplay.textContent = "Local Mode";
+                
+                const loginGuestBtn = document.getElementById('login-guest-btn');
+                if (loginGuestBtn) {
+                    loginGuestBtn.addEventListener('click', () => enterAppOffline());
+                }
+                
+                const loginBtn = document.getElementById('login-btn');
+                if (loginBtn) {
+                    loginBtn.addEventListener('click', () => enterAppOffline());
+                }
+
+                const signoutBtn = document.getElementById('signout-btn');
+                if (signoutBtn) {
+                    signoutBtn.addEventListener('click', () => {
+                        const appCont = document.getElementById('app-container');
+                        const loginScreen = document.getElementById('login-screen');
+                        if (appCont) appCont.style.display = 'none';
+                        if (loginScreen) loginScreen.style.display = 'flex';
+                        showToast("ออกจากโหมดออฟไลน์แล้ว", "info");
+                    });
+                }
             }
 
-            let participants = [];
-            let activeParticipantId = null;
-            let nextId = 1;
-            let columnCount = 2;
-            let sortableInstance = null;
+            function enterAppOffline() {
+                const loginScreen = document.getElementById('login-screen');
+                const appCont = document.getElementById('app-container');
+                if (loginScreen) loginScreen.style.display = 'none';
+                if (appCont) appCont.style.display = 'flex';
+                
+                initializeOfflineLogic();
+                preventKeyboardStickyShift();
+                showToast("กำลังใช้งานโหมดออฟไลน์ (บันทึกลงเครื่อง)", "success");
+            }
 
-            const provider = new GoogleAuthProvider();
-
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    userId = user.uid;
-                    const displayName = user.displayName || user.email || 'User';
-                    const userDisplay = document.getElementById('user-display');
-                    if (userDisplay) userDisplay.textContent = displayName;
-                    
-                    if (user.photoURL) {
-                        const avatarEl = document.getElementById('user-avatar');
-                        if (avatarEl) {
-                            avatarEl.src = user.photoURL;
-                            avatarEl.classList.remove('hidden');
+            function initializeOfflineLogic() {
+                const localDataStr = localStorage.getItem('offline_shared_meeting_notes');
+                if (localDataStr) {
+                    try {
+                        const data = JSON.parse(localDataStr);
+                        if (data.meetingTitle) {
+                            const titleEl = document.getElementById('meeting-title');
+                            if (titleEl && titleEl.tagName === 'H1') {
+                                titleEl.textContent = data.meetingTitle;
+                            }
                         }
-                    }
-                    
-                    initializeLogic(); 
-                    preventKeyboardStickyShift();
-
-                    const loginScreen = document.getElementById('login-screen');
-                    const appCont = document.getElementById('app-container');
-                    if (loginScreen) loginScreen.style.display = 'none';
-                    if (appCont) appCont.style.display = 'flex';
-
-                    const savedLayout = parseInt(localStorage.getItem('layoutMode') || '0');
-                    if (savedLayout > 0 && layoutModeIndex === 0) {
-                        layoutModeIndex = savedLayout - 1;
-                        if (layoutToggleBtn) layoutToggleBtn.click();
+                        participants = data.participants || [
+                            { id: 1, name: 'ประธาน' },
+                            { id: 2, name: 'เลขานุการ' },
+                            { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
+                            { id: 4, name: 'ผู้ชี้แจง' }
+                        ];
+                        renderParticipants();
+                        
+                        if (data.seatingLayout) {
+                            seatingLayout = { ...seatingLayout, ...data.seatingLayout };
+                            if (layoutModeIndex === 2) renderSeatingPanel();
+                        }
+                        
+                        if (data.columnCount) {
+                            updateColumnLayout(data.columnCount);
+                        }
+                        
+                        const serverTranscript = data.transcript || '';
+                        transcriptTextarea.value = serverTranscript;
+                        sttStableText = serverTranscript;
+                        saveToHistory(serverTranscript);
+                    } catch(e) {
+                        console.error("Failed to parse offline data", e);
+                        loadOfflineDefaults();
                     }
                 } else {
-                    const appCont = document.getElementById('app-container');
-                    const loginScreen = document.getElementById('login-screen');
-                    if (appCont) appCont.style.display = 'none';
-                    if (loginScreen) loginScreen.style.display = 'flex';
-                    if(unsubscribeMeeting) unsubscribeMeeting();
+                    loadOfflineDefaults();
                 }
-            });
+                
+                const maxId = participants.reduce((max, p) => p.id > max ? p.id : max, 0);
+                nextId = maxId + 1;
+                updateColumnLayout(getInitialColumnCount());
+            }
+
+            function loadOfflineDefaults() {
+                participants = [
+                    { id: 1, name: 'ประธาน' },
+                    { id: 2, name: 'เลขานุการ' },
+                    { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
+                    { id: 4, name: 'ผู้ชี้แจง' }
+                ];
+                renderParticipants();
+                transcriptTextarea.value = '';
+                sttStableText = '';
+            }
+
+            function saveOfflineState() {
+                if (saveSpinner) saveSpinner.classList.remove('hidden');
+                if (saveText) saveText.textContent = "SAVING";
+                if (saveStatusContainer) {
+                    saveStatusContainer.classList.add('saving');
+                    saveStatusContainer.classList.remove('unsaved');
+                }
+                const manualSaveBtn = document.getElementById('manual-save-btn');
+                if (manualSaveBtn) manualSaveBtn.classList.add('hidden'); 
+                
+                try {
+                    const saveData = {
+                        participants: participants,
+                        transcript: transcriptTextarea.value,
+                        meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes',
+                        columnCount: columnCount,
+                        seatingLayout: seatingLayout
+                    };
+                    localStorage.setItem('offline_shared_meeting_notes', JSON.stringify(saveData));
+                    
+                    setTimeout(() => {
+                         if (saveSpinner) saveSpinner.classList.add('hidden'); 
+                         if (saveText) saveText.textContent = "SAVED"; 
+                         if (saveStatusContainer) saveStatusContainer.classList.remove('saving');
+                         hasUnsavedChanges = false; 
+                    }, 500);
+                } catch (e) {
+                    console.error("Offline save error", e);
+                    if (saveText) saveText.textContent = "ERROR";
+                }
+            }
+
+            function renderOfflineLists(lists) {
+                if (savedListsContainer) {
+                    savedListsContainer.innerHTML = '';
+                    if (lists.length === 0) { savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีกลุ่มที่บันทึกไว้</p>'; return; }
+                    lists.forEach(data => {
+                        const docId = data.id;
+                        const item = document.createElement('div');
+                        item.className = 'saved-list-item rounded-lg p-3 flex justify-between items-center mb-2';
+                        item.innerHTML = `<span class="font-bold text-sm truncate pr-2">${data.name} (${data.participants?.length || 0} คน)</span>
+                                          <div class="flex gap-2 flex-shrink-0">
+                                            <button class="load-group-btn tool-btn text-xs px-2 py-1 h-auto">LOAD</button>
+                                            <button class="delete-group-btn tool-btn text-xs px-2 py-1 h-auto text-red-400">DEL</button>
+                                          </div>`;
+                        item.querySelector('.load-group-btn').addEventListener('click', () => {
+                            confirmTitle.textContent = "Load Group";
+                            confirmMessage.textContent = `โหลดกลุ่ม "${data.name}"? รายชื่อปัจจุบันจะถูกลบและแทนที่ด้วยกลุ่มนี้`;
+                            confirmOkBtn.onclick = () => {
+                                participants = JSON.parse(JSON.stringify(data.participants || []));
+                                nextId = participants.reduce((m, p) => p.id > m ? p.id : m, 0) + 1;
+                                renderParticipants(); markUnsaved(); saveOfflineState();
+                                hideAllModals(); showToast(`โหลดกลุ่ม "${data.name}" แล้ว`, 'success');
+                            };
+                            confirmModal.classList.remove('hidden');
+                        });
+                        item.querySelector('.delete-group-btn').addEventListener('click', () => {
+                            confirmTitle.textContent = "Delete Group";
+                            confirmMessage.textContent = `ยืนยันการลบกลุ่ม "${data.name}"?`;
+                            confirmOkBtn.onclick = () => {
+                                const remaining = lists.filter(x => x.id !== docId);
+                                localStorage.setItem('offline_participant_lists', JSON.stringify(remaining));
+                                item.remove(); showToast('ลบกลุ่มแล้ว', 'success'); hideAllModals();
+                            };
+                            confirmModal.classList.remove('hidden');
+                        });
+                        savedListsContainer.appendChild(item);
+                    });
+                }
+            }
+
+            function renderOfflineHistory(historyItems, container) {
+                if (container) {
+                    container.innerHTML = '';
+                    if (historyItems.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; return; }
+                    historyItems.forEach(data => {
+                        const docId = data.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'ไม่ทราบวันที่';
+                        const item = document.createElement('div'); item.className = 'saved-list-item rounded-lg p-4 cursor-pointer'; item.style.cssText = 'border:1px solid var(--border-color);background:var(--bg-panel-solid);';
+                        item.innerHTML = `<div class="flex justify-between items-start gap-3"><div class="flex-grow min-w-0"><p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'ไม่มีชื่อ'}</p><p class="text-xs mt-1" style="color:var(--text-secondary);">${date} (Offline)</p><p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">${data.participants?.length || 0} คน · ${data.transcript?.length || 0} ตัวอักษร</p></div><div class="flex gap-2 flex-shrink-0"><button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button><button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button></div></div>`;
+                        item.querySelector('.load-history-btn').addEventListener('click', (e) => { 
+                            e.stopPropagation(); 
+                            confirmTitle.textContent = 'Load Meeting'; confirmMessage.textContent = `โหลด "${data.title}" กลับมา? ข้อมูลปัจจุบันจะถูกแทนที่`; 
+                            confirmOkBtn.onclick = () => { 
+                                transcriptTextarea.value = data.transcript || ''; sttStableText = transcriptTextarea.value; isInterimActive = false; 
+                                participants = JSON.parse(JSON.stringify(data.participants || [])); nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1; 
+                                textHistory = []; historyIndex = -1; saveToHistory(transcriptTextarea.value); renderParticipants(); 
+                                const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = data.title; 
+                                currentRoomId = docId; 
+                                hasUnsavedChanges = false;
+                                saveOfflineState(); 
+                                hideAllModals(); showToast(`โหลด "${data.title}" แล้ว`, 'success'); 
+                            }; 
+                            confirmModal.classList.remove('hidden'); 
+                        });
+                        item.querySelector('.delete-history-btn').addEventListener('click', (e) => { 
+                            e.stopPropagation(); confirmTitle.textContent = "Delete History"; confirmMessage.textContent = `ลบ "${data.title}" ออกจากประวัติ?`; 
+                            confirmOkBtn.onclick = () => { 
+                                const remaining = historyItems.filter(x => x.id !== docId);
+                                localStorage.setItem('offline_meeting_history', JSON.stringify(remaining));
+                                item.remove(); if (container.children.length === 0) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; showToast('ลบแล้ว', 'success'); hideAllModals(); if(currentRoomId === docId) currentRoomId = null; 
+                            }; 
+                            confirmModal.classList.remove('hidden'); 
+                        });
+                        container.appendChild(item);
+                    });
+                }
+            }
 
             const loginBtn = document.getElementById('login-btn');
             if (loginBtn) {
                 loginBtn.addEventListener('click', async () => {
+                    if (!auth) {
+                        showToast("ระบบยังโหลดไม่เสร็จ กรุณารออีกสักครู่...", "info");
+                        return;
+                    }
                     try {
                         const errEl = document.getElementById('domain-error-msg');
                         if (errEl) errEl.style.display = 'none';
-                        await signInWithPopup(auth, provider);
+                        await signInWithPopup(auth, new GoogleAuthProvider());
                     } catch (e) {
                         console.error("Login Error:", e);
                         showToast("เข้าสู่ระบบไม่สำเร็จ", "error");
@@ -849,6 +1073,10 @@
             const loginGuestBtn = document.getElementById('login-guest-btn');
             if (loginGuestBtn) {
                 loginGuestBtn.addEventListener('click', async () => {
+                    if (!auth) {
+                        showToast("ระบบยังโหลดไม่เสร็จ กรุณารออีกสักครู่...", "info");
+                        return;
+                    }
                     try {
                         const errEl = document.getElementById('domain-error-msg');
                         if (errEl) errEl.style.display = 'none';
@@ -862,7 +1090,10 @@
 
             const signoutBtn = document.getElementById('signout-btn');
             if (signoutBtn) {
-                signoutBtn.addEventListener('click', () => signOut(auth));
+                signoutBtn.addEventListener('click', () => {
+                    if (!auth) return;
+                    signOut(auth);
+                });
             }
 
             function attachTitleEditListener(element) {
@@ -969,7 +1200,6 @@
                     }
                 }, (error) => {
                     console.error("Firestore Snapshot Error: ", error);
-                    if (error.code === 'permission-denied') return; 
                 });
 
                 updateColumnLayout(getInitialColumnCount());
@@ -977,6 +1207,7 @@
             }
             
             async function loadAllNamesCache() {
+                if (!userId) return;
                 try {
                     const snap = await getDocs(collection(db, getBasePath(userId), 'participant_lists'));
                     const nameSet = new Set();
@@ -1116,6 +1347,10 @@
             }
 
             async function saveStateToFirestore() {
+                if (isOfflineMode) {
+                    saveOfflineState();
+                    return;
+                }
                 if (!meetingDocRef || !userId) return;
                 if (saveSpinner) saveSpinner.classList.remove('hidden');
                 if (saveText) saveText.textContent = "SAVING";
@@ -1161,8 +1396,8 @@
                 };
             };
             
-            // Auto-save 5 นาที (300000ms)
-            const debouncedSave = debounce(saveStateToFirestore, 300000); 
+            // Auto-save ทุก ๆ 5 วินาทีเมื่อมีการพิมพ์และส่งข้อมูลเรียบร้อย
+            const debouncedSave = debounce(saveStateToFirestore, 5000); 
 
             const manualSaveBtnEl = document.getElementById('manual-save-btn');
             if (manualSaveBtnEl) {
@@ -1261,6 +1496,18 @@
                 document.querySelectorAll('.participant-box').forEach(box => {
                     box.classList.toggle('active', parseInt(box.dataset.id) === id);
                 });
+
+                // Update active speaker highlight on Seating Plan dynamically
+                document.querySelectorAll('.seat-card').forEach(seat => {
+                    const key = seat.dataset.seatKey;
+                    const seatPId = seatingLayout.seats[key];
+                    seat.classList.toggle('active-speaker', seatPId === id);
+                });
+                const chairmanEl = document.querySelector('.chairman-slot');
+                if (chairmanEl) {
+                    const chairPId = seatingLayout.seats['chairman'];
+                    chairmanEl.classList.toggle('active-speaker', chairPId === id);
+                }
 
                 const participant = participants.find(p => p.id === id);
                 if (!participant) return;
@@ -1371,6 +1618,16 @@
                 saveListConfirmBtn.addEventListener('click', async () => {
                     const listName = saveListNameInput.value.trim();
                     if (!listName) { showToast("Please enter a name", "error"); return; }
+                    if (isOfflineMode) {
+                        try {
+                            const listsStr = localStorage.getItem('offline_participant_lists') || '[]';
+                            const lists = JSON.parse(listsStr);
+                            lists.push({ id: Date.now().toString(), name: listName, participants: participants, createdAt: new Date().toISOString() });
+                            localStorage.setItem('offline_participant_lists', JSON.stringify(lists));
+                            hideAllModals(); showToast(`Group "${listName}" saved (Offline)`, "success");
+                        } catch(e) { showToast("Error saving group offline", "error"); }
+                        return;
+                    }
                     if (!userId) return;
                     try {
                         const listRef = collection(db, getBasePath(userId), 'participant_lists');
@@ -1385,14 +1642,34 @@
                     if (toolsDropdown) toolsDropdown.classList.add('hidden');
                     if (loadListModal) loadListModal.classList.remove('hidden');
                     if (savedListsContainer) savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
+                    if (isOfflineMode) {
+                        try {
+                            const listsStr = localStorage.getItem('offline_participant_lists') || '[]';
+                            const lists = JSON.parse(listsStr);
+                            lists.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                            renderOfflineLists(lists);
+                        } catch(e) { if (savedListsContainer) savedListsContainer.innerHTML = '<p class="text-center text-red-500 text-sm">โหลดไม่สำเร็จ</p>'; }
+                        return;
+                    }
                     if (!userId) return;
                     try {
-                        const snap = await getDocs(query(collection(db, getBasePath(userId), 'participant_lists'), orderBy('createdAt', 'desc')));
+                        const snap = await getDocs(collection(db, getBasePath(userId), 'participant_lists'));
+                        const lists = [];
+                        snap.forEach(d => {
+                            lists.push({ id: d.id, ...d.data() });
+                        });
+                        // เรียงลำดับจากใหม่สุดไปเก่าสุดในหน่วยความจำ (หลีกเลี่ยง Index Errors)
+                        lists.sort((a, b) => {
+                            const tA = a.createdAt?.seconds || 0;
+                            const tB = b.createdAt?.seconds || 0;
+                            return tB - tA;
+                        });
+
                         if (savedListsContainer) {
                             savedListsContainer.innerHTML = '';
-                            if (snap.empty) { savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีกลุ่มที่บันทึกไว้</p>'; return; }
-                            snap.forEach(d => {
-                                const data = d.data(), docId = d.id;
+                            if (lists.length === 0) { savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีกลุ่มที่บันทึกไว้</p>'; return; }
+                            lists.forEach(data => {
+                                const docId = data.id;
                                 const item = document.createElement('div');
                                 item.className = 'saved-list-item rounded-lg p-3 flex justify-between items-center mb-2';
                                 item.innerHTML = `<span class="font-bold text-sm truncate pr-2">${data.name} (${data.participants?.length || 0} คน)</span>
@@ -1429,6 +1706,7 @@
 
             // ── SEATING PLAN ──
             async function loadSeatingLayout() {
+                if (isOfflineMode) return;
                 if (!meetingDocRef) return;
                 try {
                     const snap = await getDoc(meetingDocRef);
@@ -1439,6 +1717,10 @@
             }
 
             async function saveSeatingLayout() {
+                if (isOfflineMode) {
+                    saveOfflineState();
+                    return;
+                }
                 if (!meetingDocRef) return;
                 try { await updateDoc(meetingDocRef, { seatingLayout }); } catch(e) { console.error('Seating save error', e); }
             }
@@ -1593,6 +1875,7 @@
 
                 if (chairP) {
                     slot.classList.add('filled');
+                    if (chairP.id === activeParticipantId) slot.classList.add('active-speaker');
                     const nameEl = document.createElement('div'); nameEl.className = 'chairman-name'; nameEl.textContent = chairP.name; slot.appendChild(nameEl);
                 } else {
                     const emptyEl = document.createElement('div'); emptyEl.className = 'chairman-empty'; emptyEl.textContent = 'ประธาน'; slot.appendChild(emptyEl);
@@ -1648,14 +1931,16 @@
                         if (!currentPId || e.target.closest('div[style*="background: #ef4444"]')) return;
                         dragSourceKey = key; el.style.opacity = '0.5'; e.preventDefault();
                         
-                        // บล็อกระบบ Bouncing ของ Safari iOS ระหว่างลากวางวัตถุ
+                        // ปิดกั้นการ Bounce หน้าจอของ iOS ระหว่างดึงลากการจัดผังที่นั่ง
                         document.body.style.overflow = 'hidden'; 
 
                         const onPointerUp = (ev) => {
-                            // คืนค่าระบบเลื่อนหน้าจอตามปกติ
                             document.body.style.overflow = '';
-                            
                             el.style.opacity = '';
+                            
+                            // Guard clause to prevent double-trigger swapping bugs
+                            if (!dragSourceKey) return;
+
                             let clientX, clientY;
                             if (ev.changedTouches) { clientX = ev.changedTouches[0].clientX; clientY = ev.changedTouches[0].clientY; } 
                             else { clientX = ev.clientX; clientY = ev.clientY; }
@@ -1677,7 +1962,8 @@
                                 }
                             }
                             dragSourceKey = null;
-                            document.removeEventListener('pointerup', onPointerUp); document.removeEventListener('touchend', onPointerUp);
+                            document.removeEventListener('pointerup', onPointerUp); 
+                            document.removeEventListener('touchend', onPointerUp);
                         };
                         document.addEventListener('pointerup', onPointerUp, {once:true}); document.addEventListener('touchend', onPointerUp, {once:true});
                     });
@@ -1799,11 +2085,17 @@
                 };
                 const stopResizing = () => { isResizing = false; resizer.classList.remove('resizing'); document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', stopResizing); document.removeEventListener('touchmove', handleMouseMove); document.removeEventListener('touchend', stopResizing); };
                 resizer.addEventListener('mousedown', (e) => { e.preventDefault(); isResizing = true; resizer.classList.add('resizing'); document.addEventListener('mousemove', handleMouseMove); document.addEventListener('mouseup', stopResizing); });
-                resizer.addEventListener('touchstart', (e) => { e.preventDefault(); isResizing = true; resizer.classList.add('resizing'); document.addEventListener('touchmove', handleMouseMove); document.addEventListener('touchend', stopResizing); });
+                resizer.addEventListener('touchstart', (e) => { e.preventDefault(); isResizing = true; resizer.classList.add('resizing'); document.addEventListener('touchmove', handleMouseMove, { passive: false }); document.addEventListener('touchend', stopResizing); }, { passive: false });
             }
 
             if (addParticipantBtn) {
-                addParticipantBtn.addEventListener('click', () => { participants.push({ id: nextId++, name: `ผู้มาชี้แจง ${nextId}` }); renderParticipants(); markUnsaved(); debouncedSave(); });
+                addParticipantBtn.addEventListener('click', () => {
+                    const currentId = nextId++;
+                    participants.push({ id: currentId, name: `ผู้มาชี้แจง ${currentId}` });
+                    renderParticipants();
+                    markUnsaved();
+                    debouncedSave();
+                });
             }
             if (bulkAddBtn) {
                 bulkAddBtn.addEventListener('click', () => { if (toolsDropdown) toolsDropdown.classList.add('hidden'); if (bulkAddTextarea) bulkAddTextarea.value = ''; bulkAddModal.classList.remove('hidden'); bulkAddTextarea.focus(); });
@@ -1949,6 +2241,33 @@
 
             async function saveCurrentMeetingToHistory(title) {
                 if (!transcriptTextarea.value.trim() && participants.length === 0) return;
+                if (isOfflineMode) {
+                    try {
+                        const historyStr = localStorage.getItem('offline_meeting_history') || '[]';
+                        const historyItems = JSON.parse(historyStr);
+                        const saveData = {
+                            id: currentRoomId || Date.now().toString(),
+                            title: title || `การประชุม ${new Date().toLocaleDateString('th-TH')}`,
+                            transcript: transcriptTextarea.value,
+                            participants: participants,
+                            savedAt: new Date().toISOString(),
+                            createdAt: currentRoomId ? undefined : new Date().toISOString()
+                        };
+
+                        if (currentRoomId) {
+                            const idx = historyItems.findIndex(x => x.id === currentRoomId);
+                            if (idx !== -1) {
+                                historyItems[idx] = { ...historyItems[idx], ...saveData, savedAt: new Date().toISOString() };
+                            }
+                        } else {
+                            historyItems.push(saveData);
+                            currentRoomId = saveData.id;
+                        }
+                        localStorage.setItem('offline_meeting_history', JSON.stringify(historyItems));
+                        showToast(`บันทึกการประชุมเรียบร้อย (Offline)`, 'success');
+                    } catch(e) { showToast('บันทึกไม่สำเร็จ', 'error'); }
+                    return;
+                }
                 if (!userId) return;
                 try {
                     const historyRef = collection(db, getBasePath(userId), 'meeting_history');
@@ -2040,14 +2359,34 @@
                     if (historyModal) historyModal.classList.remove('hidden'); 
                     const container = document.getElementById('history-list-container'); 
                     if (container) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
+                    if (isOfflineMode) {
+                        try {
+                            const historyStr = localStorage.getItem('offline_meeting_history') || '[]';
+                            const historyItems = JSON.parse(historyStr);
+                            historyItems.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+                            renderOfflineHistory(historyItems, container);
+                        } catch(e) { if (container) container.innerHTML = '<p class="text-center text-red-500 text-sm">โหลดไม่สำเร็จ</p>'; }
+                        return;
+                    }
                     if (!userId) return;
                     try {
-                        const snap = await getDocs(query(collection(db, getBasePath(userId), 'meeting_history'), orderBy('savedAt', 'desc')));
+                        const snap = await getDocs(collection(db, getBasePath(userId), 'meeting_history'));
+                        const historyItems = [];
+                        snap.forEach(d => {
+                            historyItems.push({ id: d.id, ...d.data() });
+                        });
+                        // เรียงลำดับจากใหม่สุดไปเก่าสุดในหน่วยความจำ (หลีกเลี่ยง Index Errors)
+                        historyItems.sort((a, b) => {
+                            const tA = a.savedAt?.seconds || 0;
+                            const tB = b.savedAt?.seconds || 0;
+                            return tB - tA;
+                        });
+
                         if (container) {
                             container.innerHTML = '';
-                            if (snap.empty) { container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; return; }
-                            snap.forEach(d => {
-                                const data = d.data(), docId = d.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'ไม่ทราบวันที่';
+                            if (historyItems.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; return; }
+                            historyItems.forEach(data => {
+                                const docId = data.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'ไม่ทราบวันที่';
                                 const item = document.createElement('div'); item.className = 'saved-list-item rounded-lg p-4 cursor-pointer'; item.style.cssText = 'border:1px solid var(--border-color);background:var(--bg-panel-solid);';
                                 item.innerHTML = `<div class="flex justify-between items-start gap-3"><div class="flex-grow min-w-0"><p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'ไม่มีชื่อ'}</p><p class="text-xs mt-1" style="color:var(--text-secondary);">${date}</p><p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">${data.participants?.length || 0} คน · ${data.transcript?.length || 0} ตัวอักษร</p></div><div class="flex gap-2 flex-shrink-0"><button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button><button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button></div></div>`;
                                 item.querySelector('.load-history-btn').addEventListener('click', (e) => { 
