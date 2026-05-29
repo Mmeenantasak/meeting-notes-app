@@ -345,14 +345,16 @@
         #transcript-textarea {
             width: 100%; height: 100%; padding: 1rem; border-radius: 0.5rem; 
             resize: none; font-size: 16px; /* ป้องกัน iOS ซูมขยายจอเอง */
-            line-height: 1.6; font-family: 'Sarabun', sans-serif;
+            line-height: 1.5; font-family: 'Sarabun', sans-serif;
             background-color: transparent !important; color: var(--text-primary) !important;
-            /* ช่วยให้ iOS Compositor แยก layer ของ textarea scroll ออกจาก main thread */
-            will-change: scroll-position;
-            /* จำกัด reflow/repaint ไม่ให้กระทบ element อื่นรอบข้าง */
-            contain: strict;
+            /* ตัด reflow ไม่ให้กระทบ element รอบข้าง (layout + style ไม่ใช้ strict เพราะมี size containment ที่อาจเป็นปัญหากับ flexible height) */
+            contain: layout style;
             overflow-y: scroll;
             -webkit-overflow-scrolling: touch;
+            /* ลดความซับซ้อนของการเรนเดอร์ตัวอักษร: speed สำคัญกว่าความสวย เมื่อข้อความเยอะ */
+            text-rendering: optimizeSpeed;
+            /* ปิด font feature ที่ไม่จำเป็นเพื่อลดภาระ shaping engine */
+            font-kerning: none;
         }
         #transcript-textarea:focus { outline: none !important; box-shadow: none !important; border-color: transparent !important; }
 
@@ -533,7 +535,16 @@
                     </div>
 
                     <div id="transcript-wrapper">
-                        <textarea id="transcript-textarea" placeholder="Start typing..."></textarea>
+                        <textarea id="transcript-textarea"
+                            placeholder="Start typing..."
+                            spellcheck="false"
+                            autocorrect="off"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            data-gramm="false"
+                            data-gramm_editor="false"
+                            data-enable-grammarly="false"
+                        ></textarea>
                     </div>
                  </div>
             </div>
