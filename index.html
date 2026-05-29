@@ -1425,7 +1425,7 @@
                     if (savedListsContainer) savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
                     if (!userId) return;
                     try {
-                        const snap = await getDocs(query(collection(db, getBasePath(userId), 'participant_lists'), orderBy('createdAt', 'desc')));
+                        const snap = await getDocs(collection(db, getBasePath(userId), 'participant_lists'));
                         if (savedListsContainer) {
                             savedListsContainer.innerHTML = '';
                             if (snap.empty) { savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีกลุ่มที่บันทึกไว้</p>'; return; }
