@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>เนเธญเธเธเธฑเธเธ—เธถเธเธเธฒเธฃเธเธฃเธฐเธเธธเธก (iOS Ultimate Smooth Edition)</title>
+    <title>แอปบันทึกการประชุม (iOS Ultimate Smooth Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -61,7 +61,7 @@
             height: 100%;
             height: 100dvh;
             max-height: 100dvh;
-            /* เธเนเธญเธเธเธฑเธเธเธฒเธฃเธ—เธฑเธเธเนเธญเธเธฃเธญเธขเธเธฒเธเนเธฅเธฐเนเธ–เธเนเธฎเธกเธเธฒเธฃเนเธเธ iPhone */
+            /* ป้องกันการทับซ้อนรอยบากและแถบโฮมบาร์บน iPhone 11 */
             padding-top: max(0.5rem, env(safe-area-inset-top));
             padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
             padding-left: max(0.5rem, env(safe-area-inset-left));
@@ -78,7 +78,7 @@
             transition: color 0.3s, background 0.3s;
         }
 
-        /* เธเนเธญเธเธเธฑเธ iOS Auto-Zoom เธ”เนเธงเธขเธเธฒเธฃเธเธณเธซเธเธ”เธเธเธฒเธ”เธเธญเธเธ•เนเธเธญเธ Input เนเธฅเธฐ Textarea เนเธกเนเนเธซเนเธ•เนเธณเธเธงเนเธฒ 16px */
+        /* แก้ไขบัค iOS Auto-Zoom ด้วยการล็อกขนาดฟอนต์ Input ไว้ที่ 16px */
         textarea, select, input[type="text"] {
             font-size: 16px !important; 
             background-color: var(--bg-panel-solid); 
@@ -130,7 +130,7 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
 
-        /* เธเธฒเธฃเธ—เธณ Transition เธ—เธตเนเธเนเธงเธขเธฅเธ”เธ เธฒเธฃเธฐ GPU เธเธเธญเธธเธเธเธฃเธ“เนเธเธเธเธฒ */
+        /* ปรับปรุง Transition เจาะจงลดภาระ GPU ของเบราว์เซอร์ iOS */
         .participant-box {
             background-color: var(--bg-panel-solid); 
             border: 1px solid var(--border-color); 
@@ -155,7 +155,7 @@
         .sortable-ghost { opacity: 0.3; background: var(--accent-color); }
         .sortable-drag { opacity: 1 !important; cursor: grabbing; }
 
-        /* โ”€โ”€ EDIT MODE FOR CARDS โ”€โ”€ */
+        /* ── EDIT MODE FOR CARDS ── */
         .card-action-icon {
             position: absolute; width: 34px; height: 34px; display: none; align-items: center; justify-content: center;
             border-radius: 50%; color: var(--text-secondary); transition: background-color 0.15s, color 0.15s; opacity: 0.7; z-index: 10;
@@ -181,7 +181,7 @@
         }
         #participants-grid.edit-cards-mode .delete-icon:hover { background-color: #dc2626; }
 
-        /* โ”€โ”€ MODERN MODALS (Solid Perf) โ”€โ”€ */
+        /* ── MODERN MODALS (Solid Perf) ── */
         .modal-overlay { 
             background-color: rgba(0, 0, 0, 0.65); 
             transition: opacity 0.2s ease; 
@@ -301,7 +301,7 @@
         .list-item-action:hover { color: #ef4444; }
         .saved-list-item:hover .list-item-action { visibility: visible; }
 
-        /* โ”€โ”€ PREMIUM TOAST NOTIFICATIONS โ”€โ”€ */
+        /* ── PREMIUM TOAST NOTIFICATIONS ── */
         #toast-container {
             position: fixed; bottom: 2.5rem; left: 50%; transform: translateX(-50%); z-index: 9999;
             display: flex; flex-direction: column; gap: 0.75rem; pointer-events: none;
@@ -340,13 +340,13 @@
         #transcript-wrapper { position: relative; display: flex; flex: 1; min-height: 0; overflow: hidden; }
         #transcript-textarea {
             width: 100%; height: 100%; padding: 1rem; border-radius: 0.5rem; 
-            resize: none; font-size: 16px; 
+            resize: none; font-size: 16px; /* ป้องกัน iOS ซูมขยายจอเอง */
             line-height: 1.6; font-family: 'Sarabun', sans-serif;
             background-color: transparent !important; color: var(--text-primary) !important;
         }
         #transcript-textarea:focus { outline: none !important; box-shadow: none !important; border-color: transparent !important; }
 
-        /* โ”€โ”€ LAYOUT MODES โ”€โ”€ */
+        /* ── LAYOUT MODES ── */
         #app-container.seating-mode { flex-direction: column; }
         #app-container.seating-mode #seating-panel { display: flex; flex-direction: column; flex-shrink: 0; max-height: 55vh; overflow-y: auto; }
         #app-container.seating-mode #main-container { flex: 1; min-height: 0; }
@@ -373,9 +373,9 @@
             #resizer { display: none; }
         }
 
-        /* โ”€โ”€ iOS PERFORMANCE BOOSTS โ”€โ”€ */
+        /* ── iOS PERFORMANCE BOOSTS ── */
         @supports (-webkit-touch-callout: none) {
-            /* เธเธดเธ” 3D Transform Animation เธเธ iOS Safari เน€เธเธทเนเธญเธฅเธ”เธ เธฒเธฃเธฐ GPU */
+            /* ปิด 3D Transform Animation บน iOS Safari เพื่อลดภาระ GPU */
             .modal-overlay:not(.hidden) > div {
                 animation: none !important;
                 transform: none !important;
@@ -395,7 +395,7 @@
                 Sign in with Google
             </button>
             <button id="login-guest-btn" style="display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1.5rem; background:#374151; color:#fff; font-weight:bold; border:none; border-radius:8px; font-size:1rem; cursor:pointer; width:100%; justify-content:center;">
-                เน€เธเนเธฒเนเธเนเธเธฒเธเนเธเธเนเธกเนเธฃเธฐเธเธธเธ•เธฑเธงเธ•เธ (Guest)
+                เข้าใช้งานแบบไม่ระบุตัวตน (Guest)
             </button>
         </div>
         <p id="domain-error-msg" style="color:#ef4444; font-size:0.875rem; text-align:center; display:none; max-width:400px; line-height:1.5; background:rgba(239,68,68,0.1); padding:1rem; border-radius:8px; border:1px solid rgba(239,68,68,0.3);"></p>
@@ -453,11 +453,11 @@
             </div>
 
             <div class="absolute left-1/2 transform -translate-x-1/2 text-center">
-                <h1 id="meeting-title" class="text-xl md:text-2xl font-semibold tracking-wide uppercase cursor-pointer hover:opacity-70 transition" style="color: var(--text-primary);" title="เธเธฅเธดเธเน€เธเธทเนเธญเนเธเนเธเธทเนเธญ">Meeting Notes</h1>
+                <h1 id="meeting-title" class="text-xl md:text-2xl font-semibold tracking-wide uppercase cursor-pointer hover:opacity-70 transition" style="color: var(--text-primary);" title="คลิกเพื่อแก้ชื่อ">Meeting Notes</h1>
             </div>
             
             <div class="flex items-center gap-3">
-                <button id="layout-toggle-btn" class="px-3 py-1 text-xs font-mono border rounded hover:bg-gray-200 dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);" title="เธชเธฅเธฑเธ Layout">NORMAL</button>
+                <button id="layout-toggle-btn" class="px-3 py-1 text-xs font-mono border rounded hover:bg-gray-200 dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);" title="สลับ Layout">NORMAL</button>
                 
                 <button id="ratio-toggle" class="px-3 py-1 text-xs font-mono border rounded hover:bg-white dark:hover:bg-zinc-800 transition" style="border-color: var(--border-color); color: var(--text-secondary);">AUTO</button>
                 <button id="theme-toggle" class="p-2 rounded hover:bg-gray-200 dark:hover:bg-zinc-800 transition text-gray-500 dark:text-gray-400">
@@ -481,7 +481,7 @@
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Participants</h2>
                         <div class="flex items-center gap-1 grid-controls">
-                            <!-- เธเธธเนเธก Edit Mode (เธฃเธงเธกเธฅเธฒเธเธงเธฒเธ/เธฅเธ/เนเธเนเนเธ เนเธเธเธธเนเธกเน€เธ”เธตเธขเธง) -->
+                            <!-- ปุ่ม Edit Mode (รวมลากวาง/ลบ/แก้ไข ในปุ่มเดียว) -->
                             <button id="edit-cards-btn" class="w-7 h-7 rounded bg-transparent border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 flex items-center justify-center transition text-gray-500" title="Edit & Reorder">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                             </button>
@@ -504,7 +504,7 @@
             <div id="right-panel" class="flex flex-col" style="flex: 1 1 0; min-width: 80px;">
                  <div class="bg-panel rounded-lg h-full flex flex-col relative overflow-hidden mt-4 shadow-sm border" style="border-color: var(--border-color);">
                     <div class="absolute bottom-4 right-6 z-10 flex items-center gap-2 select-none">
-                         <!-- เธเธธเนเธก Manual Save -->
+                         <!-- ปุ่ม Manual Save -->
                          <button id="manual-save-btn" class="hidden text-[0.7rem] px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-mono font-bold shadow-md transition-all active:scale-95 border border-emerald-700/50">SAVE NOW</button>
                          <div id="save-status">
                              <svg class="w-3 h-3 animate-spin hidden" id="save-spinner" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -574,7 +574,7 @@
         </div>
     </div>
 
-    <!-- z-index เธเธญเธ Confirm modal เน€เธเนเธ z-[200] เน€เธชเธกเธญเน€เธเธทเนเธญเนเธซเนเธ—เธฑเธเธเนเธญเธเธญเธขเธนเนเธซเธเนเธฒเธชเธธเธ”เน€เธชเธกเธญ -->
+    <!-- z-index ของ Confirm modal เป็น z-[200] เสมอเพื่อให้อยู่เหนือกทุกอย่างรวมถึงประวัติ -->
     <div id="confirm-modal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4 hidden z-[200]">
         <div class="w-full max-w-sm text-center p-8 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gray-400 to-transparent opacity-30"></div>
@@ -594,7 +594,7 @@
         <div class="w-full max-w-lg flex flex-col max-h-[80vh]">
             <div class="p-5 border-b flex justify-between items-center" style="border-color: var(--border-color);">
                 <h3 class="text-lg font-bold">Meeting History</h3>
-                <button class="modal-close text-gray-500 hover:text-white transition">&times;</button>
+                <button class="modal-close modal-close-btn">&times;</button>
             </div>
             <div id="history-list-container" class="p-5 overflow-y-auto flex-grow flex flex-col gap-3">
                 <p class="text-center text-gray-500 text-sm font-mono">Loading...</p>
@@ -611,8 +611,8 @@
                 <h3 class="text-lg font-bold">Save Room</h3>
             </div>
             <div class="p-6">
-                <p class="text-sm text-gray-500 mb-3">เธเธฑเธเธ—เธถเธเธเธทเนเธญเธซเนเธญเธ</p>
-                <input type="text" id="meeting-title-input" class="w-full p-3 border rounded-lg bg-transparent focus:ring-1 font-mono text-sm" placeholder="เน€เธเนเธ เธเธฃเธฐเธเธธเธกเธเธ“เธฐเธเธฃเธฃเธกเธเธฒเธฃ 12/05/68" style="border-color: var(--border-color);">
+                <p class="text-sm text-gray-500 mb-3">บันทึกชื่อห้อง</p>
+                <input type="text" id="meeting-title-input" class="w-full p-3 border rounded-lg bg-transparent focus:ring-1 font-mono text-sm" placeholder="เช่น ประชุมคณะกรรมการ 12/05/68" style="border-color: var(--border-color);">
             </div>
             <div class="p-5 border-t flex justify-end gap-3" style="border-color: var(--border-color);">
                 <button id="save-meeting-cancel" class="tool-btn">Cancel</button>
@@ -628,7 +628,7 @@
                 <button class="modal-close text-gray-500 hover:text-white transition">&times;</button>
             </div>
             <div class="p-5 pb-2">
-                <input type="text" id="search-input" class="w-full p-3 border rounded-lg bg-transparent focus:ring-1 focus:ring-offset-0" style="border-color: var(--border-color);" placeholder="เธเธดเธกเธเนเธเธทเนเธญเธ—เธตเนเธ•เนเธญเธเธเธฒเธฃเธเนเธเธซเธฒ...">
+                <input type="text" id="search-input" class="w-full p-3 border rounded-lg bg-transparent focus:ring-1 focus:ring-offset-0" style="border-color: var(--border-color);" placeholder="พิมพ์ชื่อที่ต้องการค้นหา...">
             </div>
             <div id="search-results" style="max-height:240px;overflow-y:auto;padding:0.5rem 1.25rem 1rem;display:flex;flex-direction:column;gap:0.4rem;"></div>
         </div>
@@ -637,7 +637,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, query, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const myFirebaseConfig = {
             apiKey: "AIzaSyBe1IRZCwUy-1TlP97RRp5biHCu-surkao",
@@ -654,9 +654,8 @@
         }
 
         const getBasePath = (uid) => {
-            const currentAppId = typeof window.__app_id !== 'undefined' ? window.__app_id : (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
-            if (currentAppId) {
-                return `artifacts/${currentAppId}/users/${uid}`;
+            if (typeof window.__app_id !== 'undefined' && window.__app_id) {
+                return `artifacts/${window.__app_id}/users/${uid}`;
             }
             return `users/${uid}`;
         };
@@ -723,11 +722,8 @@
             const savedListsContainer = document.getElementById('saved-lists-container');
             const loadListCancelBtn = document.getElementById('load-list-cancel');
 
-            const historyModal = document.getElementById('history-modal');
-
             let app, auth, db, userId, meetingDocRef;
             let unsubscribeMeeting = null;
-            let isOfflineMode = false;
         
             const ratios = ['Auto', '16:9', '4:3'];
             let currentRatioIndex = 0;
@@ -746,7 +742,7 @@
             let isInterimActive = false; 
             let meetingStartTime = Date.now(); 
 
-            // โ”€โ”€ SEATING PLAN STATE โ”€โ”€
+            // ── SEATING PLAN STATE ──
             let seatingLayout = {
                 chairmanSide: 'left',
                 rowsTop: 2,
@@ -766,7 +762,7 @@
                 });
             }
 
-            // เธ”เธถเธเธซเธเนเธฒเธเธญเธเธฅเธฑเธเธกเธฒเธ•เธณเนเธซเธเนเธเน€เธ”เธดเธกเน€เธกเธทเนเธญเธขเธเน€เธฅเธดเธ Virtual Keyboard เธเธ iOS
+            // แก้ไขบัค iOS Keyboard Scroll Shift Bug (ดึงตำแหน่งจอกลับมาพิกัดเดิมหลังจบคีย์บอร์ดเสมือน)
             const preventKeyboardStickyShift = () => {
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
                 if (isIOS) {
@@ -778,294 +774,74 @@
                 }
             };
 
-            // เธฃเธฐเธเธ Authentication เธเนเธญเธ เนเธฅเธฐเน€เธเนเธฒเธฃเธฐเธงเธฑเธเธเธงเธฒเธกเธเธฃเนเธญเธกเธเธญเธ Firebase
-            const initFirebaseAndAuth = async () => {
-                try {
-                    // Force Offline Mode if running via local file:/// protocol,
-                    // as Firebase Auth does not support local file origins.
-                    if (window.location.protocol === 'file:') {
-                        console.warn("Running via local file protocol. Switching to Local Offline Mode.");
-                        isOfflineMode = true;
-                        return;
-                    }
-
-                    if (!activeConfig.apiKey) {
-                        throw new Error("Firebase API key is missing. Switching to Offline Mode.");
-                    }
-                    app = initializeApp(activeConfig);
-                    auth = getAuth(app);
-                    db = getFirestore(app);
-
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    }
-                } catch (error) {
-                    console.warn("Firebase Initialization failed. Switching to Local Offline Mode:", error);
-                    isOfflineMode = true;
+            try {
+                app = initializeApp(activeConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    signInWithCustomToken(auth, __initial_auth_token).catch(e => console.error("Custom token error", e));
                 }
-            };
-
-            initFirebaseAndAuth().then(() => {
-                if (isOfflineMode) {
-                    setupOfflineMode();
-                    return;
-                }
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        const displayName = user.displayName || user.email || 'User';
-                        const userDisplay = document.getElementById('user-display');
-                        if (userDisplay) userDisplay.textContent = displayName;
-                        
-                        if (user.photoURL) {
-                            const avatarEl = document.getElementById('user-avatar');
-                            if (avatarEl) {
-                                avatarEl.src = user.photoURL;
-                                avatarEl.classList.remove('hidden');
-                            }
-                        }
-                        
-                        initializeLogic(); 
-                        preventKeyboardStickyShift();
-
-                        const loginScreen = document.getElementById('login-screen');
-                        const appCont = document.getElementById('app-container');
-                        if (loginScreen) loginScreen.style.display = 'none';
-                        if (appCont) appCont.style.display = 'flex';
-
-                        const savedLayout = parseInt(localStorage.getItem('layoutMode') || '0');
-                        if (savedLayout > 0 && layoutModeIndex === 0) {
-                            layoutModeIndex = savedLayout - 1;
-                            if (layoutToggleBtn) layoutToggleBtn.click();
-                        }
-                    } else {
-                        const appCont = document.getElementById('app-container');
-                        const loginScreen = document.getElementById('login-screen');
-                        if (appCont) appCont.style.display = 'none';
-                        if (loginScreen) loginScreen.style.display = 'flex';
-                        if (unsubscribeMeeting) unsubscribeMeeting();
-                    }
-                });
-            });
-
-            // โ”€โ”€ LOCAL OFFLINE FALLBACK MODE FUNCTIONS โ”€โ”€
-            function setupOfflineMode() {
-                userId = 'local-offline-user';
-                const userDisplay = document.getElementById('user-display');
-                if (userDisplay) userDisplay.textContent = "Local Mode";
-                
-                const loginGuestBtn = document.getElementById('login-guest-btn');
-                if (loginGuestBtn) {
-                    loginGuestBtn.addEventListener('click', () => enterAppOffline());
-                }
-                
-                const loginBtn = document.getElementById('login-btn');
-                if (loginBtn) {
-                    loginBtn.addEventListener('click', () => enterAppOffline());
-                }
-
-                const signoutBtn = document.getElementById('signout-btn');
-                if (signoutBtn) {
-                    signoutBtn.addEventListener('click', () => {
-                        const appCont = document.getElementById('app-container');
-                        const loginScreen = document.getElementById('login-screen');
-                        if (appCont) appCont.style.display = 'none';
-                        if (loginScreen) loginScreen.style.display = 'flex';
-                        showToast("เธญเธญเธเธเธฒเธเนเธซเธกเธ”เธญเธญเธเนเธฅเธเนเนเธฅเนเธง", "info");
-                    });
-                }
+            } catch (error) {
+                console.error("Firebase Initialization Error:", error);
+                showToast("การตั้งค่า Firebase ไม่ถูกต้อง", "error");
+                return;
             }
 
-            function enterAppOffline() {
-                const loginScreen = document.getElementById('login-screen');
-                const appCont = document.getElementById('app-container');
-                if (loginScreen) loginScreen.style.display = 'none';
-                if (appCont) appCont.style.display = 'flex';
-                
-                initializeOfflineLogic();
-                preventKeyboardStickyShift();
-                showToast("เธเธณเธฅเธฑเธเนเธเนเธเธฒเธเนเธซเธกเธ”เธญเธญเธเนเธฅเธเน (เธเธฑเธเธ—เธถเธเธฅเธเน€เธเธฃเธทเนเธญเธ)", "success");
-            }
+            let participants = [];
+            let activeParticipantId = null;
+            let nextId = 1;
+            let columnCount = 2;
+            let sortableInstance = null;
 
-            function initializeOfflineLogic() {
-                const localDataStr = localStorage.getItem('offline_shared_meeting_notes');
-                if (localDataStr) {
-                    try {
-                        const data = JSON.parse(localDataStr);
-                        if (data.meetingTitle) {
-                            const titleEl = document.getElementById('meeting-title');
-                            if (titleEl && titleEl.tagName === 'H1') {
-                                titleEl.textContent = data.meetingTitle;
-                            }
+            const provider = new GoogleAuthProvider();
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    userId = user.uid;
+                    const displayName = user.displayName || user.email || 'User';
+                    const userDisplay = document.getElementById('user-display');
+                    if (userDisplay) userDisplay.textContent = displayName;
+                    
+                    if (user.photoURL) {
+                        const avatarEl = document.getElementById('user-avatar');
+                        if (avatarEl) {
+                            avatarEl.src = user.photoURL;
+                            avatarEl.classList.remove('hidden');
                         }
-                        participants = data.participants || [
-                            { id: 1, name: 'เธเธฃเธฐเธเธฒเธ' },
-                            { id: 2, name: 'เน€เธฅเธเธฒเธเธธเธเธฒเธฃ' },
-                            { id: 3, name: 'เน€เธเนเธฒเธซเธเนเธฒเธ—เธตเนเธเนเธฒเธขเน€เธฅเธเธฒเธเธธเธเธฒเธฃ' },
-                            { id: 4, name: 'เธเธนเนเธเธตเนเนเธเธ' }
-                        ];
-                        renderParticipants();
-                        
-                        if (data.seatingLayout) {
-                            seatingLayout = { ...seatingLayout, ...data.seatingLayout };
-                            if (layoutModeIndex === 2) renderSeatingPanel();
-                        }
-                        
-                        if (data.columnCount) {
-                            updateColumnLayout(data.columnCount);
-                        }
-                        
-                        const serverTranscript = data.transcript || '';
-                        transcriptTextarea.value = serverTranscript;
-                        sttStableText = serverTranscript;
-                        saveToHistory(serverTranscript);
-                    } catch(e) {
-                        console.error("Failed to parse offline data", e);
-                        loadOfflineDefaults();
+                    }
+                    
+                    initializeLogic(); 
+                    preventKeyboardStickyShift();
+
+                    const loginScreen = document.getElementById('login-screen');
+                    const appCont = document.getElementById('app-container');
+                    if (loginScreen) loginScreen.style.display = 'none';
+                    if (appCont) appCont.style.display = 'flex';
+
+                    const savedLayout = parseInt(localStorage.getItem('layoutMode') || '0');
+                    if (savedLayout > 0 && layoutModeIndex === 0) {
+                        layoutModeIndex = savedLayout - 1;
+                        if (layoutToggleBtn) layoutToggleBtn.click();
                     }
                 } else {
-                    loadOfflineDefaults();
+                    const appCont = document.getElementById('app-container');
+                    const loginScreen = document.getElementById('login-screen');
+                    if (appCont) appCont.style.display = 'none';
+                    if (loginScreen) loginScreen.style.display = 'flex';
+                    if(unsubscribeMeeting) unsubscribeMeeting();
                 }
-                
-                const maxId = participants.reduce((max, p) => p.id > max ? p.id : max, 0);
-                nextId = maxId + 1;
-                updateColumnLayout(getInitialColumnCount());
-            }
-
-            function loadOfflineDefaults() {
-                participants = [
-                    { id: 1, name: 'เธเธฃเธฐเธเธฒเธ' },
-                    { id: 2, name: 'เน€เธฅเธเธฒเธเธธเธเธฒเธฃ' },
-                    { id: 3, name: 'เน€เธเนเธฒเธซเธเนเธฒเธ—เธตเนเธเนเธฒเธขเน€เธฅเธเธฒเธเธธเธเธฒเธฃ' },
-                    { id: 4, name: 'เธเธนเนเธเธตเนเนเธเธ' }
-                ];
-                renderParticipants();
-                transcriptTextarea.value = '';
-                sttStableText = '';
-            }
-
-            function saveOfflineState() {
-                if (saveSpinner) saveSpinner.classList.remove('hidden');
-                if (saveText) saveText.textContent = "SAVING";
-                if (saveStatusContainer) {
-                    saveStatusContainer.classList.add('saving');
-                    saveStatusContainer.classList.remove('unsaved');
-                }
-                const manualSaveBtn = document.getElementById('manual-save-btn');
-                if (manualSaveBtn) manualSaveBtn.classList.add('hidden'); 
-                
-                try {
-                    const saveData = {
-                        participants: participants,
-                        transcript: transcriptTextarea.value,
-                        meetingTitle: document.getElementById('meeting-title')?.textContent || 'Meeting Notes',
-                        columnCount: columnCount,
-                        seatingLayout: seatingLayout
-                    };
-                    localStorage.setItem('offline_shared_meeting_notes', JSON.stringify(saveData));
-                    
-                    setTimeout(() => {
-                         if (saveSpinner) saveSpinner.classList.add('hidden'); 
-                         if (saveText) saveText.textContent = "SAVED"; 
-                         if (saveStatusContainer) saveStatusContainer.classList.remove('saving');
-                         hasUnsavedChanges = false; 
-                    }, 500);
-                } catch (e) {
-                    console.error("Offline save error", e);
-                    if (saveText) saveText.textContent = "ERROR";
-                }
-            }
-
-            function renderOfflineLists(lists) {
-                if (savedListsContainer) {
-                    savedListsContainer.innerHTML = '';
-                    if (lists.length === 0) { savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">เธขเธฑเธเนเธกเนเธกเธตเธเธฅเธธเนเธกเธ—เธตเนเธเธฑเธเธ—เธถเธเนเธงเน</p>'; return; }
-                    lists.forEach(data => {
-                        const docId = data.id;
-                        const item = document.createElement('div');
-                        item.className = 'saved-list-item rounded-lg p-3 flex justify-between items-center mb-2';
-                        item.innerHTML = `<span class="font-bold text-sm truncate pr-2">${data.name} (${data.participants?.length || 0} เธเธ)</span>
-                                          <div class="flex gap-2 flex-shrink-0">
-                                            <button class="load-group-btn tool-btn text-xs px-2 py-1 h-auto">LOAD</button>
-                                            <button class="delete-group-btn tool-btn text-xs px-2 py-1 h-auto text-red-400">DEL</button>
-                                          </div>`;
-                        item.querySelector('.load-group-btn').addEventListener('click', () => {
-                            confirmTitle.textContent = "Load Group";
-                            confirmMessage.textContent = `เนเธซเธฅเธ”เธเธฅเธธเนเธก "${data.name}"? เธฃเธฒเธขเธเธทเนเธญเธเธฑเธเธเธธเธเธฑเธเธเธฐเธ–เธนเธเธฅเธเนเธฅเธฐเนเธ—เธเธ—เธตเนเธ”เนเธงเธขเธเธฅเธธเนเธกเธเธตเน`;
-                            confirmOkBtn.onclick = () => {
-                                participants = JSON.parse(JSON.stringify(data.participants || []));
-                                nextId = participants.reduce((m, p) => p.id > m ? p.id : m, 0) + 1;
-                                renderParticipants(); markUnsaved(); saveOfflineState();
-                                hideAllModals(); showToast(`เนเธซเธฅเธ”เธเธฅเธธเนเธก "${data.name}" เนเธฅเนเธง`, 'success');
-                            };
-                            confirmModal.classList.remove('hidden');
-                        });
-                        item.querySelector('.delete-group-btn').addEventListener('click', () => {
-                            confirmTitle.textContent = "Delete Group";
-                            confirmMessage.textContent = `เธขเธทเธเธขเธฑเธเธเธฒเธฃเธฅเธเธเธฅเธธเนเธก "${data.name}"?`;
-                            confirmOkBtn.onclick = () => {
-                                const remaining = lists.filter(x => x.id !== docId);
-                                localStorage.setItem('offline_participant_lists', JSON.stringify(remaining));
-                                item.remove(); showToast('เธฅเธเธเธฅเธธเนเธกเนเธฅเนเธง', 'success'); hideAllModals();
-                            };
-                            confirmModal.classList.remove('hidden');
-                        });
-                        savedListsContainer.appendChild(item);
-                    });
-                }
-            }
-
-            function renderOfflineHistory(historyItems, container) {
-                if (container) {
-                    container.innerHTML = '';
-                    if (historyItems.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">เธขเธฑเธเนเธกเนเธกเธตเธเธฃเธฐเธงเธฑเธ•เธดเธเธฒเธฃเธเธฃเธฐเธเธธเธก</p>'; return; }
-                    historyItems.forEach(data => {
-                        const docId = data.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'เนเธกเนเธ—เธฃเธฒเธเธงเธฑเธเธ—เธตเน';
-                        const item = document.createElement('div'); item.className = 'saved-list-item rounded-lg p-4 cursor-pointer'; item.style.cssText = 'border:1px solid var(--border-color);background:var(--bg-panel-solid);';
-                        item.innerHTML = `<div class="flex justify-between items-start gap-3"><div class="flex-grow min-w-0"><p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'เนเธกเนเธกเธตเธเธทเนเธญ'}</p><p class="text-xs mt-1" style="color:var(--text-secondary);">${date} (Offline)</p><p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">${data.participants?.length || 0} เธเธ ยท ${data.transcript?.length || 0} เธ•เธฑเธงเธญเธฑเธเธฉเธฃ</p></div><div class="flex gap-2 flex-shrink-0"><button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button><button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button></div></div>`;
-                        item.querySelector('.load-history-btn').addEventListener('click', (e) => { 
-                            e.stopPropagation(); 
-                            confirmTitle.textContent = 'Load Meeting'; confirmMessage.textContent = `เนเธซเธฅเธ” "${data.title}" เธเธฅเธฑเธเธกเธฒ? เธเนเธญเธกเธนเธฅเธเธฑเธเธเธธเธเธฑเธเธเธฐเธ–เธนเธเนเธ—เธเธ—เธตเน`; 
-                            confirmOkBtn.onclick = () => { 
-                                transcriptTextarea.value = data.transcript || ''; sttStableText = transcriptTextarea.value; isInterimActive = false; 
-                                participants = JSON.parse(JSON.stringify(data.participants || [])); nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1; 
-                                textHistory = []; historyIndex = -1; saveToHistory(transcriptTextarea.value); renderParticipants(); 
-                                const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = data.title; 
-                                currentRoomId = docId; 
-                                hasUnsavedChanges = false;
-                                saveOfflineState(); 
-                                hideAllModals(); showToast(`เนเธซเธฅเธ” "${data.title}" เนเธฅเนเธง`, 'success'); 
-                            }; 
-                            confirmModal.classList.remove('hidden'); 
-                        });
-                        item.querySelector('.delete-history-btn').addEventListener('click', (e) => { 
-                            e.stopPropagation(); confirmTitle.textContent = "Delete History"; confirmMessage.textContent = `เธฅเธ "${data.title}" เธญเธญเธเธเธฒเธเธเธฃเธฐเธงเธฑเธ•เธด?`; 
-                            confirmOkBtn.onclick = () => { 
-                                const remaining = historyItems.filter(x => x.id !== docId);
-                                localStorage.setItem('offline_meeting_history', JSON.stringify(remaining));
-                                item.remove(); if (container.children.length === 0) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">เธขเธฑเธเนเธกเนเธกเธตเธเธฃเธฐเธงเธฑเธ•เธดเธเธฒเธฃเธเธฃเธฐเธเธธเธก</p>'; showToast('เธฅเธเนเธฅเนเธง', 'success'); hideAllModals(); if(currentRoomId === docId) currentRoomId = null; 
-                            }; 
-                            confirmModal.classList.remove('hidden'); 
-                        });
-                        container.appendChild(item);
-                    });
-                }
-            }
+            });
 
             const loginBtn = document.getElementById('login-btn');
             if (loginBtn) {
                 loginBtn.addEventListener('click', async () => {
-                    if (!auth) {
-                        showToast("เธฃเธฐเธเธเธขเธฑเธเนเธซเธฅเธ”เนเธกเนเน€เธชเธฃเนเธ เธเธฃเธธเธ“เธฒเธฃเธญเธญเธตเธเธชเธฑเธเธเธฃเธนเน...", "info");
-                        return;
-                    }
                     try {
                         const errEl = document.getElementById('domain-error-msg');
                         if (errEl) errEl.style.display = 'none';
-                        await signInWithPopup(auth, new GoogleAuthProvider());
+                        await signInWithPopup(auth, provider);
                     } catch (e) {
                         console.error("Login Error:", e);
-                        showToast("เน€เธเนเธฒเธชเธนเนเธฃเธฐเธเธเนเธกเนเธชเธณเน€เธฃเนเธ", "error");
+                        showToast("เข้าสู่ระบบไม่สำเร็จ", "error");
                     }
                 });
             }
@@ -1073,27 +849,20 @@
             const loginGuestBtn = document.getElementById('login-guest-btn');
             if (loginGuestBtn) {
                 loginGuestBtn.addEventListener('click', async () => {
-                    if (!auth) {
-                        showToast("เธฃเธฐเธเธเธขเธฑเธเนเธซเธฅเธ”เนเธกเนเน€เธชเธฃเนเธ เธเธฃเธธเธ“เธฒเธฃเธญเธญเธตเธเธชเธฑเธเธเธฃเธนเน...", "info");
-                        return;
-                    }
                     try {
                         const errEl = document.getElementById('domain-error-msg');
                         if (errEl) errEl.style.display = 'none';
                         await signInAnonymously(auth);
                     } catch (e) {
                         console.error("Guest Login Error:", e);
-                        showToast("เน€เธเนเธฒเธชเธนเนเธฃเธฐเธเธเนเธเธ Guest เนเธกเนเธชเธณเน€เธฃเนเธ", "error");
+                        showToast("เข้าสู่ระบบแบบ Guest ไม่สำเร็จ", "error");
                     }
                 });
             }
 
             const signoutBtn = document.getElementById('signout-btn');
             if (signoutBtn) {
-                signoutBtn.addEventListener('click', () => {
-                    if (!auth) return;
-                    signOut(auth);
-                });
+                signoutBtn.addEventListener('click', () => signOut(auth));
             }
 
             function attachTitleEditListener(element) {
@@ -1114,7 +883,7 @@
                         h1.id = 'meeting-title';
                         h1.className = 'text-xl md:text-2xl font-semibold tracking-wide uppercase cursor-pointer hover:opacity-70 transition';
                         h1.style.color = 'var(--text-primary)';
-                        h1.title = 'เธเธฅเธดเธเน€เธเธทเนเธญเนเธเนเธเธทเนเธญ';
+                        h1.title = 'คลิกเพื่อแก้ชื่อ';
                         h1.textContent = input.value.trim() || 'Meeting Notes';
                         input.replaceWith(h1);
                         attachTitleEditListener(h1);
@@ -1150,10 +919,10 @@
                     
                         if (JSON.stringify(participants) !== JSON.stringify(data.participants)) {
                             participants = data.participants || [
-                                { id: 1, name: 'เธเธฃเธฐเธเธฒเธ' },
-                                { id: 2, name: 'เน€เธฅเธเธฒเธเธธเธเธฒเธฃ' },
-                                { id: 3, name: 'เน€เธเนเธฒเธซเธเนเธฒเธ—เธตเนเธเนเธฒเธขเน€เธฅเธเธฒเธเธธเธเธฒเธฃ' },
-                                { id: 4, name: 'เธเธนเนเธเธตเนเนเธเธ' }
+                                { id: 1, name: 'ประธาน' },
+                                { id: 2, name: 'เลขานุการ' },
+                                { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
+                                { id: 4, name: 'ผู้ชี้แจง' }
                             ];
                             renderParticipants();
                         }
@@ -1186,10 +955,10 @@
                             meetingTitle: "Meeting Notes",
                             createdAt: new Date().toISOString(),
                             participants: [
-                                { id: 1, name: 'เธเธฃเธฐเธเธฒเธ' },
-                                { id: 2, name: 'เน€เธฅเธเธฒเธเธธเธเธฒเธฃ' },
-                                { id: 3, name: 'เน€เธเนเธฒเธซเธเนเธฒเธ—เธตเนเธเนเธฒเธขเน€เธฅเธเธฒเธเธธเธเธฒเธฃ' },
-                                { id: 4, name: 'เธเธนเนเธเธตเนเนเธเธ' }
+                                { id: 1, name: 'ประธาน' },
+                                { id: 2, name: 'เลขานุการ' },
+                                { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' },
+                                { id: 4, name: 'ผู้ชี้แจง' }
                             ],
                             transcript: '',
                             columnCount: columnCount
@@ -1200,6 +969,7 @@
                     }
                 }, (error) => {
                     console.error("Firestore Snapshot Error: ", error);
+                    if (error.code === 'permission-denied') return; 
                 });
 
                 updateColumnLayout(getInitialColumnCount());
@@ -1207,7 +977,6 @@
             }
             
             async function loadAllNamesCache() {
-                if (!userId) return;
                 try {
                     const snap = await getDocs(collection(db, getBasePath(userId), 'participant_lists'));
                     const nameSet = new Set();
@@ -1338,19 +1107,15 @@
                     
                     if (isEditCardsMode) {
                         participantsGrid.classList.add('edit-cards-mode');
-                        showToast('เนเธซเธกเธ”เนเธเนเนเธ: เธฅเธฒเธเธชเธฅเธฑเธเธ•เธณเนเธซเธเนเธ เน€เธเธฅเธตเนเธขเธเธเธทเนเธญ เธซเธฃเธทเธญเธฅเธเนเธ”เน', 'info');
+                        showToast('โหมดแก้ไข: ลากสลับตำแหน่ง เปลี่ยนชื่อ หรือลบได้', 'info');
                     } else {
                         participantsGrid.classList.remove('edit-cards-mode');
-                        showToast('เธญเธญเธเธเธฒเธเนเธซเธกเธ”เนเธเนเนเธ', 'info');
+                        showToast('ออกจากโหมดแก้ไข', 'info');
                     }
                 });
             }
 
             async function saveStateToFirestore() {
-                if (isOfflineMode) {
-                    saveOfflineState();
-                    return;
-                }
                 if (!meetingDocRef || !userId) return;
                 if (saveSpinner) saveSpinner.classList.remove('hidden');
                 if (saveText) saveText.textContent = "SAVING";
@@ -1396,8 +1161,8 @@
                 };
             };
             
-            // Auto-save เธ—เธธเธ เน 5 เธงเธดเธเธฒเธ—เธตเน€เธกเธทเนเธญเธกเธตเธเธฒเธฃเธเธดเธกเธเนเนเธฅเธฐเธชเนเธเธเนเธญเธกเธนเธฅเน€เธฃเธตเธขเธเธฃเนเธญเธข
-            const debouncedSave = debounce(saveStateToFirestore, 5000); 
+            // Auto-save 5 นาที (300000ms)
+            const debouncedSave = debounce(saveStateToFirestore, 300000); 
 
             const manualSaveBtnEl = document.getElementById('manual-save-btn');
             if (manualSaveBtnEl) {
@@ -1497,18 +1262,6 @@
                     box.classList.toggle('active', parseInt(box.dataset.id) === id);
                 });
 
-                // Update active speaker highlight on Seating Plan dynamically
-                document.querySelectorAll('.seat-card').forEach(seat => {
-                    const key = seat.dataset.seatKey;
-                    const seatPId = seatingLayout.seats[key];
-                    seat.classList.toggle('active-speaker', seatPId === id);
-                });
-                const chairmanEl = document.querySelector('.chairman-slot');
-                if (chairmanEl) {
-                    const chairPId = seatingLayout.seats['chairman'];
-                    chairmanEl.classList.toggle('active-speaker', chairPId === id);
-                }
-
                 const participant = participants.find(p => p.id === id);
                 if (!participant) return;
                 
@@ -1589,7 +1342,7 @@
                 renderParticipants();
                 markUnsaved();
                 debouncedSave();
-                showToast("เธฅเธเธฃเธฒเธขเธเธทเนเธญเนเธฅเนเธง", "info");
+                showToast("ลบรายชื่อแล้ว", "info");
             }
             
             if (clearAllBtn) {
@@ -1618,16 +1371,6 @@
                 saveListConfirmBtn.addEventListener('click', async () => {
                     const listName = saveListNameInput.value.trim();
                     if (!listName) { showToast("Please enter a name", "error"); return; }
-                    if (isOfflineMode) {
-                        try {
-                            const listsStr = localStorage.getItem('offline_participant_lists') || '[]';
-                            const lists = JSON.parse(listsStr);
-                            lists.push({ id: Date.now().toString(), name: listName, participants: participants, createdAt: new Date().toISOString() });
-                            localStorage.setItem('offline_participant_lists', JSON.stringify(lists));
-                            hideAllModals(); showToast(`Group "${listName}" saved (Offline)`, "success");
-                        } catch(e) { showToast("Error saving group offline", "error"); }
-                        return;
-                    }
                     if (!userId) return;
                     try {
                         const listRef = collection(db, getBasePath(userId), 'participant_lists');
@@ -1642,71 +1385,50 @@
                     if (toolsDropdown) toolsDropdown.classList.add('hidden');
                     if (loadListModal) loadListModal.classList.remove('hidden');
                     if (savedListsContainer) savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
-                    if (isOfflineMode) {
-                        try {
-                            const listsStr = localStorage.getItem('offline_participant_lists') || '[]';
-                            const lists = JSON.parse(listsStr);
-                            lists.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                            renderOfflineLists(lists);
-                        } catch(e) { if (savedListsContainer) savedListsContainer.innerHTML = '<p class="text-center text-red-500 text-sm">เนเธซเธฅเธ”เนเธกเนเธชเธณเน€เธฃเนเธ</p>'; }
-                        return;
-                    }
                     if (!userId) return;
                     try {
-                        const snap = await getDocs(collection(db, getBasePath(userId), 'participant_lists'));
-                        const lists = [];
-                        snap.forEach(d => {
-                            lists.push({ id: d.id, ...d.data() });
-                        });
-                        // เน€เธฃเธตเธขเธเธฅเธณเธ”เธฑเธเธเธฒเธเนเธซเธกเนเธชเธธเธ”เนเธเน€เธเนเธฒเธชเธธเธ”เนเธเธซเธเนเธงเธขเธเธงเธฒเธกเธเธณ (เธซเธฅเธตเธเน€เธฅเธตเนเธขเธ Index Errors)
-                        lists.sort((a, b) => {
-                            const tA = a.createdAt?.seconds || 0;
-                            const tB = b.createdAt?.seconds || 0;
-                            return tB - tA;
-                        });
-
+                        const snap = await getDocs(query(collection(db, getBasePath(userId), 'participant_lists'), orderBy('createdAt', 'desc')));
                         if (savedListsContainer) {
                             savedListsContainer.innerHTML = '';
-                            if (lists.length === 0) { savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">เธขเธฑเธเนเธกเนเธกเธตเธเธฅเธธเนเธกเธ—เธตเนเธเธฑเธเธ—เธถเธเนเธงเน</p>'; return; }
-                            lists.forEach(data => {
-                                const docId = data.id;
+                            if (snap.empty) { savedListsContainer.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีกลุ่มที่บันทึกไว้</p>'; return; }
+                            snap.forEach(d => {
+                                const data = d.data(), docId = d.id;
                                 const item = document.createElement('div');
                                 item.className = 'saved-list-item rounded-lg p-3 flex justify-between items-center mb-2';
-                                item.innerHTML = `<span class="font-bold text-sm truncate pr-2">${data.name} (${data.participants?.length || 0} เธเธ)</span>
+                                item.innerHTML = `<span class="font-bold text-sm truncate pr-2">${data.name} (${data.participants?.length || 0} คน)</span>
                                                   <div class="flex gap-2 flex-shrink-0">
                                                     <button class="load-group-btn tool-btn text-xs px-2 py-1 h-auto">LOAD</button>
                                                     <button class="delete-group-btn tool-btn text-xs px-2 py-1 h-auto text-red-400">DEL</button>
                                                   </div>`;
                                 item.querySelector('.load-group-btn').addEventListener('click', () => {
                                     confirmTitle.textContent = "Load Group";
-                                    confirmMessage.textContent = `เนเธซเธฅเธ”เธเธฅเธธเนเธก "${data.name}"? เธฃเธฒเธขเธเธทเนเธญเธเธฑเธเธเธธเธเธฑเธเธเธฐเธ–เธนเธเธฅเธเนเธฅเธฐเนเธ—เธเธ—เธตเนเธ”เนเธงเธขเธเธฅเธธเนเธกเธเธตเน`;
+                                    confirmMessage.textContent = `โหลดกลุ่ม "${data.name}"? รายชื่อปัจจุบันจะถูกลบและแทนที่ด้วยกลุ่มนี้`;
                                     confirmOkBtn.onclick = () => {
                                         participants = JSON.parse(JSON.stringify(data.participants || []));
                                         nextId = participants.reduce((m, p) => p.id > m ? p.id : m, 0) + 1;
                                         renderParticipants(); markUnsaved(); debouncedSave();
-                                        hideAllModals(); showToast(`เนเธซเธฅเธ”เธเธฅเธธเนเธก "${data.name}" เนเธฅเนเธง`, 'success');
+                                        hideAllModals(); showToast(`โหลดกลุ่ม "${data.name}" แล้ว`, 'success');
                                     };
                                     confirmModal.classList.remove('hidden');
                                 });
                                 item.querySelector('.delete-group-btn').addEventListener('click', () => {
                                     confirmTitle.textContent = "Delete Group";
-                                    confirmMessage.textContent = `เธขเธทเธเธขเธฑเธเธเธฒเธฃเธฅเธเธเธฅเธธเนเธก "${data.name}"?`;
+                                    confirmMessage.textContent = `ยืนยันการลบกลุ่ม "${data.name}"?`;
                                     confirmOkBtn.onclick = async () => {
-                                        try { await deleteDoc(doc(db, getBasePath(userId), 'participant_lists', docId)); item.remove(); showToast('เธฅเธเธเธฅเธธเนเธกเนเธฅเนเธง', 'success'); hideAllModals(); } 
-                                        catch(err) { showToast('เธฅเธเนเธกเนเธชเธณเน€เธฃเนเธ', 'error'); }
+                                        try { await deleteDoc(doc(db, getBasePath(userId), 'participant_lists', docId)); item.remove(); showToast('ลบกลุ่มแล้ว', 'success'); hideAllModals(); } 
+                                        catch(err) { showToast('ลบไม่สำเร็จ', 'error'); }
                                     };
                                     confirmModal.classList.remove('hidden');
                                 });
                                 savedListsContainer.appendChild(item);
                             });
                         }
-                    } catch(e) { if (savedListsContainer) savedListsContainer.innerHTML = '<p class="text-center text-red-500 text-sm">เธ”เธถเธเธเนเธญเธกเธนเธฅเนเธกเนเธชเธณเน€เธฃเนเธ</p>'; }
+                    } catch(e) { if (savedListsContainer) savedListsContainer.innerHTML = '<p class="text-center text-red-500 text-sm">ดึงข้อมูลไม่สำเร็จ</p>'; }
                 });
             }
 
-            // โ”€โ”€ SEATING PLAN โ”€โ”€
+            // ── SEATING PLAN ──
             async function loadSeatingLayout() {
-                if (isOfflineMode) return;
                 if (!meetingDocRef) return;
                 try {
                     const snap = await getDoc(meetingDocRef);
@@ -1717,10 +1439,6 @@
             }
 
             async function saveSeatingLayout() {
-                if (isOfflineMode) {
-                    saveOfflineState();
-                    return;
-                }
                 if (!meetingDocRef) return;
                 try { await updateDoc(meetingDocRef, { seatingLayout }); } catch(e) { console.error('Seating save error', e); }
             }
@@ -1739,29 +1457,29 @@
                 controls.style.cssText = 'display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem;width:100%;';
 
                 const topGroup = document.createElement('div'); topGroup.className = 'seating-control-group';
-                topGroup.innerHTML = `<span>เธเธ</span><button class="seating-ctrl-btn" id="top-minus">โ’</button><span id="top-count">${seatingLayout.rowsTop}</span><button class="seating-ctrl-btn" id="top-plus">+</button>`;
+                topGroup.innerHTML = `<span>บน</span><button class="seating-ctrl-btn" id="top-minus">−</button><span id="top-count">${seatingLayout.rowsTop}</span><button class="seating-ctrl-btn" id="top-plus">+</button>`;
                 
                 const botGroup = document.createElement('div'); botGroup.className = 'seating-control-group';
-                botGroup.innerHTML = `<span>เธฅเนเธฒเธ</span><button class="seating-ctrl-btn" id="bot-minus">โ’</button><span id="bot-count">${seatingLayout.rowsBottom}</span><button class="seating-ctrl-btn" id="bot-plus">+</button>`;
+                botGroup.innerHTML = `<span>ล่าง</span><button class="seating-ctrl-btn" id="bot-minus">−</button><span id="bot-count">${seatingLayout.rowsBottom}</span><button class="seating-ctrl-btn" id="bot-plus">+</button>`;
                 
                 const seatGroup = document.createElement('div'); seatGroup.className = 'seating-control-group';
-                seatGroup.innerHTML = `<span>เธ—เธตเนเธเธฑเนเธ/เนเธ–เธง</span><button class="seating-ctrl-btn" id="seat-minus">โ’</button><span id="seat-count">${seatingLayout.seatsPerRow}</span><button class="seating-ctrl-btn" id="seat-plus">+</button>`;
+                seatGroup.innerHTML = `<span>ที่นั่ง/แถว</span><button class="seating-ctrl-btn" id="seat-minus">−</button><span id="seat-count">${seatingLayout.seatsPerRow}</span><button class="seating-ctrl-btn" id="seat-plus">+</button>`;
 
                 const sizeGroup = document.createElement('div'); sizeGroup.className = 'seating-control-group';
-                sizeGroup.innerHTML = `<span>เธเธเธฒเธ”</span><button class="seating-ctrl-btn" id="size-minus">โ’</button><button class="seating-ctrl-btn" id="size-plus">+</button>`;
+                sizeGroup.innerHTML = `<span>ขนาด</span><button class="seating-ctrl-btn" id="size-minus">−</button><button class="seating-ctrl-btn" id="size-plus">+</button>`;
 
                 const chairBtn = document.createElement('button'); chairBtn.className = 'chairman-side-btn';
-                chairBtn.textContent = seatingLayout.chairmanSide === 'left' ? 'เธเธฃเธฐเธเธฒเธ โ เธเนเธฒเธข' : 'เธเธฃเธฐเธเธฒเธ โ’ เธเธงเธฒ';
+                chairBtn.textContent = seatingLayout.chairmanSide === 'left' ? 'ประธาน ← ซ้าย' : 'ประธาน → ขวา';
                 chairBtn.addEventListener('click', () => {
                     seatingLayout.chairmanSide = seatingLayout.chairmanSide === 'left' ? 'right' : 'left';
                     saveSeatingLayout(); resetSeatingPanelHeight(); renderSeatingPanel();
                 });
 
                 const dragBtn = document.createElement('button'); dragBtn.className = `drag-mode-btn ${isDragMode ? 'active' : ''}`;
-                dragBtn.textContent = isDragMode ? 'โฆ DRAG ON' : 'DRAG';
+                dragBtn.textContent = isDragMode ? '✦ DRAG ON' : 'DRAG';
                 dragBtn.addEventListener('click', () => {
                     isDragMode = !isDragMode; seatingPanel.classList.toggle('drag-mode', isDragMode); renderSeatingPanel();
-                    if (isDragMode) showToast('เนเธซเธกเธ”เธฅเธฒเธเธงเธฒเธ โ€” เธฅเธฒเธเธเธทเนเธญเธชเธฅเธฑเธเธ—เธตเน เธซเธฃเธทเธญ เธเธ” X เน€เธเธทเนเธญเธฅเธ', 'info'); else showToast('เธญเธญเธเธเธฒเธเนเธซเธกเธ”เธฅเธฒเธเธงเธฒเธ', 'info');
+                    if (isDragMode) showToast('โหมดลากวาง — ลากชื่อสลับที่ หรือ กด X เพื่อลบ', 'info'); else showToast('ออกจากโหมดลากวาง', 'info');
                 });
 
                 controls.appendChild(topGroup); controls.appendChild(botGroup); controls.appendChild(seatGroup);
@@ -1875,10 +1593,9 @@
 
                 if (chairP) {
                     slot.classList.add('filled');
-                    if (chairP.id === activeParticipantId) slot.classList.add('active-speaker');
                     const nameEl = document.createElement('div'); nameEl.className = 'chairman-name'; nameEl.textContent = chairP.name; slot.appendChild(nameEl);
                 } else {
-                    const emptyEl = document.createElement('div'); emptyEl.className = 'chairman-empty'; emptyEl.textContent = 'เธเธฃเธฐเธเธฒเธ'; slot.appendChild(emptyEl);
+                    const emptyEl = document.createElement('div'); emptyEl.className = 'chairman-empty'; emptyEl.textContent = 'ประธาน'; slot.appendChild(emptyEl);
                 }
                 slot.dataset.seatKey = 'chairman';
                 setupSeatEvents(slot, 'chairman', chairId);
@@ -1920,9 +1637,9 @@
                     if (currentPId) {
                         const removeBtn = document.createElement('div');
                         removeBtn.style.cssText = `position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:white;font-size:0.65rem;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;box-shadow:0 2px 4px rgba(0,0,0,0.3);font-weight:bold;line-height:1;`;
-                        removeBtn.textContent = 'ร—';
+                        removeBtn.textContent = '×';
                         removeBtn.addEventListener('click', (e) => {
-                            e.stopPropagation(); delete seatingLayout.seats[key]; saveSeatingLayout(); renderSeatingPanel(); showToast('เธฅเธเธญเธญเธเธเธฒเธเธ—เธตเนเธเธฑเนเธเนเธฅเนเธง', 'info');
+                            e.stopPropagation(); delete seatingLayout.seats[key]; saveSeatingLayout(); renderSeatingPanel(); showToast('ลบออกจากที่นั่งแล้ว', 'info');
                         });
                         el.appendChild(removeBtn);
                     }
@@ -1931,16 +1648,14 @@
                         if (!currentPId || e.target.closest('div[style*="background: #ef4444"]')) return;
                         dragSourceKey = key; el.style.opacity = '0.5'; e.preventDefault();
                         
-                        // เธเธดเธ”เธเธฑเนเธเธเธฒเธฃ Bounce เธซเธเนเธฒเธเธญเธเธญเธ iOS เธฃเธฐเธซเธงเนเธฒเธเธ”เธถเธเธฅเธฒเธเธเธฒเธฃเธเธฑเธ”เธเธฑเธเธ—เธตเนเธเธฑเนเธ
+                        // บล็อกระบบ Bouncing ของ Safari iOS ระหว่างลากวางวัตถุ
                         document.body.style.overflow = 'hidden'; 
 
                         const onPointerUp = (ev) => {
+                            // คืนค่าระบบเลื่อนหน้าจอตามปกติ
                             document.body.style.overflow = '';
-                            el.style.opacity = '';
                             
-                            // Guard clause to prevent double-trigger swapping bugs
-                            if (!dragSourceKey) return;
-
+                            el.style.opacity = '';
                             let clientX, clientY;
                             if (ev.changedTouches) { clientX = ev.changedTouches[0].clientX; clientY = ev.changedTouches[0].clientY; } 
                             else { clientX = ev.clientX; clientY = ev.clientY; }
@@ -1962,8 +1677,7 @@
                                 }
                             }
                             dragSourceKey = null;
-                            document.removeEventListener('pointerup', onPointerUp); 
-                            document.removeEventListener('touchend', onPointerUp);
+                            document.removeEventListener('pointerup', onPointerUp); document.removeEventListener('touchend', onPointerUp);
                         };
                         document.addEventListener('pointerup', onPointerUp, {once:true}); document.addEventListener('touchend', onPointerUp, {once:true});
                     });
@@ -1979,9 +1693,9 @@
                 const popup = document.createElement('div'); popup.className = 'seat-assign-popup';
                 popup.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--bg-panel-solid);border:1px solid var(--border-color);border-radius:16px;padding:1rem;z-index:200;width:min(320px,90vw);max-height:60vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5);`;
 
-                const title = document.createElement('p'); title.style.cssText = 'font-family:DM Mono,monospace;font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.75rem;letter-spacing:0.05em;'; title.textContent = 'เน€เธฅเธทเธญเธเธเธทเนเธญเธ—เธตเนเธเธฐเธงเธฒเธ'; popup.appendChild(title);
+                const title = document.createElement('p'); title.style.cssText = 'font-family:DM Mono,monospace;font-size:0.7rem;color:var(--text-secondary);margin-bottom:0.75rem;letter-spacing:0.05em;'; title.textContent = 'เลือกชื่อที่จะวาง'; popup.appendChild(title);
 
-                const clearBtn = document.createElement('div'); clearBtn.style.cssText = 'padding:0.5rem 0.75rem;border-radius:10px;border:1px dashed var(--border-color);cursor:pointer;font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.5rem;text-align:center;'; clearBtn.textContent = 'โ€” เธฅเนเธฒเธเธ—เธตเนเธเธฑเนเธ โ€”';
+                const clearBtn = document.createElement('div'); clearBtn.style.cssText = 'padding:0.5rem 0.75rem;border-radius:10px;border:1px dashed var(--border-color);cursor:pointer;font-size:0.78rem;color:var(--text-secondary);margin-bottom:0.5rem;text-align:center;'; clearBtn.textContent = '— ล้างที่นั่ง —';
                 clearBtn.addEventListener('click', () => { delete seatingLayout.seats[key]; saveSeatingLayout(); renderSeatingPanel(); popup.remove(); overlay.remove(); });
                 popup.appendChild(clearBtn);
 
@@ -2000,7 +1714,7 @@
 
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && isDragMode) {
-                    isDragMode = false; seatingPanel.classList.remove('drag-mode'); renderSeatingPanel(); showToast('เธญเธญเธเธเธฒเธเนเธซเธกเธ”เธฅเธฒเธเธงเธฒเธ', 'info');
+                    isDragMode = false; seatingPanel.classList.remove('drag-mode'); renderSeatingPanel(); showToast('ออกจากโหมดลากวาง', 'info');
                 }
             });
 
@@ -2011,7 +1725,7 @@
                     
                     if (layoutModeIndex === 0) {
                         layoutToggleBtn.textContent = 'NORMAL'; layoutToggleBtn.style.color = 'var(--text-secondary)'; layoutToggleBtn.style.borderColor = 'var(--border-color)';
-                        leftPanel.style.height = ''; leftPanel.style.flexBasis = '33%'; isDragMode = false; showToast('เนเธซเธกเธ”เธเธเธ•เธด', 'info');
+                        leftPanel.style.height = ''; leftPanel.style.flexBasis = '33%'; isDragMode = false; showToast('โหมดปกติ', 'info');
                     } else if (layoutModeIndex === 1) {
                         appContainer.classList.add('meeting-mode');
                         layoutToggleBtn.textContent = 'FOCUS'; layoutToggleBtn.style.color = 'var(--accent-color)'; layoutToggleBtn.style.borderColor = 'var(--accent-color)';
@@ -2040,7 +1754,7 @@
                         });
 
                         if (layoutChanged) await saveSeatingLayout();
-                        renderSeatingPanel(); showToast('เนเธซเธกเธ”เธเธฑเธเธ—เธตเนเธเธฑเนเธ', 'info');
+                        renderSeatingPanel(); showToast('โหมดผังที่นั่ง', 'info');
                     }
                     localStorage.setItem('layoutMode', layoutModeIndex);
                 });
@@ -2085,17 +1799,11 @@
                 };
                 const stopResizing = () => { isResizing = false; resizer.classList.remove('resizing'); document.removeEventListener('mousemove', handleMouseMove); document.removeEventListener('mouseup', stopResizing); document.removeEventListener('touchmove', handleMouseMove); document.removeEventListener('touchend', stopResizing); };
                 resizer.addEventListener('mousedown', (e) => { e.preventDefault(); isResizing = true; resizer.classList.add('resizing'); document.addEventListener('mousemove', handleMouseMove); document.addEventListener('mouseup', stopResizing); });
-                resizer.addEventListener('touchstart', (e) => { e.preventDefault(); isResizing = true; resizer.classList.add('resizing'); document.addEventListener('touchmove', handleMouseMove, { passive: false }); document.addEventListener('touchend', stopResizing); }, { passive: false });
+                resizer.addEventListener('touchstart', (e) => { e.preventDefault(); isResizing = true; resizer.classList.add('resizing'); document.addEventListener('touchmove', handleMouseMove); document.addEventListener('touchend', stopResizing); });
             }
 
             if (addParticipantBtn) {
-                addParticipantBtn.addEventListener('click', () => {
-                    const currentId = nextId++;
-                    participants.push({ id: currentId, name: `เธเธนเนเธกเธฒเธเธตเนเนเธเธ ${currentId}` });
-                    renderParticipants();
-                    markUnsaved();
-                    debouncedSave();
-                });
+                addParticipantBtn.addEventListener('click', () => { participants.push({ id: nextId++, name: `ผู้มาชี้แจง ${nextId}` }); renderParticipants(); markUnsaved(); debouncedSave(); });
             }
             if (bulkAddBtn) {
                 bulkAddBtn.addEventListener('click', () => { if (toolsDropdown) toolsDropdown.classList.add('hidden'); if (bulkAddTextarea) bulkAddTextarea.value = ''; bulkAddModal.classList.remove('hidden'); bulkAddTextarea.focus(); });
@@ -2159,11 +1867,11 @@
             if (copyNamesBtn) {
                 copyNamesBtn.addEventListener('click', () => {
                     const namesList = participants.map(p => p.name).join('\n');
-                    if(!namesList) { showToast('เนเธกเนเธกเธตเธฃเธฒเธขเธเธทเนเธญ', 'info'); return; }
+                    if(!namesList) { showToast('ไม่มีรายชื่อ', 'info'); return; }
                     const textArea = document.createElement("textarea");
                     textArea.value = namesList; document.body.appendChild(textArea); textArea.select();
-                    try { document.execCommand('copy'); showToast('เธเธฑเธ”เธฅเธญเธเธฃเธฒเธขเธเธทเนเธญเนเธฅเนเธง', 'success'); }
-                    catch (err) { showToast('เธเธฑเธ”เธฅเธญเธเนเธกเนเธชเธณเน€เธฃเนเธ', 'error'); }
+                    try { document.execCommand('copy'); showToast('คัดลอกรายชื่อแล้ว', 'success'); }
+                    catch (err) { showToast('คัดลอกไม่สำเร็จ', 'error'); }
                     document.body.removeChild(textArea);
                 });
             }
@@ -2210,13 +1918,13 @@
             function renderSearchResults(term) {
                 const results = document.getElementById('search-results'); results.innerHTML = '';
                 const matches = term ? allNamesCache.filter(n => n.toLowerCase().includes(term.toLowerCase())) : allNamesCache;
-                if (!matches.length) { results.innerHTML = `<p style="font-size:0.75rem;color:var(--text-secondary);text-align:center;padding:0.5rem;">เนเธกเนเธเธเธเธทเนเธญ</p>`; return; }
+                if (!matches.length) { results.innerHTML = `<p style="font-size:0.75rem;color:var(--text-secondary);text-align:center;padding:0.5rem;">ไม่พบชื่อ</p>`; return; }
                 matches.slice(0, 20).forEach(name => {
                     const item = document.createElement('div'); item.textContent = name; item.style.cssText = 'padding:0.6rem 0.75rem;cursor:pointer;font-size:0.82rem;border:1px solid var(--border-color);border-radius:0.4rem;transition:all 0.15s;';
                     item.addEventListener('mouseover', () => item.style.borderColor = 'var(--text-secondary)'); item.addEventListener('mouseout', () => item.style.borderColor = 'var(--border-color)');
                     item.addEventListener('click', () => {
-                        if (participants.find(p => p.name === name)) showToast(`"${name}" เธกเธตเธญเธขเธนเนเนเธฅเนเธง`, 'info');
-                        else { participants.push({ id: nextId++, name }); renderParticipants(); markUnsaved(); debouncedSave(); showToast(`เน€เธเธดเนเธก "${name}" เนเธฅเนเธง`, 'success'); }
+                        if (participants.find(p => p.name === name)) showToast(`"${name}" มีอยู่แล้ว`, 'info');
+                        else { participants.push({ id: nextId++, name }); renderParticipants(); markUnsaved(); debouncedSave(); showToast(`เพิ่ม "${name}" แล้ว`, 'success'); }
                         document.getElementById('search-modal').classList.add('hidden');
                     }); results.appendChild(item);
                 });
@@ -2241,38 +1949,11 @@
 
             async function saveCurrentMeetingToHistory(title) {
                 if (!transcriptTextarea.value.trim() && participants.length === 0) return;
-                if (isOfflineMode) {
-                    try {
-                        const historyStr = localStorage.getItem('offline_meeting_history') || '[]';
-                        const historyItems = JSON.parse(historyStr);
-                        const saveData = {
-                            id: currentRoomId || Date.now().toString(),
-                            title: title || `เธเธฒเธฃเธเธฃเธฐเธเธธเธก ${new Date().toLocaleDateString('th-TH')}`,
-                            transcript: transcriptTextarea.value,
-                            participants: participants,
-                            savedAt: new Date().toISOString(),
-                            createdAt: currentRoomId ? undefined : new Date().toISOString()
-                        };
-
-                        if (currentRoomId) {
-                            const idx = historyItems.findIndex(x => x.id === currentRoomId);
-                            if (idx !== -1) {
-                                historyItems[idx] = { ...historyItems[idx], ...saveData, savedAt: new Date().toISOString() };
-                            }
-                        } else {
-                            historyItems.push(saveData);
-                            currentRoomId = saveData.id;
-                        }
-                        localStorage.setItem('offline_meeting_history', JSON.stringify(historyItems));
-                        showToast(`เธเธฑเธเธ—เธถเธเธเธฒเธฃเธเธฃเธฐเธเธธเธกเน€เธฃเธตเธขเธเธฃเนเธญเธข (Offline)`, 'success');
-                    } catch(e) { showToast('เธเธฑเธเธ—เธถเธเนเธกเนเธชเธณเน€เธฃเนเธ', 'error'); }
-                    return;
-                }
                 if (!userId) return;
                 try {
                     const historyRef = collection(db, getBasePath(userId), 'meeting_history');
                     const saveData = {
-                        title: title || `เธเธฒเธฃเธเธฃเธฐเธเธธเธก ${new Date().toLocaleDateString('th-TH')}`,
+                        title: title || `การประชุม ${new Date().toLocaleDateString('th-TH')}`,
                         transcript: transcriptTextarea.value,
                         participants: participants,
                         savedAt: serverTimestamp(),
@@ -2296,7 +1977,7 @@
                     }
                 } catch(e) { 
                     console.error('Save history error:', e);
-                    showToast('เธเธฑเธเธ—เธถเธเนเธกเนเธชเธณเน€เธฃเนเธ', 'error'); 
+                    showToast('บันทึกไม่สำเร็จ', 'error'); 
                 }
             }
 
@@ -2304,10 +1985,10 @@
             if (saveMeetingBtn) {
                 saveMeetingBtn.addEventListener('click', async () => { 
                     if (toolsDropdown) toolsDropdown.classList.add('hidden'); 
-                    if (!transcriptTextarea.value.trim() && participants.length === 0) { showToast('เนเธกเนเธกเธตเธเนเธญเธกเธนเธฅเนเธซเนเธเธฑเธเธ—เธถเธ', 'info'); return; } 
+                    if (!transcriptTextarea.value.trim() && participants.length === 0) { showToast('ไม่มีข้อมูลให้บันทึก', 'info'); return; } 
                     const currentTitle = document.getElementById('meeting-title')?.textContent || 'Meeting Notes'; 
                     await saveCurrentMeetingToHistory(currentTitle); 
-                    showToast(`เธเธฑเธเธ—เธถเธ "${currentTitle}" เนเธฅเนเธง`, 'success'); 
+                    showToast(`บันทึก "${currentTitle}" แล้ว`, 'success'); 
                 });
             }
             
@@ -2330,7 +2011,7 @@
                     
                     if (hasUnsavedChanges) {
                         confirmTitle.textContent = "Unsaved Changes!"; 
-                        confirmMessage.textContent = "เธเธธเธ“เธขเธฑเธเธกเธตเธเนเธญเธกเธนเธฅเธ—เธตเนเธขเธฑเธเนเธกเนเนเธ”เนเน€เธเธ เธ•เนเธญเธเธเธฒเธฃเน€เธฃเธดเนเธกเธซเนเธญเธเนเธซเธกเนเนเธฅเธฐเธ—เธดเนเธเธเนเธญเธกเธนเธฅเน€เธ”เธดเธกเธซเธฃเธทเธญเนเธกเน?";
+                        confirmMessage.textContent = "คุณยังมีข้อมูลที่ยังไม่ได้เซฟ ต้องการเริ่มห้องใหม่และทิ้งข้อมูลเดิมหรือไม่?";
                     } else {
                         confirmTitle.textContent = "New Meeting"; 
                         confirmMessage.textContent = "Start a new meeting? The current board will be cleared.";
@@ -2338,7 +2019,7 @@
                     
                     confirmOkBtn.onclick = () => { 
                         transcriptTextarea.value = ''; sttStableText = ''; isInterimActive = false; 
-                        participants = [ { id: 1, name: 'เธเธฃเธฐเธเธฒเธ' }, { id: 2, name: 'เน€เธฅเธเธฒเธเธธเธเธฒเธฃ' }, { id: 3, name: 'เน€เธเนเธฒเธซเธเนเธฒเธ—เธตเนเธเนเธฒเธขเน€เธฅเธเธฒเธเธธเธเธฒเธฃ' }, { id: 4, name: 'เธเธนเนเธเธตเนเนเธเธ' } ]; 
+                        participants = [ { id: 1, name: 'ประธาน' }, { id: 2, name: 'เลขานุการ' }, { id: 3, name: 'เจ้าหน้าที่ฝ่ายเลขานุการ' }, { id: 4, name: 'ผู้ชี้แจง' } ]; 
                         activeParticipantId = null; nextId = 5; textHistory = []; historyIndex = -1; 
                         updateUndoRedoButtons(); renderParticipants(); 
                         const titleEl = document.getElementById('meeting-title'); if (titleEl && titleEl.tagName === 'H1') titleEl.textContent = 'Meeting Notes'; 
@@ -2346,7 +2027,7 @@
                         
                         hasUnsavedChanges = false; 
                         saveStateToFirestore(); 
-                        hideAllModals(); showToast(`เน€เธฃเธดเนเธกเธเธฒเธฃเธเธฃเธฐเธเธธเธกเนเธซเธกเน`, 'success'); 
+                        hideAllModals(); showToast(`เริ่มการประชุมใหม่`, 'success'); 
                     };
                     confirmModal.classList.remove('hidden');
                 });
@@ -2359,39 +2040,19 @@
                     if (historyModal) historyModal.classList.remove('hidden'); 
                     const container = document.getElementById('history-list-container'); 
                     if (container) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">Loading...</p>';
-                    if (isOfflineMode) {
-                        try {
-                            const historyStr = localStorage.getItem('offline_meeting_history') || '[]';
-                            const historyItems = JSON.parse(historyStr);
-                            historyItems.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
-                            renderOfflineHistory(historyItems, container);
-                        } catch(e) { if (container) container.innerHTML = '<p class="text-center text-red-500 text-sm">เนเธซเธฅเธ”เนเธกเนเธชเธณเน€เธฃเนเธ</p>'; }
-                        return;
-                    }
                     if (!userId) return;
                     try {
-                        const snap = await getDocs(collection(db, getBasePath(userId), 'meeting_history'));
-                        const historyItems = [];
-                        snap.forEach(d => {
-                            historyItems.push({ id: d.id, ...d.data() });
-                        });
-                        // เน€เธฃเธตเธขเธเธฅเธณเธ”เธฑเธเธเธฒเธเนเธซเธกเนเธชเธธเธ”เนเธเน€เธเนเธฒเธชเธธเธ”เนเธเธซเธเนเธงเธขเธเธงเธฒเธกเธเธณ (เธซเธฅเธตเธเน€เธฅเธตเนเธขเธ Index Errors)
-                        historyItems.sort((a, b) => {
-                            const tA = a.savedAt?.seconds || 0;
-                            const tB = b.savedAt?.seconds || 0;
-                            return tB - tA;
-                        });
-
+                        const snap = await getDocs(query(collection(db, getBasePath(userId), 'meeting_history'), orderBy('savedAt', 'desc')));
                         if (container) {
                             container.innerHTML = '';
-                            if (historyItems.length === 0) { container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">เธขเธฑเธเนเธกเนเธกเธตเธเธฃเธฐเธงเธฑเธ•เธดเธเธฒเธฃเธเธฃเธฐเธเธธเธก</p>'; return; }
-                            historyItems.forEach(data => {
-                                const docId = data.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'เนเธกเนเธ—เธฃเธฒเธเธงเธฑเธเธ—เธตเน';
+                            if (snap.empty) { container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; return; }
+                            snap.forEach(d => {
+                                const data = d.data(), docId = d.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'ไม่ทราบวันที่';
                                 const item = document.createElement('div'); item.className = 'saved-list-item rounded-lg p-4 cursor-pointer'; item.style.cssText = 'border:1px solid var(--border-color);background:var(--bg-panel-solid);';
-                                item.innerHTML = `<div class="flex justify-between items-start gap-3"><div class="flex-grow min-w-0"><p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'เนเธกเนเธกเธตเธเธทเนเธญ'}</p><p class="text-xs mt-1" style="color:var(--text-secondary);">${date}</p><p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">${data.participants?.length || 0} เธเธ ยท ${data.transcript?.length || 0} เธ•เธฑเธงเธญเธฑเธเธฉเธฃ</p></div><div class="flex gap-2 flex-shrink-0"><button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button><button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button></div></div>`;
+                                item.innerHTML = `<div class="flex justify-between items-start gap-3"><div class="flex-grow min-w-0"><p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'ไม่มีชื่อ'}</p><p class="text-xs mt-1" style="color:var(--text-secondary);">${date}</p><p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">${data.participants?.length || 0} คน · ${data.transcript?.length || 0} ตัวอักษร</p></div><div class="flex gap-2 flex-shrink-0"><button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button><button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button></div></div>`;
                                 item.querySelector('.load-history-btn').addEventListener('click', (e) => { 
                                     e.stopPropagation(); 
-                                    confirmTitle.textContent = 'Load Meeting'; confirmMessage.textContent = `เนเธซเธฅเธ” "${data.title}" เธเธฅเธฑเธเธกเธฒ? เธเนเธญเธกเธนเธฅเธเธฑเธเธเธธเธเธฑเธเธเธฐเธ–เธนเธเนเธ—เธเธ—เธตเน`; 
+                                    confirmTitle.textContent = 'Load Meeting'; confirmMessage.textContent = `โหลด "${data.title}" กลับมา? ข้อมูลปัจจุบันจะถูกแทนที่`; 
                                     confirmOkBtn.onclick = async () => { 
                                         transcriptTextarea.value = data.transcript || ''; sttStableText = transcriptTextarea.value; isInterimActive = false; 
                                         participants = JSON.parse(JSON.stringify(data.participants || [])); nextId = participants.reduce((m,p) => p.id>m?p.id:m, 0) + 1; 
@@ -2400,22 +2061,22 @@
                                         currentRoomId = docId; 
                                         hasUnsavedChanges = false;
                                         await saveStateToFirestore(); 
-                                        hideAllModals(); showToast(`เนเธซเธฅเธ” "${data.title}" เนเธฅเนเธง`, 'success'); 
+                                        hideAllModals(); showToast(`โหลด "${data.title}" แล้ว`, 'success'); 
                                     }; 
                                     confirmModal.classList.remove('hidden'); 
                                 });
                                 item.querySelector('.delete-history-btn').addEventListener('click', (e) => { 
-                                    e.stopPropagation(); confirmTitle.textContent = "Delete History"; confirmMessage.textContent = `เธฅเธ "${data.title}" เธญเธญเธเธเธฒเธเธเธฃเธฐเธงเธฑเธ•เธด?`; 
+                                    e.stopPropagation(); confirmTitle.textContent = "Delete History"; confirmMessage.textContent = `ลบ "${data.title}" ออกจากประวัติ?`; 
                                     confirmOkBtn.onclick = async () => { 
-                                        try { await deleteDoc(doc(db, getBasePath(userId), 'meeting_history', docId)); item.remove(); if (container.children.length === 0) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">เธขเธฑเธเนเธกเนเธกเธตเธเธฃเธฐเธงเธฑเธ•เธดเธเธฒเธฃเธเธฃเธฐเธเธธเธก</p>'; showToast('เธฅเธเนเธฅเนเธง', 'success'); hideAllModals(); if(currentRoomId === docId) currentRoomId = null; } 
-                                        catch(err) { showToast('เธฅเธเนเธกเนเธชเธณเน€เธฃเนเธ', 'error'); } 
+                                        try { await deleteDoc(doc(db, getBasePath(userId), 'meeting_history', docId)); item.remove(); if (container.children.length === 0) container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; showToast('ลบแล้ว', 'success'); hideAllModals(); if(currentRoomId === docId) currentRoomId = null; } 
+                                        catch(err) { showToast('ลบไม่สำเร็จ', 'error'); } 
                                     }; 
                                     confirmModal.classList.remove('hidden'); 
                                 });
                                 container.appendChild(item);
                             });
                         }
-                    } catch(e) { if (container) container.innerHTML = '<p class="text-center text-red-500 text-sm">เนเธซเธฅเธ”เนเธกเนเธชเธณเน€เธฃเนเธ</p>'; }
+                    } catch(e) { if (container) container.innerHTML = '<p class="text-center text-red-500 text-sm">โหลดไม่สำเร็จ</p>'; }
                 });
             }
         });
