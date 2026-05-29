@@ -75,7 +75,7 @@
             letter-spacing: 0.01em;
             background: var(--bg-gradient-start);
             color: var(--text-primary);
-            transition: color 0.3s, background 0.3s;
+            /* ลบ transition ออกจาก body ทั้งหน้าเพื่อป้องกัน full-page repaint บน iOS */
         }
 
         /* แก้ไขบัค iOS Auto-Zoom ด้วยการล็อกขนาดฟอนต์ Input ไว้ที่ 16px */
@@ -137,12 +137,16 @@
             box-shadow: var(--card-shadow);
             position: relative; 
             cursor: pointer; 
-            transition: background-color 0.12s, border-color 0.12s, transform 0.12s; 
+            /* ใช้เฉพาะ border-color เพื่อลดจำนวน property ที่ต้อง interpolate */
+            transition: border-color 0.1s ease-out; 
             user-select: none;
             -webkit-tap-highlight-color: transparent; 
             -webkit-touch-callout: none; 
             height: auto; 
             min-height: 75px;
+            /* Promote เป็น GPU composite layer เพื่อให้ iOS render แยกออกมาจาก main thread */
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
         }
         .participant-box:active {
             transform: scale(0.96); border-color: var(--accent-color); background-color: rgba(128, 128, 128, 0.05);
@@ -343,6 +347,12 @@
             resize: none; font-size: 16px; /* ป้องกัน iOS ซูมขยายจอเอง */
             line-height: 1.6; font-family: 'Sarabun', sans-serif;
             background-color: transparent !important; color: var(--text-primary) !important;
+            /* ช่วยให้ iOS Compositor แยก layer ของ textarea scroll ออกจาก main thread */
+            will-change: scroll-position;
+            /* จำกัด reflow/repaint ไม่ให้กระทบ element อื่นรอบข้าง */
+            contain: strict;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
         }
         #transcript-textarea:focus { outline: none !important; box-shadow: none !important; border-color: transparent !important; }
 
@@ -375,13 +385,23 @@
 
         /* ── iOS PERFORMANCE BOOSTS ── */
         @supports (-webkit-touch-callout: none) {
-            /* ปิด 3D Transform Animation บน iOS Safari เพื่อลดภาระ GPU */
+            /* ปิด animation ที่ทำให้ iOS ต้อง composite หลาย layer พร้อมกัน */
             .modal-overlay:not(.hidden) > div {
                 animation: none !important;
                 transform: none !important;
             }
             .participant-box, .seat-card {
                 transition: border-color 0.1s ease-out !important;
+                /* ปิด transform บน iOS เพราะ translateZ ซ้ำซ้อนกับ compositing แล้ว */
+                transform: none !important;
+            }
+            /* ปิด box-shadow animation ที่ทำให้ iOS repaint ทั้ง layer */
+            .participant-box:hover, .participant-box.active {
+                box-shadow: none !important;
+            }
+            /* ลด transition บน toast ให้สั้นลงบน iOS */
+            .toast {
+                transition: opacity 0.15s ease, transform 0.15s ease !important;
             }
         }
     </style>
@@ -721,6 +741,7 @@
             const loadListModal = document.getElementById('load-list-modal');
             const savedListsContainer = document.getElementById('saved-lists-container');
             const loadListCancelBtn = document.getElementById('load-list-cancel');
+            const historyModal = document.getElementById('history-modal');
 
             let app, auth, db, userId, meetingDocRef;
             let unsubscribeMeeting = null;
@@ -735,8 +756,9 @@
             let hasUnsavedChanges = false;
 
             let textHistory = [];
+            let _prevActiveBoxId = null; /* track ปุ่มชื่อที่ active ก่อนหน้า เพื่อหลีกเลี่ยง querySelectorAll */
             let historyIndex = -1;
-            const MAX_HISTORY = 30; 
+            const MAX_HISTORY = 20; /* ลดจาก 30 → 20 เพื่อประหยัด RAM บน iPhone */
             
             let allNamesCache = []; 
             let sttStableText = ''; 
@@ -1074,10 +1096,11 @@
                 transcriptTextarea.addEventListener('input', () => {
                     sttStableText = transcriptTextarea.value; 
                     clearTimeout(historyTimeout);
-                    historyTimeout = setTimeout(() => saveToHistory(transcriptTextarea.value), 500); 
+                    /* เพิ่ม debounce จาก 500ms → 1500ms เพื่อลดจำนวนครั้งที่คัดลอก String ทั้งก้อนบน iPhone */
+                    historyTimeout = setTimeout(() => saveToHistory(transcriptTextarea.value), 1500); 
                     markUnsaved();
                     debouncedSave();
-                });
+                }, { passive: true }); /* passive: true ช่วย iOS scroll โดยไม่รอ JS เสร็จก่อน */
             }
 
             function getInitialColumnCount(){
@@ -1274,20 +1297,29 @@
             function handleParticipantSelect(id) {
                 if (isInterimActive) { transcriptTextarea.value = sttStableText; isInterimActive = false; }
                 activeParticipantId = id;
-                document.querySelectorAll('.participant-box').forEach(box => {
-                    box.classList.toggle('active', parseInt(box.dataset.id) === id);
-                });
+
+                /* แทนที่ querySelectorAll ('.participant-box') ด้วยการ toggle เฉพาะ element ที่เปลี่ยนจริง
+                   ลด DOM scan จาก O(n) ทุกครั้ง เป็น O(1) ตรงๆ 2 element */
+                if (_prevActiveBoxId !== null) {
+                    const prevBox = participantsGrid.querySelector(`[data-id="${_prevActiveBoxId}"]`);
+                    if (prevBox) prevBox.classList.remove('active');
+                }
+                const nextBox = participantsGrid.querySelector(`[data-id="${id}"]`);
+                if (nextBox) nextBox.classList.add('active');
+                _prevActiveBoxId = id;
                 
-                // Update active speaker highlight on Seating Plan dynamically
-                document.querySelectorAll('.seat-card').forEach(seat => {
-                    const key = seat.dataset.seatKey;
-                    const seatPId = seatingLayout.seats[key];
-                    seat.classList.toggle('active-speaker', seatPId === id);
-                });
-                const chairmanEl = document.querySelector('.chairman-slot');
-                if (chairmanEl) {
-                    const chairPId = seatingLayout.seats['chairman'];
-                    chairmanEl.classList.toggle('active-speaker', chairPId === id);
+                /* อัปเดต seating plan เฉพาะเมื่ออยู่ใน seating mode เท่านั้น เพื่อหลีกเลี่ยง querySelectorAll ที่ไม่จำเป็น */
+                if (layoutModeIndex === 2) {
+                    document.querySelectorAll('.seat-card').forEach(seat => {
+                        const key = seat.dataset.seatKey;
+                        const seatPId = seatingLayout.seats[key];
+                        seat.classList.toggle('active-speaker', seatPId === id);
+                    });
+                    const chairmanEl = document.querySelector('.chairman-slot');
+                    if (chairmanEl) {
+                        const chairPId = seatingLayout.seats['chairman'];
+                        chairmanEl.classList.toggle('active-speaker', chairPId === id);
+                    }
                 }
 
                 const participant = participants.find(p => p.id === id);
@@ -1984,14 +2016,26 @@
                 searchInput.addEventListener('input', function() { renderSearchResults(this.value.trim()); });
             }
 
-            setInterval(() => {
-                if (clockDiv) {
-                    const now = new Date(); clockDiv.textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                }
-                const elapsed = Date.now() - meetingStartTime, h = Math.floor(elapsed / 3600000).toString().padStart(2, '0'), m = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0'), s = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
-                const durationTimer = document.getElementById('duration-timer');
-                if (durationTimer) durationTimer.textContent = `${h}:${m}:${s}`;
-            }, 1000);
+            /* เปลี่ยน setInterval เป็น rAF + setTimeout เพื่อให้ browser จัดคิว DOM write
+               ร่วมกับ paint cycle แทนที่จะ interrupt render ทุก 1 วินาทีแบบ setInterval */
+            const durationTimerEl = document.getElementById('duration-timer');
+            function tickClock() {
+                requestAnimationFrame(() => {
+                    if (clockDiv) {
+                        const now = new Date();
+                        clockDiv.textContent = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    }
+                    if (durationTimerEl) {
+                        const elapsed = Date.now() - meetingStartTime;
+                        const h = Math.floor(elapsed / 3600000).toString().padStart(2, '0');
+                        const m = Math.floor((elapsed % 3600000) / 60000).toString().padStart(2, '0');
+                        const s = Math.floor((elapsed % 60000) / 1000).toString().padStart(2, '0');
+                        durationTimerEl.textContent = `${h}:${m}:${s}`;
+                    }
+                });
+                setTimeout(tickClock, 1000);
+            }
+            tickClock();
 
             document.querySelectorAll('.modal-close').forEach(btn => btn.addEventListener('click', hideAllModals));
             allModals.forEach(modal => modal.addEventListener('click', (e) => { if(e.target === modal) hideAllModals(); }));
@@ -2338,8 +2382,15 @@
                         if (container) {
                             container.innerHTML = '';
                             if (snap.empty) { container.innerHTML = '<p class="text-center text-gray-500 text-sm font-mono">ยังไม่มีประวัติการประชุม</p>'; return; }
-                            snap.forEach(d => {
-                                const data = d.data(), docId = d.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'ไม่ทราบวันที่';
+                            const items = [];
+                            snap.forEach(d => items.push({ id: d.id, data: d.data() }));
+                            items.sort((a, b) => {
+                                const timeA = a.data.savedAt?.toMillis ? a.data.savedAt.toMillis() : (new Date(a.data.savedAt).getTime() || 0);
+                                const timeB = b.data.savedAt?.toMillis ? b.data.savedAt.toMillis() : (new Date(b.data.savedAt).getTime() || 0);
+                                return timeB - timeA;
+                            });
+                            items.forEach(d => {
+                                const data = d.data, docId = d.id, date = data.createdAt ? new Date(data.createdAt).toLocaleDateString('th-TH', {day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : 'ไม่ทราบวันที่';
                                 const item = document.createElement('div'); item.className = 'saved-list-item rounded-lg p-4 cursor-pointer'; item.style.cssText = 'border:1px solid var(--border-color);background:var(--bg-panel-solid);';
                                 item.innerHTML = `<div class="flex justify-between items-start gap-3"><div class="flex-grow min-w-0"><p class="font-bold text-sm uppercase tracking-wide truncate">${data.title || 'ไม่มีชื่อ'}</p><p class="text-xs mt-1" style="color:var(--text-secondary);">${date}</p><p class="text-xs mt-1 font-mono truncate" style="color:var(--text-secondary);">${data.participants?.length || 0} คน · ${data.transcript?.length || 0} ตัวอักษร</p></div><div class="flex gap-2 flex-shrink-0"><button class="load-history-btn tool-btn text-xs px-2 py-1" style="height:auto;">LOAD</button><button class="delete-history-btn tool-btn text-xs px-2 py-1 text-red-400" style="height:auto;">DEL</button></div></div>`;
                                 item.querySelector('.load-history-btn').addEventListener('click', (e) => { 
