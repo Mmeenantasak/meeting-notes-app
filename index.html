@@ -567,7 +567,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, query, orderBy, getDoc, writeBatch, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // ── Firebase Config ──
@@ -1334,7 +1334,7 @@ document.getElementById('load-list-btn')?.addEventListener('click',async()=>{
 const provider=new GoogleAuthProvider();
 document.getElementById('login-btn').addEventListener('click',async()=>{
     if(isOffline){enterApp(null);return;}
-    try{await signInWithPopup(auth,provider);}catch(e){document.getElementById('login-error').textContent='เข้าสู่ระบบไม่สำเร็จ';document.getElementById('login-error').style.display='block';}
+    try{await signInWithRedirect(auth,provider);}catch(e){document.getElementById('login-error').textContent='เข้าสู่ระบบไม่สำเร็จ';document.getElementById('login-error').style.display='block';}
 });
 document.getElementById('login-guest-btn').addEventListener('click',async()=>{
     if(isOffline){enterApp(null);return;}
