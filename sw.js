@@ -1,4 +1,4 @@
-const CACHE_NAME = 'meeting-notes-v1';
+const CACHE_NAME = 'meeting-notes-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -6,10 +6,9 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(ASSETS))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
 });
 
@@ -25,12 +24,19 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+  if (event.request.url.includes('firestore') || event.request.url.includes('googleapis')) return;
+
   event.respondWith(
-    caches.match(event.request)
+    fetch(event.request)
       .then(response => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request).catch(() => {
-          // Fallback if offline and not in cache
+        const resClone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request).then(res => {
+          if (res) return res;
           if (event.request.mode === 'navigate') {
             return caches.match('./index.html');
           }
