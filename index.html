@@ -836,8 +836,14 @@ applyScales();
 document.getElementById('manual-save-btn')?.addEventListener('click', async () => {
     closeMenu();
     if(isOffline) { toast('ออฟไลน์ ไม่สามารถบันทึกประวัติได้', 'error'); return; }
-    const title = prompt('ตั้งชื่อบันทึกการประชุม:');
-    if(!title) return;
+    
+    const c = committees.find(x => x.id === currentCommitteeId);
+    let title = c ? c.shortName : 'บันทึกการประชุม';
+    if(currentSessionId) {
+        const s = sessions.find(x => x.id === currentSessionId);
+        if(s) title += ` (ครั้งที่ ${s.sessionNumber})`;
+    }
+
     try {
         await addDoc(collection(db, getBasePath(userId), 'meeting_history'), {
             title,
