@@ -18,6 +18,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
+            --text-scale: 1; --list-scale: 1;
             --bg-gradient-start:#faf8f5; --bg-gradient-end:#f2ede6; --bg-panel:#ffffff;
             --bg-panel-solid:#ffffff; --text-primary:#1c1917; --text-secondary:#78716c;
             --border-color:rgba(168,155,138,0.4); --accent-color:#44403c;
@@ -193,7 +194,7 @@
 
         /* ── Main Layout ── */
         #main-container { display:flex; flex:1; min-height:0; gap:0.4rem; padding:0 0.25rem 0.25rem; }
-        #left-panel { display:flex; flex-direction:column; gap:0.4rem; overflow-y:auto; padding-right:0.25rem; flex-basis:32%; min-width:220px; }
+        #left-panel { display:flex; flex-direction:column; gap:0.4rem; overflow-y:auto; padding-right:0.25rem; flex-basis:32%; min-width:220px; zoom:var(--list-scale); }
         #participants-card { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:16px; padding:0.875rem; flex-shrink:0; }
         #participants-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.65rem; }
         #participants-label { font-size:0.72rem; font-family:'DM Mono',monospace; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.1em; font-weight:600; }
@@ -207,7 +208,7 @@
         /* ── Right Panel ── */
         #right-panel { flex:1 1 0; min-width:80px; display:flex; flex-direction:column; min-height:0; }
         #textarea-card { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:16px; flex:1; display:flex; flex-direction:column; overflow:hidden; min-height:0; position:relative; }
-        #transcript-textarea { flex:1; width:100%; padding:1rem; resize:none; font-family:'Sarabun',sans-serif; font-size:17px; font-weight:400; line-height:1.65; background:transparent !important; color:var(--text-primary) !important; border:none; outline:none !important; box-shadow:none !important; border-color:transparent !important; overflow-y:scroll; -webkit-overflow-scrolling:touch; contain:layout style; text-rendering:optimizeSpeed; font-kerning:none; }
+        #transcript-textarea { flex:1; width:100%; padding:1rem; resize:none; font-family:'Sarabun',sans-serif; font-size:17px; font-weight:400; line-height:1.65; background:transparent !important; color:var(--text-primary) !important; border:none; outline:none !important; box-shadow:none !important; border-color:transparent !important; overflow-y:scroll; -webkit-overflow-scrolling:touch; contain:layout style; text-rendering:optimizeSpeed; font-kerning:none; zoom:var(--text-scale); }
 
         /* ── Save Status ── */
         #save-status { position:absolute; bottom:0.75rem; right:0.75rem; font-family:'DM Mono',monospace; font-size:0.65rem; color:var(--text-secondary); background:var(--bg-panel-solid); border:1px solid var(--border-color); border-radius:999px; padding:0.2rem 0.6rem; display:flex; align-items:center; gap:0.3rem; cursor:pointer; transition:color 0.15s,border-color 0.15s; }
@@ -385,12 +386,23 @@
                 <button class="btn-secondary" id="ratio-toggle" style="font-size:0.65rem;padding:0.25rem 0.65rem;">AUTO</button>
             </div>
         </div>
-        <div class="menu-row">
-            <span>🔍 App Scale</span>
-            <div style="display:flex;gap:0.4rem;align-items:center;">
-                <button class="btn-secondary" id="zoom-decrease-btn" style="width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;">−</button>
-                <span id="zoom-size-display" style="font-family:'DM Mono',monospace;font-size:0.75rem;width:32px;text-align:center;">100%</span>
-                <button class="btn-secondary" id="zoom-increase-btn" style="width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;">+</button>
+        <div class="menu-section" style="padding-top:0;">
+            <div class="menu-label" style="margin-bottom:0.5rem;">Font Sizes</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+                <span style="font-size:0.8rem;color:var(--text-secondary);">เนื้อหา (Text)</span>
+                <div style="display:flex;gap:0.4rem;align-items:center;">
+                    <button class="btn-secondary" id="text-zoom-dec" style="width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;">−</button>
+                    <span id="text-zoom-display" style="font-family:'DM Mono',monospace;font-size:0.75rem;width:32px;text-align:center;">100%</span>
+                    <button class="btn-secondary" id="text-zoom-inc" style="width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;">+</button>
+                </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:0.8rem;color:var(--text-secondary);">รายชื่อ (Names)</span>
+                <div style="display:flex;gap:0.4rem;align-items:center;">
+                    <button class="btn-secondary" id="list-zoom-dec" style="width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;">−</button>
+                    <span id="list-zoom-display" style="font-family:'DM Mono',monospace;font-size:0.75rem;width:32px;text-align:center;">100%</span>
+                    <button class="btn-secondary" id="list-zoom-inc" style="width:28px;height:28px;padding:0;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:bold;">+</button>
+                </div>
             </div>
         </div>
     </div>
@@ -401,12 +413,14 @@
             <button class="menu-btn" id="bulk-add-btn">PASTE LIST</button>
             <button class="menu-btn" id="import-excel-btn">IMPORT XLS</button>
             <button class="menu-btn" id="copy-names-btn">COPY NAMES</button>
+            <button class="menu-btn" id="copy-text-btn">COPY TEXT</button>
             <button class="menu-btn full danger" id="clear-text-btn">CLEAR TEXT</button>
             <input type="file" id="excel-input" accept=".xlsx,.xls" style="display:none;">
         </div>
     </div>
     <div class="menu-section">
         <div class="menu-label">Data</div>
+        <button class="menu-manage-btn" id="manual-save-btn" style="color:#10b981;border-color:#10b981;margin-bottom:0.4rem;">💾 บันทึกลงประวัติการประชุม</button>
         <button class="menu-manage-btn" id="open-history-btn">🕐 ประวัติการประชุม</button>
         <button class="menu-manage-btn" id="open-people-db-btn">👥 จัดการรายชื่อบุคคล</button>
         <button class="menu-manage-btn" id="open-committee-db-btn">🏛️ จัดการคณะกรรมาธิการ</button>
@@ -642,13 +656,10 @@ let hasUnsavedChanges=false, unsubPart=null;
 let sortableInstance=null, isEditCardsMode=false, _prevActiveBoxId=null;
 let layoutModeIndex=0, currentRatioIndex=0;
 const ratios=['Auto','16:9','4:3'];
-let currentAppScale=100;
 let meetingStartTime=Date.now();
 // Seating
 let seatingLayout={chairmanSide:'left',rowsTop:2,rowsBottom:2,seatsPerRow:8,seatHeight:48,seats:{}};
-let isDragMode=false;
-// Pointer drag state
-let _seatDragSrcKey=null, _seatGhost=null, _seatDropEl=null;
+let isDragMode=false, _seatDragSrcKey=null, _seatDropEl=null, _seatGhost=null;
 
 // ── Firebase Init ──
 if (!isOffline) {
@@ -800,19 +811,43 @@ ratioBtn.addEventListener('click',()=>{
 });
 
 // ── App Scale Toggle ──
-const zoomDecBtn=document.getElementById('zoom-decrease-btn');
-const zoomIncBtn=document.getElementById('zoom-increase-btn');
-const zoomSizeDisp=document.getElementById('zoom-size-display');
-function applyAppScale(scale){
-    currentAppScale = Math.max(50, Math.min(scale, 200));
-    if(zoomSizeDisp) zoomSizeDisp.textContent = currentAppScale + '%';
-    document.body.style.zoom = currentAppScale + '%';
-    localStorage.setItem('appScale', currentAppScale);
+let currentTextScale = 100;
+let currentListScale = 100;
+function applyScales() {
+    const td = document.getElementById('text-zoom-display'); if(td) td.textContent = currentTextScale + '%';
+    const ld = document.getElementById('list-zoom-display'); if(ld) ld.textContent = currentListScale + '%';
+    document.documentElement.style.setProperty('--text-scale', currentTextScale / 100);
+    document.documentElement.style.setProperty('--list-scale', currentListScale / 100);
+    localStorage.setItem('textScale', currentTextScale);
+    localStorage.setItem('listScale', currentListScale);
+    document.body.style.zoom = '';
 }
-if(zoomDecBtn) zoomDecBtn.addEventListener('click', ()=>applyAppScale(currentAppScale - 10));
-if(zoomIncBtn) zoomIncBtn.addEventListener('click', ()=>applyAppScale(currentAppScale + 10));
-const savedScale = localStorage.getItem('appScale');
-if(savedScale) applyAppScale(parseInt(savedScale, 10));
+document.getElementById('text-zoom-dec')?.addEventListener('click', () => { currentTextScale = Math.max(50, currentTextScale - 10); applyScales(); });
+document.getElementById('text-zoom-inc')?.addEventListener('click', () => { currentTextScale = Math.min(200, currentTextScale + 10); applyScales(); });
+document.getElementById('list-zoom-dec')?.addEventListener('click', () => { currentListScale = Math.max(50, currentListScale - 10); applyScales(); });
+document.getElementById('list-zoom-inc')?.addEventListener('click', () => { currentListScale = Math.min(200, currentListScale + 10); applyScales(); });
+const savedTextScale = localStorage.getItem('textScale');
+const savedListScale = localStorage.getItem('listScale');
+if (savedTextScale) currentTextScale = parseInt(savedTextScale, 10);
+if (savedListScale) currentListScale = parseInt(savedListScale, 10);
+applyScales();
+
+// ── Manual Save & Copy Text ──
+document.getElementById('manual-save-btn')?.addEventListener('click', () => {
+    closeMenu();
+    debouncedSaveSession(true);
+    toast('💾 บันทึกประวัติการประชุมเรียบร้อยแล้ว', 'success');
+});
+document.getElementById('copy-text-btn')?.addEventListener('click', async () => {
+    closeMenu();
+    try {
+        const text = document.getElementById('transcript-textarea').value;
+        await navigator.clipboard.writeText(text);
+        toast('คัดลอกข้อความสำเร็จ', 'success');
+    } catch(e) {
+        toast('คัดลอกข้อความไม่สำเร็จ', 'error');
+    }
+});
 
 // ── Resizer ──
 function setupResizer(el, onMove){
@@ -1006,6 +1041,12 @@ function attachSeatEvents(el,key){
             if(activeParticipantId){
                 Object.keys(seatingLayout.seats).forEach(k=>{if(seatingLayout.seats[k]===activeParticipantId) delete seatingLayout.seats[k];});
                 seatingLayout.seats[key]=activeParticipantId;renderSeatingPanel();
+            } else {
+                editingParticipantId = 'seat:' + key;
+                document.getElementById('edit-name-input').value = '';
+                document.getElementById('autocomplete-list').style.display = 'none';
+                openModal('edit-name-modal');
+                setTimeout(() => document.getElementById('edit-name-input').focus(), 50);
             }
         }
     });
@@ -1132,11 +1173,23 @@ document.getElementById('edit-name-save').addEventListener('click',()=>{
     const newName=document.getElementById('edit-name-input').value.trim();
     if(!newName) return;
     document.getElementById('autocomplete-list').style.display='none';
-    if(editingParticipantId!==null){
+    if(typeof editingParticipantId === 'string' && editingParticipantId.startsWith('seat:')){
+        const seatKey = editingParticipantId.split(':')[1];
+        let p = participants.find(x=>x.name.toLowerCase()===newName.toLowerCase());
+        if(!p){
+            p={id:nextId++,name:newName};
+            participants.push(p);
+            saveNameToCache(newName);
+        }
+        Object.keys(seatingLayout.seats).forEach(k=>{if(seatingLayout.seats[k]===p.id) delete seatingLayout.seats[k];});
+        seatingLayout.seats[seatKey]=p.id;
+        renderParticipants();renderSeatingPanel();markUnsaved();debouncedSaveSession();
+    }
+    else if(editingParticipantId!==null){
         const p=participants.find(x=>x.id===editingParticipantId);
-        if(p){p.name=newName;renderParticipants();markUnsaved();debouncedSaveSession();}
+        if(p){p.name=newName;renderParticipants();renderSeatingPanel();markUnsaved();debouncedSaveSession();saveNameToCache(newName);}
     } else {
-        participants.push({id:nextId++,name:newName});renderParticipants();markUnsaved();debouncedSaveSession();
+        participants.push({id:nextId++,name:newName});renderParticipants();renderSeatingPanel();markUnsaved();debouncedSaveSession();saveNameToCache(newName);
     }
     closeModal('edit-name-modal');
 });
