@@ -833,10 +833,25 @@ if (savedListScale) currentListScale = parseInt(savedListScale, 10);
 applyScales();
 
 // ── Manual Save & Copy Text ──
-document.getElementById('manual-save-btn')?.addEventListener('click', () => {
+document.getElementById('manual-save-btn')?.addEventListener('click', async () => {
     closeMenu();
-    debouncedSaveSession(true);
-    toast('💾 บันทึกประวัติการประชุมเรียบร้อยแล้ว', 'success');
+    if(isOffline) { toast('ออฟไลน์ ไม่สามารถบันทึกประวัติได้', 'error'); return; }
+    const title = prompt('ตั้งชื่อบันทึกการประชุม:');
+    if(!title) return;
+    try {
+        await addDoc(collection(db, getBasePath(userId), 'meeting_history'), {
+            title,
+            transcript: document.getElementById('transcript-textarea').value,
+            participants: JSON.parse(JSON.stringify(participants)),
+            savedAt: serverTimestamp(),
+            createdAt: Date.now()
+        });
+        toast('💾 บันทึกประวัติการประชุมเรียบร้อยแล้ว', 'success');
+        document.getElementById('open-history-btn').click();
+    } catch(e) {
+        console.error(e);
+        toast('เกิดข้อผิดพลาดในการบันทึก', 'error');
+    }
 });
 document.getElementById('copy-text-btn')?.addEventListener('click', async () => {
     closeMenu();
@@ -1509,15 +1524,37 @@ document.getElementById('btn-committee').addEventListener('click',e=>{
 });
 function renderCommitteeDropdown(){
     const dd=document.getElementById('dd-committee');dd.innerHTML='';
-    committees.forEach(c=>{
-        const item=document.createElement('div');item.className='dd-item'+(c.id===currentCommitteeId?' active':'');
-        item.innerHTML=`<span>${c.shortName}</span>`;
-        item.addEventListener('click',()=>{selectCommittee(c.id);dd.classList.add('hidden');});
-        dd.appendChild(item);
-    });
-    const add=document.createElement('div');add.className='dd-item add-new';add.textContent='+ สร้างคณะใหม่';
-    add.addEventListener('click',()=>{dd.classList.add('hidden');document.getElementById('new-committee-short').value='';document.getElementById('new-committee-full').value='';openModal('create-committee-modal');setTimeout(()=>document.getElementById('new-committee-short').focus(),100);});
-    dd.appendChild(add);
+    const searchWrapper=document.createElement('div');
+    searchWrapper.style.padding='0.4rem';
+    const searchInput=document.createElement('input');
+    searchInput.type='text';
+    searchInput.placeholder='ค้นหาคณะ...';
+    searchInput.style.cssText='width:100%;padding:0.4rem 0.5rem;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-panel);color:var(--text-primary);font-family:"Sarabun",sans-serif;font-size:0.85rem;outline:none;';
+    searchWrapper.appendChild(searchInput);
+    dd.appendChild(searchWrapper);
+
+    const listContainer=document.createElement('div');
+    listContainer.style.maxHeight='250px';
+    listContainer.style.overflowY='auto';
+    dd.appendChild(listContainer);
+
+    const renderList = (filterText) => {
+        listContainer.innerHTML='';
+        const term=filterText.toLowerCase();
+        committees.filter(c=>c.shortName.toLowerCase().includes(term) || (c.fullName||'').toLowerCase().includes(term)).forEach(c=>{
+            const item=document.createElement('div');item.className='dd-item'+(c.id===currentCommitteeId?' active':'');
+            item.innerHTML=`<span>${c.shortName}</span>`;
+            item.addEventListener('click',()=>{selectCommittee(c.id);dd.classList.add('hidden');});
+            listContainer.appendChild(item);
+        });
+        const add=document.createElement('div');add.className='dd-item add-new';add.textContent='+ สร้างคณะใหม่';
+        add.addEventListener('click',()=>{dd.classList.add('hidden');document.getElementById('new-committee-short').value='';document.getElementById('new-committee-full').value='';openModal('create-committee-modal');setTimeout(()=>document.getElementById('new-committee-short').focus(),100);});
+        listContainer.appendChild(add);
+    };
+
+    searchInput.addEventListener('input', (e) => renderList(e.target.value));
+    renderList('');
+    setTimeout(()=>searchInput.focus(), 100);
 }
 async function selectCommittee(id){
     currentCommitteeId=id;currentSessionId=null;currentPartId=null;
