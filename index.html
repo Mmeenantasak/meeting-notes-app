@@ -1420,10 +1420,14 @@ document.getElementById('signout-btn-menu').addEventListener('click',async()=>{
     else{document.getElementById('app-container').style.display='none';document.getElementById('login-screen').style.display='flex';}
 });
 
+let _appEntered = false;
 if(!isOffline){
     onAuthStateChanged(auth,user=>{
-        if(user){userId=user.uid;enterApp(user);}
-        else{document.getElementById('app-container').style.display='none';document.getElementById('login-screen').style.display='flex';}
+        if(user){
+            userId=user.uid;
+            if(!_appEntered){ _appEntered=true; enterApp(user); }
+        }
+        else{_appEntered=false;document.getElementById('app-container').style.display='none';document.getElementById('login-screen').style.display='flex';}
     });
 }
 
@@ -1456,13 +1460,19 @@ async function loadCommittees(){
 }
 async function importDefaultCommittees(){
     try{
+        // Double-check: prevent duplicate import in case of race condition
+        const preCheck = await getDocs(collection(db,getBasePath(userId),'committees'));
+        if(!preCheck.empty){
+            committees=[];preCheck.forEach(d=>committees.push({id:d.id,...d.data()}));committees.sort((a,b)=>a.shortName.localeCompare(b.shortName,'th'));
+            return;
+        }
         const batch=writeBatch(db);
         COMMITTEES_DATA.forEach(c=>{const ref=doc(collection(db,getBasePath(userId),'committees'));batch.set(ref,{...c,createdAt:serverTimestamp()});});
         await batch.commit();
         const snap=await getDocs(collection(db,getBasePath(userId),'committees'));
         committees=[];snap.forEach(d=>committees.push({id:d.id,...d.data()}));committees.sort((a,b)=>a.shortName.localeCompare(b.shortName,'th'));
         toast('นำเข้า 35 คณะกรรมาธิการแล้ว','success');
-    }catch(e){console.error('Import error',e);toast('Import คณะไม่สำเร็จ','error');}
+    }catch(e){console.error('Import error',e);toast('Import ไม่สำเร็จ','error');}
 }
 async function loadNamesCache(){
     try{
