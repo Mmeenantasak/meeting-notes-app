@@ -921,12 +921,19 @@ function renderSeatingPanel(){
     dragBtn.addEventListener('click',()=>{isDragMode=!isDragMode;seatingPanel.classList.toggle('drag-mode',isDragMode);renderSeatingPanel();});
     controls.append(topG,botG,seatG,chairBtn,dragBtn);
     // controls row ±
-    topG.querySelector('#top-minus').addEventListener('click',()=>{ if(seatingLayout.rowsTop>1){seatingLayout.rowsTop--;resetSeatingPanelHeight();renderSeatingPanel();} });
-    topG.querySelector('#top-plus').addEventListener('click',()=>{ seatingLayout.rowsTop++;resetSeatingPanelHeight();renderSeatingPanel(); });
-    botG.querySelector('#bot-minus').addEventListener('click',()=>{ if(seatingLayout.rowsBottom>1){seatingLayout.rowsBottom--;resetSeatingPanelHeight();renderSeatingPanel();} });
-    botG.querySelector('#bot-plus').addEventListener('click',()=>{ seatingLayout.rowsBottom++;resetSeatingPanelHeight();renderSeatingPanel(); });
-    seatG.querySelector('#seat-minus').addEventListener('click',()=>{ if(seatingLayout.seatsPerRow>2){seatingLayout.seatsPerRow--;resetSeatingPanelHeight();renderSeatingPanel();} });
-    seatG.querySelector('#seat-plus').addEventListener('click',()=>{ if(seatingLayout.seatsPerRow<20){seatingLayout.seatsPerRow++;resetSeatingPanelHeight();renderSeatingPanel();} });
+    topG.querySelector('#top-minus').addEventListener('click',()=>{ if(seatingLayout.rowsTop>1){seatingLayout.rowsTop--;resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();} });
+    // Add rows: add to opposite side of chairman first
+    topG.querySelector('#top-plus').addEventListener('click',()=>{
+        if(seatingLayout.chairmanSide==='left') seatingLayout.rowsBottom++; else seatingLayout.rowsTop++;
+        resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();
+    });
+    botG.querySelector('#bot-minus').addEventListener('click',()=>{ if(seatingLayout.rowsBottom>1){seatingLayout.rowsBottom--;resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();} });
+    botG.querySelector('#bot-plus').addEventListener('click',()=>{
+        if(seatingLayout.chairmanSide==='left') seatingLayout.rowsBottom++; else seatingLayout.rowsTop++;
+        resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();
+    });
+    seatG.querySelector('#seat-minus').addEventListener('click',()=>{ if(seatingLayout.seatsPerRow>2){seatingLayout.seatsPerRow--;resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();} });
+    seatG.querySelector('#seat-plus').addEventListener('click',()=>{ if(seatingLayout.seatsPerRow<20){seatingLayout.seatsPerRow++;resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();} });
 
     const wrapper=document.createElement('div');
     wrapper.style.cssText='display:flex;flex-direction:row;align-items:stretch;gap:6px;flex:1;min-width:0;overflow-x:auto;margin-top:0.4rem;';
@@ -1242,7 +1249,7 @@ document.getElementById('bulk-add-btn').addEventListener('click',()=>{document.g
 document.getElementById('bulk-confirm').addEventListener('click',()=>{
     const names=document.getElementById('bulk-textarea').value.split('\n').map(n=>n.trim()).filter(n=>n);
     if(!names.length){toast('ไม่มีชื่อ','info');return;}
-    names.forEach(n=>participants.push({id:nextId++,name:n}));
+    names.forEach(n=>{ participants.push({id:nextId++,name:n}); saveNameToCache(n); });
     renderParticipants();markUnsaved();debouncedSaveSession();closeModal('bulk-add-modal');toast(`เพิ่ม ${names.length} คนแล้ว`,'success');
 });
 
@@ -1627,6 +1634,13 @@ async function selectSession(id){
     participants=JSON.parse(JSON.stringify(s?.participants||DEFAULT_PARTICIPANTS));
     nextId=participants.reduce((m,p)=>p.id>m?p.id:m,0)+1;
     columnCount=s?.columnCount||2;updateColumnLayout(columnCount);renderParticipants();
+    // Restore seating layout if available
+    if(s?.seatingLayout){
+        seatingLayout=JSON.parse(JSON.stringify(s.seatingLayout));
+    } else {
+        seatingLayout={chairmanSide:'left',rowsTop:2,rowsBottom:2,seatsPerRow:8,seatHeight:48,seats:{}};
+    }
+    if(layoutModeIndex===2) renderSeatingPanel();
     ta.value='';setSaveState('saved');meetingStartTime=Date.now();
     await loadPartsForSession(id);
     if(parts.length>0) await selectPart(parts[parts.length-1].id);
@@ -1637,14 +1651,41 @@ document.getElementById('create-session-save').addEventListener('click',async()=
     const sessionNumber=sessions.length+1;
     try{
         const meetingDate=dateVal?new Date(dateVal):new Date();
+        // Load permanent members for this committee
+        const c = committees.find(x=>x.id===currentCommitteeId);
+        const permanentNames = c?.permanentMembers || [];
+        let initNextId = 1;
+        const initParticipants = permanentNames.map((name,i)=>({id:initNextId++,name}));
+
+        // Carry over seating for permanent members from last session
+        let initSeating = {chairmanSide:'left',rowsTop:2,rowsBottom:2,seatsPerRow:8,seatHeight:48,seats:{}};
+        if(sessions.length > 0){
+            const lastS = sessions[sessions.length-1];
+            if(lastS.seatingLayout){
+                initSeating = JSON.parse(JSON.stringify(lastS.seatingLayout));
+                // Keep only permanent member seats, re-map to new IDs
+                Object.keys(initSeating.seats).forEach(k=>{
+                    const pid = initSeating.seats[k];
+                    const prevP = lastS.participants?.find(x=>x.id===pid);
+                    if(!prevP || !permanentNames.includes(prevP.name)){
+                        delete initSeating.seats[k];
+                    } else {
+                        const newP = initParticipants.find(x=>x.name===prevP.name);
+                        if(newP) initSeating.seats[k]=newP.id; else delete initSeating.seats[k];
+                    }
+                });
+            }
+        }
+
         const ref=await addDoc(collection(db,getBasePath(userId),'sessions'),{
             committeeId:currentCommitteeId,sessionNumber,meetingDate,updatedAt:serverTimestamp(),
-            participants:DEFAULT_PARTICIPANTS,columnCount:2
+            participants:initParticipants,columnCount:2,seatingLayout:initSeating
         });
-        sessions.push({id:ref.id,committeeId:currentCommitteeId,sessionNumber,meetingDate,updatedAt:new Date(),participants:DEFAULT_PARTICIPANTS,columnCount:2});
-        closeModal('create-session-modal');toast(`เพิ่มครั้งที่ ${sessionNumber} แล้ว`,'success');await selectSession(ref.id);
+        sessions.push({id:ref.id,committeeId:currentCommitteeId,sessionNumber,meetingDate,updatedAt:new Date(),participants:initParticipants,columnCount:2,seatingLayout:initSeating});
+        closeModal('create-session-modal');toast(`ครั้งที่ ${sessionNumber} สร้างแล้ว`,'success');await selectSession(ref.id);
     }catch(e){toast('สร้างครั้งประชุมไม่สำเร็จ','error');console.error(e);}
 });
+
 async function editSessionNumber(s){
     const n=prompt(`แก้ไขครั้งที่ (ปัจจุบัน: ${s.sessionNumber}):`,s.sessionNumber);
     if(n===null) return;const num=parseInt(n);if(isNaN(num)||num<1){toast('ต้องเป็นตัวเลข','error');return;}
@@ -1724,8 +1765,8 @@ async function saveCurrentPart(){
 async function saveCurrentSession(){
     if(!currentSessionId||isOffline) return;
     try{
-        await updateDoc(doc(db,getBasePath(userId),'sessions',currentSessionId),{participants,columnCount,updatedAt:serverTimestamp()});
-        const s=sessions.find(x=>x.id===currentSessionId);if(s){s.participants=participants;s.columnCount=columnCount;}
+        await updateDoc(doc(db,getBasePath(userId),'sessions',currentSessionId),{participants,columnCount,seatingLayout:JSON.parse(JSON.stringify(seatingLayout)),updatedAt:serverTimestamp()});
+        const s=sessions.find(x=>x.id===currentSessionId);if(s){s.participants=participants;s.columnCount=columnCount;s.seatingLayout=JSON.parse(JSON.stringify(seatingLayout));}
         setSaveState('saved');hasUnsavedChanges=false;
     }catch(e){console.error(e);}
 }
@@ -1855,8 +1896,18 @@ function renderCommitteeDB(){
     countEl.textContent=`แสดง ${committees.length} คณะ`;
     if(!arr.length){list.innerHTML='<p style="color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:0.5rem;">ไม่พบ</p>';return;}
     arr.forEach(c=>{
-        const row=document.createElement('div');row.className='db-row';
-        row.innerHTML=`<div style="flex:1;min-width:0;"><div class="db-row-name">${c.shortName}</div><div class="db-row-sub">${c.fullName||''}</div></div><div class="db-row-actions"><button class="db-action-btn edit-c">✏️</button><button class="db-action-btn del del-c">🗑️</button></div>`;
+        const row=document.createElement('div');row.className='db-row';row.style.flexDirection='column';row.style.alignItems='flex-start';row.style.gap='0.4rem';
+        const permCount = (c.permanentMembers||[]).length;
+        row.innerHTML=`
+            <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+                <div style="flex:1;min-width:0;"><div class="db-row-name">${c.shortName}</div><div class="db-row-sub">${c.fullName||''}</div></div>
+                <div class="db-row-actions">
+                    <button class="db-action-btn perm-c" title="คนประจำคณะ" style="font-size:0.7rem;padding:0.2rem 0.4rem;">👥 ${permCount}</button>
+                    <button class="db-action-btn edit-c">✏️</button>
+                    <button class="db-action-btn del del-c">🗑️</button>
+                </div>
+            </div>`;
+        row.querySelector('.perm-c').addEventListener('click',()=>openPermanentMembersEditor(c));
         row.querySelector('.edit-c').addEventListener('click',()=>{
             document.getElementById('edit-committee-short').value=c.shortName;
             document.getElementById('edit-committee-full').value=c.fullName||'';
@@ -1883,6 +1934,98 @@ document.getElementById('edit-committee-save').addEventListener('click',async()=
         renderCommitteeDB();closeModal('edit-committee-modal');toast('แก้ไขแล้ว','success');
     }catch{toast('แก้ไขไม่สำเร็จ','error');}
 });
+
+// ── Permanent Members Editor ──
+function openPermanentMembersEditor(committee){
+    // Build a quick modal-style overlay
+    const existing = document.getElementById('perm-modal-overlay');
+    if(existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'perm-modal-overlay';
+    overlay.className = 'modal-overlay';
+    overlay.style.zIndex = '800';
+
+    const box = document.createElement('div');
+    box.className = 'modal-box wide';
+    box.style.maxHeight = '80vh';
+
+    const perms = committee.permanentMembers ? [...committee.permanentMembers] : [];
+
+    const render = () => {
+        box.innerHTML = `
+            <div class="modal-header"><h3>👥 คนประจำคณะ: ${committee.shortName}</h3><button class="modal-close" id="perm-close">&times;</button></div>
+            <div class="modal-body">
+                <p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem;">รายชื่อเหล่านี้จะถูกโหลดอัตโนมัติเมื่อสร้างครั้งใหม่</p>
+                <div id="perm-list" style="max-height:300px;overflow-y:auto;margin-bottom:0.75rem;">
+                    ${perms.length===0 ? '<p style="color:var(--text-secondary);font-size:0.85rem;text-align:center;padding:0.5rem;">ยังไม่มีคนประจำ</p>' : ''}
+                    ${perms.map((name,i) => `
+                        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0.5rem;border-bottom:1px solid var(--border-color);">
+                            <span style="font-size:0.88rem;">${name}</span>
+                            <button class="db-action-btn del" data-idx="${i}">🗑️</button>
+                        </div>`).join('')}
+                </div>
+                <div style="display:flex;gap:0.5rem;">
+                    <input type="text" id="perm-add-input" class="form-input" style="flex:1;" placeholder="พิมพ์หรือเลือกชื่อ..."></input>
+                    <div id="perm-ac" style="position:absolute;background:var(--bg-panel-solid);border:1px solid var(--border-color);border-radius:8px;max-height:150px;overflow-y:auto;z-index:900;display:none;min-width:200px;"></div>
+                    <button class="btn-primary" id="perm-add-btn" style="white-space:nowrap;">เพิ่ม</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="perm-cancel">ยกเลิก</button>
+                <button class="btn-primary" id="perm-save">บันทึกคนประจำ</button>
+            </div>`;
+
+        box.querySelector('#perm-close').onclick = () => overlay.remove();
+        box.querySelector('#perm-cancel').onclick = () => overlay.remove();
+
+        box.querySelectorAll('[data-idx]').forEach(btn=>{
+            btn.onclick = () => { perms.splice(parseInt(btn.dataset.idx),1); render(); };
+        });
+
+        const addInput = box.querySelector('#perm-add-input');
+        const acDiv = box.querySelector('#perm-ac');
+        addInput.addEventListener('input', ()=>{
+            const v = addInput.value.trim().toLowerCase();
+            if(!v) { acDiv.style.display='none'; return; }
+            const matches = allNamesCache.filter(n=>n.toLowerCase().includes(v) && !perms.includes(n)).slice(0,8);
+            if(!matches.length) { acDiv.style.display='none'; return; }
+            acDiv.innerHTML = matches.map(n=>`<div class="ac-item">${n}</div>`).join('');
+            acDiv.style.display='block';
+            const r = addInput.getBoundingClientRect();
+            acDiv.style.top = (addInput.offsetTop + addInput.offsetHeight + 2) + 'px';
+            acDiv.style.left = addInput.offsetLeft + 'px';
+            acDiv.querySelectorAll('.ac-item').forEach(item=>{
+                item.addEventListener('mousedown', e=>{ e.preventDefault(); addInput.value=item.textContent; acDiv.style.display='none'; });
+            });
+        });
+
+        const doAdd = () => {
+            const name = addInput.value.trim();
+            if(!name || perms.includes(name)) { toast('ชื่อซ้ำหรือว่าง','info'); return; }
+            perms.push(name); render();
+        };
+        box.querySelector('#perm-add-btn').onclick = doAdd;
+        addInput.onkeydown = e => { if(e.key==='Enter') doAdd(); };
+
+        box.querySelector('#perm-save').onclick = async () => {
+            try {
+                await updateDoc(doc(db,getBasePath(userId),'committees',committee.id),{permanentMembers:perms});
+                const c = committees.find(x=>x.id===committee.id);
+                if(c) c.permanentMembers = perms;
+                overlay.remove();
+                renderCommitteeDB();
+                toast(`บันทึกคนประจำ ${perms.length} คนแล้ว`, 'success');
+            } catch(e) { toast('บันทึกไม่สำเร็จ','error'); console.error(e); }
+        };
+
+        setTimeout(()=>addInput.focus(), 50);
+    };
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+    render();
+}
 
 // ── Keyboard Shortcuts ──
 document.addEventListener('keydown',e=>{
