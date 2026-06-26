@@ -536,7 +536,10 @@
     <div class="modal-box wide">
         <div class="modal-header"><h3>จัดการคณะกรรมาธิการ</h3><button class="modal-close" data-close="committee-db-modal">×</button></div>
         <div class="modal-body">
-            <button class="btn-primary" id="committee-db-add-btn" style="margin-bottom:0.65rem;font-size:0.78rem;">+ เพิ่มคณะใหม่</button>
+            <div style="display:flex;gap:0.5rem;margin-bottom:0.65rem;align-items:center;">
+                <button class="btn-primary" id="committee-db-add-btn" style="font-size:0.78rem;">+ เพิ่มคณะใหม่</button>
+                <button class="btn-secondary" id="committee-dedup-btn" style="font-size:0.78rem;color:#f59e0b;border-color:#f59e0b;">🧹 ลบคณะซ้ำ</button>
+            </div>
             <input type="text" id="committee-search" class="db-search" placeholder="🔍 ค้นหาคณะ...">
             <div id="committee-count" class="db-count"></div>
             <div id="committee-db-list" class="db-list"></div>
@@ -1950,6 +1953,61 @@ function renderCommitteeDB(){
 }
 document.getElementById('committee-search').addEventListener('input',renderCommitteeDB);
 document.getElementById('committee-db-add-btn').addEventListener('click',()=>{document.getElementById('new-committee-short').value='';document.getElementById('new-committee-full').value='';openModal('create-committee-modal');});
+
+// ── Clean Duplicate Committees ──
+document.getElementById('committee-dedup-btn').addEventListener('click', async () => {
+    // Group by shortName
+    const groups = {};
+    committees.forEach(c => {
+        const key = c.shortName.trim();
+        if(!groups[key]) groups[key] = [];
+        groups[key].push(c);
+    });
+    const dupeGroups = Object.values(groups).filter(g => g.length > 1);
+    if(!dupeGroups.length) { toast('ไม่มีคณะซ้ำ ทุกคณะไม่ซ้ำกัน','info'); return; }
+
+    // For each group, check which committees have sessions in Firestore
+    toast('กำลังตรวจสอบ...','info');
+    const toDelete = [];
+    const toKeep = [];
+    for(const group of dupeGroups) {
+        const withSessions = [];
+        const noSessions = [];
+        for(const c of group) {
+            try {
+                const snap = await getDocs(query(collection(db,getBasePath(userId),'sessions'),where('committeeId','==',c.id),limit(1)));
+                if(!snap.empty) withSessions.push(c); else noSessions.push(c);
+            } catch { noSessions.push(c); }
+        }
+        // Keep: prefer one with sessions, else keep first
+        const keeper = withSessions.length > 0 ? withSessions[0] : group[0];
+        toKeep.push(keeper);
+        group.forEach(c => { if(c.id !== keeper.id) toDelete.push(c); });
+    }
+
+    if(!toDelete.length) { toast('ไม่มีคณะซ้ำที่เป็นคณะว่างเลย','success'); return; }
+
+    // Show preview
+    const preview = toDelete.map(c => `• ${c.shortName} (ID:${c.id.slice(0,6)}...)`).join('\n');
+    const ok = await showConfirm(
+        `พบ ${toDelete.length} คณะซ้ำที่ไม่มีข้อมูล`,
+        `จะลบคณะเหล่านี้:\n${preview}\n\nยืนยันลบ?`
+    );
+    if(!ok) return;
+
+    let deleted = 0;
+    for(const c of toDelete) {
+        try {
+            await deleteDoc(doc(db,getBasePath(userId),'committees',c.id));
+            committees = committees.filter(x => x.id !== c.id);
+            if(currentCommitteeId === c.id) currentCommitteeId = null;
+            deleted++;
+        } catch(e) { console.error('Delete failed',c.id,e); }
+    }
+    renderCommitteeDB();
+    if(currentCommitteeId === null) document.getElementById('lbl-committee').textContent = '— คณะ —';
+    toast(`ลบ ${deleted} คณะซ้ำเรียบร้อยแล้ว`,'success');
+});
 document.getElementById('edit-committee-save').addEventListener('click',async()=>{
     const si=document.getElementById('edit-committee-short');const fi=document.getElementById('edit-committee-full');
     const id=si.dataset.id,sn=si.value.trim(),fn=fi.value.trim();if(!sn||!id) return;
