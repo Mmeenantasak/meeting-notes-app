@@ -218,7 +218,7 @@
         #save-status.unsaved { color:#f59e0b; border-color:#f59e0b; }
 
         /* ── Modals ── */
-        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:400; display:flex; align-items:center; justify-content:center; padding:1rem; }
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:600; display:flex; align-items:center; justify-content:center; padding:1rem; }
         .modal-overlay.hidden { display:none; }
         .modal-box { background:var(--bg-panel-solid); border-radius:20px; border:1px solid rgba(255,255,255,0.08); box-shadow:0 25px 50px rgba(0,0,0,0.8); width:100%; max-width:460px; animation:modal-pop 0.25s cubic-bezier(0.16,1,0.3,1); overflow:hidden; }
         .modal-box.wide { max-width:560px; max-height:85vh; display:flex; flex-direction:column; }
@@ -677,7 +677,12 @@ if (!isOffline) {
 }
 
 // ── Helpers ──
-const debounce = (fn,ms)=>{ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); }; };
+const debounce = (fn,ms)=>{
+    let t;
+    const wrapped = (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a),ms); };
+    wrapped.flush = (...a)=>{ clearTimeout(t); fn(...a); };
+    return wrapped;
+};
 function toast(msg,type='info'){
     const t=document.createElement('div');
     t.className=`toast ${type==='success'?'toast-success':type==='error'?'toast-error':''}`;
@@ -2145,8 +2150,19 @@ document.addEventListener('keydown',e=>{
     if(e.key==='Escape'&&isDragMode){isDragMode=false;seatingPanel.classList.remove('drag-mode');renderSeatingPanel();toast('ออกจากโหมดลาก','info');}
 });
 
-// ── beforeunload warning ──
-window.addEventListener('beforeunload',e=>{if(hasUnsavedChanges){e.preventDefault();e.returnValue='';}});
+// ── beforeunload: flush pending saves immediately ──
+window.addEventListener('beforeunload', e=>{
+    if(hasUnsavedChanges){
+        // Flush debounce timers → fire saves immediately (fire-and-forget before page closes)
+        debouncedSavePart.flush();
+        debouncedSaveSession.flush();
+        saveCurrentPart();
+        saveCurrentSession();
+        // Browser leave-dialog as safety net
+        e.preventDefault();
+        e.returnValue='';
+    }
+});
 
 // ── iOS fix ──
 const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
