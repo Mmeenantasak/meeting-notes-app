@@ -179,7 +179,7 @@
         .chairman-slot .chairman-name { writing-mode:vertical-rl; text-orientation:mixed; font-size:0.65rem; font-weight:700; letter-spacing:0.05em; text-align:center; padding:0.5rem 0; color:var(--text-primary); word-break:break-all; }
         .chairman-slot .chairman-empty { writing-mode:vertical-rl; font-size:0.6rem; color:var(--text-secondary); opacity:0.5; }
         .seating-table-area { flex:1; display:flex; flex-direction:column; gap:4px; min-width:0; }
-        .table-divider { height:8px; background:var(--text-secondary); border-radius:3px; margin:3px 0; opacity:0.2; flex-shrink:0; }
+        .table-divider { height:5px; background:var(--accent-color); border-radius:3px; margin:4px 0; opacity:0.6; flex-shrink:0; }
         .seating-row { display:flex; gap:4px; flex-wrap:nowrap; }
         .seat-card { flex:1; min-width:0; border-radius:10px; border:1px solid var(--border-color); background:var(--bg-panel-solid); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:border-color 0.12s; position:relative; -webkit-tap-highlight-color:transparent; user-select:none; }
         .seat-card:hover { border-color:var(--accent-color); }
@@ -930,14 +930,13 @@ function renderSeatingPanel(){
     controls.append(topG,botG,seatG,chairBtn,dragBtn,clearBtn);
     // controls row ±
     topG.querySelector('#top-minus').addEventListener('click',()=>{ if(seatingLayout.rowsTop>1){seatingLayout.rowsTop--;resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();} });
-    // Add rows: add to opposite side of chairman first
     topG.querySelector('#top-plus').addEventListener('click',()=>{
-        if(seatingLayout.chairmanSide==='left') seatingLayout.rowsBottom++; else seatingLayout.rowsTop++;
+        seatingLayout.rowsTop++;
         resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();
     });
     botG.querySelector('#bot-minus').addEventListener('click',()=>{ if(seatingLayout.rowsBottom>1){seatingLayout.rowsBottom--;resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();} });
     botG.querySelector('#bot-plus').addEventListener('click',()=>{
-        if(seatingLayout.chairmanSide==='left') seatingLayout.rowsBottom++; else seatingLayout.rowsTop++;
+        seatingLayout.rowsBottom++;
         resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();
     });
     seatG.querySelector('#seat-minus').addEventListener('click',()=>{ if(seatingLayout.seatsPerRow>2){seatingLayout.seatsPerRow--;resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();} });
