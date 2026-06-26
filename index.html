@@ -1284,9 +1284,26 @@ document.getElementById('bulk-add-btn').addEventListener('click',()=>{document.g
 document.getElementById('bulk-confirm').addEventListener('click',()=>{
     const names=document.getElementById('bulk-textarea').value.split('\n').map(n=>n.trim()).filter(n=>n);
     if(!names.length){toast('ไม่มีชื่อ','info');return;}
-    names.forEach(n=>{ participants.push({id:nextId++,name:n}); saveNameToCache(n); });
-    renderParticipants();markUnsaved();debouncedSaveSession();closeModal('bulk-add-modal');toast(`เพิ่ม ${names.length} คนแล้ว`,'success');
+    try{
+        names.forEach(n=>{ participants.push({id:nextId++,name:n}); saveNameToCache(n); });
+        renderParticipants();markUnsaved();debouncedSaveSession();
+        closeModal('bulk-add-modal');
+        toast(`เพิ่ม ${names.length} คนแล้ว`,'success');
+    }catch(err){console.error('bulk-confirm error',err);toast('เกิดข้อผิดพลาด','error');}
 });
+
+// ── Save Name to People Cache ──
+async function saveNameToCache(name){
+    if(!name||!userId) return;
+    // Only add if not already in cache
+    if(allNamesCache.some(n=>n.toLowerCase()===name.toLowerCase())) return;
+    try{
+        const ref=doc(collection(db,getBasePath(userId),'people'));
+        await setDoc(ref,{name,createdAt:serverTimestamp()});
+        allPeopleDocs.push({id:ref.id,name});
+        allNamesCache=allPeopleDocs.map(p=>p.name).filter(Boolean);
+    }catch(e){console.error('saveNameToCache error',e);}
+}
 
 // ── Bulk Add Autocomplete ──
 const bulkTa = document.getElementById('bulk-textarea');
