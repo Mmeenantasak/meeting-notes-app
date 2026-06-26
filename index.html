@@ -174,6 +174,8 @@
         .chairman-side-btn:hover { border-color:var(--accent-color); color:var(--text-primary); }
         .drag-mode-btn { padding:3px 10px; border-radius:999px; border:1px solid var(--border-color); background:transparent; color:var(--text-secondary); font-family:'DM Mono',monospace; font-size:0.68rem; cursor:pointer; transition:background-color 0.15s,color 0.15s; margin-left:auto; }
         .drag-mode-btn.active { border-color:#3b82f6; color:#3b82f6; background:rgba(59,130,246,0.1); }
+        .seat-delete-btn { position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%; border:none; background:rgba(239,68,68,0.85); color:#fff; font-size:0.75rem; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0; z-index:10; transition:background 0.12s; }
+        .seat-delete-btn:hover { background:#dc2626; }
         .chairman-slot { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:48px; cursor:pointer; border-radius:10px; border:2px dashed var(--border-color); transition:border-color 0.15s; position:relative; }
         .chairman-slot.filled { border-style:solid; border-color:var(--accent-color); }
         .chairman-slot .chairman-name { writing-mode:vertical-rl; text-orientation:mixed; font-size:0.65rem; font-weight:700; letter-spacing:0.05em; text-align:center; padding:0.5rem 0; color:var(--text-primary); word-break:break-all; }
@@ -954,25 +956,25 @@ function renderSeatingPanel(){
     if(seatingLayout.chairmanSide==='left'){wrapper.appendChild(chairEl);wrapper.appendChild(tableArea);}
     else{wrapper.appendChild(tableArea);wrapper.appendChild(chairEl);}
 
-    // Drag-to-delete trash zone (visible only in drag mode)
-    if(isDragMode){
-        const trash=document.createElement('div');
-        trash.id='seat-trash-zone';
-        trash.style.cssText='display:flex;align-items:center;justify-content:center;gap:0.4rem;padding:0.4rem 0.8rem;margin-top:0.4rem;border:2px dashed #ef4444;border-radius:10px;color:#ef4444;font-size:0.78rem;cursor:default;transition:background 0.15s;';
-        trash.innerHTML='🗑️ ลากมาวางไว้ที่นี่เพื่อลบออก';
-        trash.dataset.seatKey='__trash__';
-        seatingPanel.appendChild(wrapper);
-        seatingPanel.appendChild(trash);seatingPanel.appendChild(controls);
-    } else {
-        seatingPanel.appendChild(controls);seatingPanel.appendChild(wrapper);
-    }
+    seatingPanel.appendChild(controls);seatingPanel.appendChild(wrapper);
 }
 function buildChairmanSlot(){
     const el=document.createElement('div');el.className='chairman-slot';el.dataset.seatKey='chairman';
+    el.style.position='relative';
     const pid=seatingLayout.seats['chairman'];
     const p=participants.find(x=>x.id===pid);
-    if(p){el.classList.add('filled');const n=document.createElement('span');n.className='chairman-name';n.textContent=p.name;el.appendChild(n);}
-    else{const e2=document.createElement('span');e2.className='chairman-empty';e2.textContent='ประธาน';el.appendChild(e2);}
+    if(p){
+        el.classList.add('filled');
+        const n=document.createElement('span');n.className='chairman-name';n.textContent=p.name;el.appendChild(n);
+        if(isDragMode){
+            const xBtn=document.createElement('button');
+            xBtn.textContent='×';xBtn.className='seat-delete-btn';
+            xBtn.addEventListener('click',e=>{ e.stopPropagation(); delete seatingLayout.seats['chairman']; debouncedSaveSession(); renderSeatingPanel(); });
+            el.appendChild(xBtn);
+        }
+    } else {
+        const e2=document.createElement('span');e2.className='chairman-empty';e2.textContent='ประธาน';el.appendChild(e2);
+    }
     attachSeatEvents(el,'chairman');return el;
 }
 function buildRow(zone,rowIdx){
@@ -981,9 +983,20 @@ function buildRow(zone,rowIdx){
         const key=`${zone}-${rowIdx}-${c}`;
         const card=document.createElement('div');card.className='seat-card';card.dataset.seatKey=key;
         card.style.minHeight=seatingLayout.seatHeight+'px';
+        card.style.position='relative';
         const pid=seatingLayout.seats[key];const p=participants.find(x=>x.id===pid);
-        if(p){card.classList.add('filled');const n=document.createElement('span');n.className='seat-name';n.textContent=p.name;card.appendChild(n);}
-        else{const e2=document.createElement('span');e2.className='seat-empty-icon';e2.textContent='+';card.appendChild(e2);}
+        if(p){
+            card.classList.add('filled');
+            const n=document.createElement('span');n.className='seat-name';n.textContent=p.name;card.appendChild(n);
+            if(isDragMode){
+                const xBtn=document.createElement('button');
+                xBtn.textContent='×';xBtn.className='seat-delete-btn';
+                xBtn.addEventListener('click',e=>{ e.stopPropagation(); delete seatingLayout.seats[key]; debouncedSaveSession(); renderSeatingPanel(); });
+                card.appendChild(xBtn);
+            }
+        } else {
+            const e2=document.createElement('span');e2.className='seat-empty-icon';e2.textContent='+';card.appendChild(e2);
+        }
         if(pid===activeParticipantId) card.classList.add('active-speaker');
         attachSeatEvents(card,key);row.appendChild(card);
     }
@@ -1058,18 +1071,12 @@ function attachSeatEvents(el,key){
             const targetKey=targetEl?.dataset?.seatKey;
             _seatDragCleanup();
             if(targetKey && targetKey!==key){
-                if(targetKey==='__trash__'){
-                    // Delete the dragged person from their seat
-                    delete seatingLayout.seats[key];
-                    toast('ลบออกจากที่นั่งแล้ว','info');
-                } else {
-                    // swap
-                    const aId=seatingLayout.seats[key];
-                    const bId=seatingLayout.seats[targetKey];
-                    if(aId!==undefined) seatingLayout.seats[targetKey]=aId; else delete seatingLayout.seats[targetKey];
-                    if(bId!==undefined) seatingLayout.seats[key]=bId; else delete seatingLayout.seats[key];
-                    toast('สลับที่นั่งแล้ว','success');
-                }
+                // swap seats
+                const aId=seatingLayout.seats[key];
+                const bId=seatingLayout.seats[targetKey];
+                if(aId!==undefined) seatingLayout.seats[targetKey]=aId; else delete seatingLayout.seats[targetKey];
+                if(bId!==undefined) seatingLayout.seats[key]=bId; else delete seatingLayout.seats[key];
+                toast('สลับที่นั่งแล้ว','success');
                 debouncedSaveSession();
             }
             renderSeatingPanel();
