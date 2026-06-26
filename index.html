@@ -249,7 +249,7 @@
         .db-count { font-size:0.65rem; font-family:'DM Mono',monospace; color:var(--text-secondary); text-align:right; margin-bottom:0.5rem; }
 
         /* ── Autocomplete ── */
-        #autocomplete-list { position:absolute; left:0; right:0; top:100%; background:var(--bg-panel-solid); border:1px solid var(--border-color); border-radius:10px; max-height:200px; overflow-y:auto; z-index:600; display:none; margin-top:2px; box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+        #autocomplete-list { position:absolute; left:0; right:0; top:100%; background:var(--bg-panel-solid); border:1px solid var(--border-color); border-radius:10px; max-height:320px; overflow-y:auto; z-index:600; display:none; margin-top:4px; box-shadow:0 8px 24px rgba(0,0,0,0.3); }
         .ac-item { padding:0.55rem 0.85rem; cursor:pointer; font-size:0.85rem; border-bottom:1px solid var(--border-color); }
         .ac-item:last-child { border-bottom:none; }
         .ac-item:hover { background:rgba(128,128,128,0.1); }
@@ -434,11 +434,11 @@
 
 <!-- Edit Name Modal -->
 <div id="edit-name-modal" class="modal-overlay hidden">
-    <div class="modal-box">
-        <div class="modal-header"><h3>แก้ไขชื่อ</h3><button class="modal-close" data-close="edit-name-modal">×</button></div>
+    <div class="modal-box" style="max-width:560px;">
+        <div class="modal-header"><h3>แก้ไขชื่อ / เลือกชื่อ</h3><button class="modal-close" data-close="edit-name-modal">&times;</button></div>
         <div class="modal-body">
             <div style="position:relative;">
-                <input type="text" id="edit-name-input" class="form-input" placeholder="ชื่อ-นามสกุล" autocomplete="off">
+                <input type="text" id="edit-name-input" class="form-input" style="font-size:1rem;padding:0.75rem 1rem;" placeholder="พิมพ์หรือค้นหาชื่อ..." autocomplete="off">
                 <div id="autocomplete-list"></div>
             </div>
         </div>
@@ -949,7 +949,8 @@ function renderSeatingPanel(){
     wrapper.style.cssText='display:flex;flex-direction:row;align-items:stretch;gap:6px;flex:1;min-width:0;overflow-x:auto;margin-top:0.4rem;';
     const chairEl=buildChairmanSlot();
     const tableArea=document.createElement('div');tableArea.style.cssText='display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;';
-    for(let r=0;r<seatingLayout.rowsTop;r++) tableArea.appendChild(buildRow('top',r));
+    // Render top rows in reverse so new rows appear at the outer top (not near divider)
+    for(let r=seatingLayout.rowsTop-1;r>=0;r--) tableArea.appendChild(buildRow('top',r));
     const div=document.createElement('div');div.className='table-divider';tableArea.appendChild(div);
     for(let r=0;r<seatingLayout.rowsBottom;r++) tableArea.appendChild(buildRow('bottom',r));
     if(seatingLayout.chairmanSide==='left'){wrapper.appendChild(chairEl);wrapper.appendChild(tableArea);}
