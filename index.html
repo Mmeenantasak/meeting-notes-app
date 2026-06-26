@@ -447,17 +447,17 @@
 </div>
 
 <!-- Bulk Add Modal -->
-<div id="bulk-add-modal" class="modal-overlay hidden">
+<div id="bulk-add-modal" class="modal-overlay hidden" style="z-index:600;">
     <div class="modal-box">
         <div class="modal-header"><h3>วางรายชื่อ</h3><button class="modal-close" data-close="bulk-add-modal">×</button></div>
         <div class="modal-body">
             <p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem;">ใส่ชื่อทีละบรรทัด:</p>
             <div style="position:relative;">
-                <textarea id="bulk-textarea" style="width:100%;height:170px;padding:0.75rem;border-radius:10px;resize:none;font-family:'Sarabun',sans-serif;" placeholder="นาย ก&#10;นาย ข"></textarea>
+                <textarea id="bulk-textarea" style="width:100%;height:200px;padding:0.75rem;border-radius:10px;resize:none;font-family:'Sarabun',sans-serif;font-size:0.95rem;" placeholder="นาย ก&#10;นาย ข"></textarea>
                 <div id="bulk-autocomplete-list" style="position:absolute;background:var(--bg-panel-solid);border:1px solid var(--border-color);border-radius:10px;max-height:150px;overflow-y:auto;z-index:600;display:none;margin-top:2px;box-shadow:0 8px 24px rgba(0,0,0,0.3);min-width:180px;width:max-content;"></div>
             </div>
         </div>
-        <div class="modal-footer"><button class="btn-secondary" data-close="bulk-add-modal">Cancel</button><button class="btn-primary" id="bulk-confirm">Import</button></div>
+        <div class="modal-footer"><button class="btn-secondary" data-close="bulk-add-modal">ยกเลิก</button><button class="btn-primary" id="bulk-confirm">เพิ่มรายชื่อ</button></div>
     </div>
 </div>
 
