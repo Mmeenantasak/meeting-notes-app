@@ -158,6 +158,8 @@
         #app-container.meeting-mode #participants-grid { display:grid !important; grid-template-columns:repeat(var(--meeting-cols,4),minmax(0,1fr)) !important; overflow-y:auto; overflow-x:hidden; flex:1; min-height:0; gap:0.5rem; }
         #app-container.meeting-mode #right-panel { flex:1 1 0 !important; min-height:0; }
         #app-container.meeting-mode #resizer { display:none !important; }
+        /* FOCUS mode: keep column controls visible */
+        #app-container.meeting-mode #participants-controls { display:flex !important; }
         #app-container.seating-mode { flex-direction:column; }
         #app-container.seating-mode #seating-panel { display:flex !important; flex-shrink:0; max-height:55vh; overflow-y:auto; }
         #app-container.seating-mode #main-container { flex:1; min-height:0; }
@@ -187,8 +189,8 @@
         .seat-card:hover { border-color:var(--accent-color); }
         .seat-card.filled { border-color:var(--accent-color); }
         .seat-card.active-speaker { box-shadow:0 0 0 2px var(--accent-color); }
-        .seat-card .seat-name { font-size:0.6rem; font-weight:700; text-align:center; padding:2px 3px; line-height:1.2; word-break:break-word; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; color:var(--text-primary); pointer-events:none; }
-        .seat-card .seat-empty-icon { color:var(--text-secondary); opacity:0.3; font-size:0.9rem; pointer-events:none; }
+        .seat-card .seat-name { font-size:0.72rem; font-weight:600; text-align:center; padding:0 4px; width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; pointer-events:none; }
+        .seat-card .seat-empty-icon { font-size:0.9rem; color:var(--text-secondary); opacity:0.4; pointer-events:none; }
         .drag-mode .seat-card,.drag-mode .chairman-slot { cursor:grab; border-style:dashed !important; touch-action:none; }
         /* drag source = faded, drop target = blue highlight */
         .seat-card.seat-dragging,.chairman-slot.seat-dragging { opacity:0.35; }
@@ -325,9 +327,12 @@
         <button class="hdr-dropdown-btn" id="btn-part">
             <span id="lbl-part">— ตอนที่ —</span><span class="chevron">▾</span>
         </button>
-        <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;line-height:1;">
-            <div id="hdr-clock">00:00:00</div>
-            <div id="hdr-duration" style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-secondary);letter-spacing:0.06em;">00:00:00</div>
+        <div style="margin-left:auto;display:flex;gap:0.5rem;align-items:center;">
+            <div id="offline-badge" style="display:none;font-family:'DM Mono',monospace;font-size:0.62rem;padding:2px 8px;border-radius:999px;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.4);letter-spacing:0.05em;">⚠ OFFLINE</div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1;">
+                <div id="hdr-clock">00:00:00</div>
+                <div id="hdr-duration" style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-secondary);letter-spacing:0.06em;">00:00:00</div>
+            </div>
         </div>
     </header>
 
@@ -341,11 +346,15 @@
             <div id="participants-card">
                 <div id="participants-header">
                     <span id="participants-label">Participants</span>
-                    <div id="participants-controls">
-                        <button class="ctrl-btn" id="edit-cards-btn" title="Edit & Reorder">✏️</button>
-                        <button class="ctrl-btn" id="decrease-cols-btn">-</button>
-                        <span id="cols-count">2</span>
-                        <button class="ctrl-btn" id="increase-cols-btn">+</button>
+                    <div style="display:flex;align-items:center;gap:0.35rem;">
+                        <input id="participants-search" type="text" placeholder="🔍 ค้น..." autocomplete="off"
+                            style="font-size:0.72rem;padding:2px 6px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-main);color:var(--text-primary);width:80px;outline:none;">
+                        <div id="participants-controls">
+                            <button class="ctrl-btn" id="edit-cards-btn" title="Edit & Reorder">✏️</button>
+                            <button class="ctrl-btn" id="decrease-cols-btn">-</button>
+                            <span id="cols-count">2</span>
+                            <button class="ctrl-btn" id="increase-cols-btn">+</button>
+                        </div>
                     </div>
                 </div>
                 <div id="participants-grid"></div>
@@ -1538,7 +1547,10 @@ async function importDefaultCommittees(){
         toast('นำเข้า 35 คณะกรรมาธิการแล้ว','success');
     }catch(e){console.error('Import error',e);toast('Import ไม่สำเร็จ','error');}
 }
+let _namesCacheLoaded = false;
 async function loadNamesCache(){
+    if(_namesCacheLoaded) return; // Prevent double-load
+    _namesCacheLoaded = true;
     try{
         const snap=await getDocs(collection(db,getBasePath(userId),'people'));
         allPeopleDocs=[];
@@ -2147,8 +2159,32 @@ document.addEventListener('keydown',e=>{
         else if(e.key==='z'&&e.shiftKey){e.preventDefault();document.getElementById('redo-btn').click();}
         else if(e.key==='t'){e.preventDefault();document.getElementById('timestamp-btn').click();}
     }
-    if(e.key==='Escape'&&isDragMode){isDragMode=false;seatingPanel.classList.remove('drag-mode');renderSeatingPanel();toast('ออกจากโหมดลาก','info');}
+    if(e.key==='Escape'){
+        if(isDragMode){isDragMode=false;seatingPanel.classList.remove('drag-mode');renderSeatingPanel();toast('ออกจากโหมดลาก','info');return;}
+        // Close any visible non-hidden modal overlay
+        const openModal=document.querySelector('.modal-overlay:not(.hidden)');
+        if(openModal) openModal.classList.add('hidden');
+    }
 });
+
+// ── Offline Indicator ──
+function updateOfflineBadge(){
+    const badge=document.getElementById('offline-badge');
+    if(badge) badge.style.display=!navigator.onLine?'block':'none';
+}
+window.addEventListener('online', updateOfflineBadge);
+window.addEventListener('offline', updateOfflineBadge);
+updateOfflineBadge();
+
+// ── Participants Search/Filter ──
+document.getElementById('participants-search').addEventListener('input', function(){
+    const q=this.value.trim().toLowerCase();
+    document.querySelectorAll('#participants-grid .participant-box').forEach(box=>{
+        const name=box.querySelector('h3')?.textContent?.toLowerCase()||'';
+        box.style.display=(!q||name.includes(q))?'':'none';
+    });
+});
+
 
 // ── beforeunload: flush pending saves immediately ──
 window.addEventListener('beforeunload', e=>{
