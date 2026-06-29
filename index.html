@@ -435,6 +435,7 @@
         <button class="menu-manage-btn" id="open-history-btn">🕐 ประวัติการประชุม</button>
         <button class="menu-manage-btn" id="open-people-db-btn">👥 จัดการรายชื่อบุคคล</button>
         <button class="menu-manage-btn" id="open-committee-db-btn">🏛️ จัดการคณะกรรมาธิการ</button>
+        <button class="menu-manage-btn" id="recover-data-btn" style="color:#f59e0b; border-color:#f59e0b; margin-top:0.4rem;">♻️ กู้คืนข้อมูลที่สูญหาย (Recovery)</button>
     </div>
 </div>
 
@@ -1967,6 +1968,52 @@ document.getElementById('add-person-save').addEventListener('click',async()=>{
         document.getElementById('people-count').textContent=`แสดง ${allPeopleDocs.length} รายชื่อ`;
         renderPeopleList(allPeopleDocs);closeModal('add-person-modal');toast(existId?'แก้ไขแล้ว':'เพิ่มแล้ว','success');
     }catch{toast('บันทึกไม่สำเร็จ','error');}
+});
+// ── Recover Orphaned Data ──
+document.getElementById('recover-data-btn').addEventListener('click', async () => {
+    closeMenu();
+    if(isOffline) { toast('ไม่สามารถใช้ในโหมดออฟไลน์', 'error'); return; }
+    
+    toast('กำลังค้นหาข้อมูล...', 'info');
+    try {
+        const snap = await getDocs(collection(db, getBasePath(userId), 'sessions'));
+        const existingCommitteeIds = new Set(committees.map(c => c.id));
+        const orphanedSessions = [];
+        
+        snap.forEach(d => {
+            const data = d.data();
+            if(!existingCommitteeIds.has(data.committeeId)) {
+                orphanedSessions.push({id: d.id, ...data});
+            }
+        });
+
+        if(orphanedSessions.length === 0) {
+            toast('ไม่พบข้อมูลตกค้างในระบบ', 'success');
+            return;
+        }
+
+        const batch = writeBatch(db);
+        const recoveredCommRef = doc(collection(db, getBasePath(userId), 'committees'));
+        batch.set(recoveredCommRef, {
+            shortName: `กู้คืนข้อมูล (${new Date().toLocaleDateString('th-TH')})`,
+            fullName: 'ข้อมูลที่ถูกกู้คืนจากคณะที่ถูกลบ',
+            createdAt: serverTimestamp()
+        });
+
+        orphanedSessions.forEach(s => {
+            const sRef = doc(db, getBasePath(userId), 'sessions', s.id);
+            batch.update(sRef, { committeeId: recoveredCommRef.id });
+        });
+
+        await batch.commit();
+        await loadCommittees();
+        
+        showConfirm('กู้คืนสำเร็จ', `พบ ${orphanedSessions.length} รายการที่ตกค้างอยู่ในระบบ\nตอนนี้ได้นำไปรวมไว้ที่คณะ "กู้คืนข้อมูล (...)" เรียบร้อยแล้วครับ\n\n(คุณสามารถเปิดดูและคัดลอกข้อความไปใส่คณะที่ถูกต้องได้เลย)`);
+
+    } catch(e) {
+        console.error(e);
+        toast('กู้คืนไม่สำเร็จ', 'error');
+    }
 });
 
 // ── Committee DB ──
