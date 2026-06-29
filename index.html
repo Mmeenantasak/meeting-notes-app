@@ -133,7 +133,7 @@
         #signout-btn-menu { padding:0.35rem 0.75rem; border-radius:999px; border:1px solid rgba(239,68,68,0.3); background:transparent; color:#ef4444; font-size:0.72rem; font-family:'DM Mono',monospace; cursor:pointer; }
 
         /* ── Dropdown Panels ── */
-        .dd-panel { position:fixed; background:var(--bg-panel-solid); border:1px solid var(--border-color); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.5); z-index:300; min-width:220px; max-width:300px; max-height:60vh; overflow-y:auto; padding:0.5rem; }
+        .dd-panel { position:fixed; background:var(--bg-panel-solid); border:1px solid var(--border-color); border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.5); z-index:550; min-width:220px; max-width:300px; max-height:60vh; overflow-y:auto; padding:0.5rem; }
         .dd-item { padding:0.65rem 0.75rem; border-radius:10px; cursor:pointer; font-size:0.88rem; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; transition:background 0.1s; }
         .dd-item:hover { background:rgba(128,128,128,0.1); }
         .dd-item.active { background:rgba(128,128,128,0.12); font-weight:700; }
@@ -1170,6 +1170,14 @@ function renderParticipants(){
     });
     if(!sortableInstance) initSortable();
     if(isEditCardsMode) grid.classList.add('edit-cards-mode');
+    // Re-apply any active search filter
+    const q=(document.getElementById('participants-search')?.value||'').trim().toLowerCase();
+    if(q){
+        grid.querySelectorAll('.participant-box').forEach(box=>{
+            const nm=box.querySelector('h3')?.textContent?.toLowerCase()||'';
+            box.style.display=nm.includes(q)?'':'none';
+        });
+    }
 }
 
 function initSortable(){
@@ -1489,7 +1497,10 @@ document.getElementById('login-guest-btn').addEventListener('click',async()=>{
     try{await signInAnonymously(auth);}catch{document.getElementById('login-error').textContent='Guest login ไม่สำเร็จ';document.getElementById('login-error').style.display='block';}
 });
 document.getElementById('signout-btn-menu').addEventListener('click',async()=>{
-    closeMenu();if(!isOffline&&auth) await signOut(auth);
+    closeMenu();
+    _namesCacheLoaded = false; // Reset so names reload on next login
+    _appEntered = false;
+    if(!isOffline&&auth) await signOut(auth);
     else{document.getElementById('app-container').style.display='none';document.getElementById('login-screen').style.display='flex';}
 });
 
