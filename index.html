@@ -68,7 +68,7 @@
             box-shadow:var(--card-shadow); position:relative; cursor:pointer;
             transition:border-color 0.1s ease-out; user-select:none;
             -webkit-tap-highlight-color:transparent; height:auto; min-height:72px;
-            transform:translateZ(0); -webkit-transform:translateZ(0); border-radius:14px !important;
+            border-radius:14px !important;
         }
         .participant-box:hover { border-color:var(--accent-color); }
         .participant-box.active { border-color:var(--accent-color); background-color:rgba(128,128,128,0.05); box-shadow:inset 0 0 0 1px var(--accent-color); }
@@ -596,7 +596,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, query, orderBy, getDoc, writeBatch, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, query, orderBy, getDoc, writeBatch, where, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // ── Firebase Config ──
 const myFirebaseConfig = {
@@ -1113,24 +1113,25 @@ function attachSeatEvents(el,key){
     });
 
     // ── Click (non-drag mode) ──
+// ── Click (non-drag mode) ──
     el.addEventListener('click',()=>{
         if(isDragMode) return; // drag handled by pointerup
         const pid=seatingLayout.seats[key];
-        if(pid){const p=participants.find(x=>x.id===pid);if(p) selectParticipant(p.id);}
-        else{
-            if(activeParticipantId){
-                Object.keys(seatingLayout.seats).forEach(k=>{if(seatingLayout.seats[k]===activeParticipantId) delete seatingLayout.seats[k];});
-                seatingLayout.seats[key]=activeParticipantId;renderSeatingPanel();
-            } else {
-                editingParticipantId = 'seat:' + key;
-                document.getElementById('edit-name-input').value = '';
-                document.getElementById('autocomplete-list').style.display = 'none';
-                openModal('edit-name-modal');
-                setTimeout(()=>{ document.getElementById('edit-name-input').focus(); showAutocomplete(); }, 80);
-            }
+        if(pid){
+            const p=participants.find(x=>x.id===pid);
+            if(p) selectParticipant(p.id);
+        } else {
+            // ที่นั่งว่าง: เปิด popup เพิ่ม/เลือกชื่อเสมอ
+            // (ไม่ใช้ activeParticipantId ค้างจากการคลิกเลือกคนพูดก่อนหน้า
+            //  เพราะทำให้คนที่เพิ่งเลือกไว้ "ติดตาม" มาลงที่นั่งใหม่โดยไม่ตั้งใจ
+            //  การย้ายคนระหว่างที่นั่งให้ใช้โหมดลาก (DRAG) แทน)
+            editingParticipantId = 'seat:' + key;
+            document.getElementById('edit-name-input').value = '';
+            document.getElementById('autocomplete-list').style.display = 'none';
+            openModal('edit-name-modal');
+            setTimeout(()=>{ document.getElementById('edit-name-input').focus(); showAutocomplete(); }, 80);
         }
     });
-}
 
 // ── Participants ──
 function renderParticipants(){
@@ -1151,29 +1152,10 @@ function renderParticipants(){
         const delIcon=document.createElement('div');delIcon.className='card-action-icon delete-icon';
         delIcon.innerHTML='<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
         box.appendChild(delIcon);box.appendChild(name);box.appendChild(editIcon);
-        // single-click: เลือกชื่อแทรกในเอกสาร (ยกเว้น edit-mode)
-        box.addEventListener('click',e=>{
-            if(e.target.closest('.card-action-icon')) return;
-            if(isEditCardsMode) return;
-            selectParticipant(p.id);
-        });
-        // double-click บนชื่อ: เปิดแก้ไขทันที (ไม่ต้องเปิด edit-mode)
-        name.addEventListener('dblclick',e=>{
-            e.preventDefault();e.stopPropagation();
-            openEditName(p.id,p.name);
-        });
-        box.addEventListener('touchend',e=>{
-            if(e.target.closest('.card-action-icon')) return;
-            if(isEditCardsMode) return;
-            document.getElementById('transcript-textarea').focus();
-        },{passive:true});
-        editIcon.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openEditName(p.id,p.name);});
-        delIcon.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();deleteParticipant(p.id);});
         grid.appendChild(box);
     });
     if(!sortableInstance) initSortable();
     if(isEditCardsMode) grid.classList.add('edit-cards-mode');
-    // Re-apply any active search filter
     const q=(document.getElementById('participants-search')?.value||'').trim().toLowerCase();
     if(q){
         grid.querySelectorAll('.participant-box').forEach(box=>{
@@ -1182,6 +1164,39 @@ function renderParticipants(){
         });
     }
 }
+
+// ── Delegated events for participant cards (ผูกครั้งเดียว ไม่ผูกซ้ำทุกครั้งที่ re-render) ──
+document.getElementById('participants-grid').addEventListener('click', e => {
+    const box = e.target.closest('.participant-box');
+    if (!box) return;
+    const id = parseInt(box.dataset.id, 10);
+
+    if (e.target.closest('.edit-icon')) {
+        const p = participants.find(x => x.id === id);
+        openEditName(id, p ? p.name : '');
+        return;
+    }
+    if (e.target.closest('.delete-icon')) {
+        deleteParticipant(id);
+        return;
+    }
+    if (isEditCardsMode) return;
+    selectParticipant(id);
+});
+document.getElementById('participants-grid').addEventListener('dblclick', e => {
+    if (!e.target.closest('h3')) return;
+    const box = e.target.closest('.participant-box');
+    if (!box) return;
+    const id = parseInt(box.dataset.id, 10);
+    const p = participants.find(x => x.id === id);
+    openEditName(id, p ? p.name : '');
+});
+document.getElementById('participants-grid').addEventListener('touchend', e => {
+    if (e.target.closest('.card-action-icon')) return;
+    if (isEditCardsMode) return;
+    if (!e.target.closest('.participant-box')) return;
+    document.getElementById('transcript-textarea').focus();
+}, { passive: true });
 
 function initSortable(){
     if(typeof Sortable==='undefined') return;
@@ -1547,14 +1562,14 @@ async function loadCommittees(){
 }
 async function importDefaultCommittees(){
     try{
-        // Double-check: prevent duplicate import in case of race condition
-        const preCheck = await getDocs(collection(db,getBasePath(userId),'committees'));
-        if(!preCheck.empty){
-            committees=[];preCheck.forEach(d=>committees.push({id:d.id,...d.data()}));committees.sort((a,b)=>a.shortName.localeCompare(b.shortName,'th'));
-            return;
-        }
         const batch=writeBatch(db);
-        COMMITTEES_DATA.forEach(c=>{const ref=doc(collection(db,getBasePath(userId),'committees'));batch.set(ref,{...c,createdAt:serverTimestamp()});});
+        COMMITTEES_DATA.forEach((c,i)=>{
+            // ใช้ ID คงที่ตาม index แทนการสุ่ม ID
+            // ทำให้ import ซ้ำจากหลายอุปกรณ์พร้อมกันแล้ว "เขียนทับ" ตัวเดิม
+            // แทนที่จะสร้างเอกสารใหม่ซ้อนขึ้นมา (idempotent write)
+            const ref=doc(db,getBasePath(userId),'committees',`default-${i}`);
+            batch.set(ref,{...c,createdAt:serverTimestamp()},{merge:true});
+        });
         await batch.commit();
         const snap=await getDocs(collection(db,getBasePath(userId),'committees'));
         committees=[];snap.forEach(d=>committees.push({id:d.id,...d.data()}));committees.sort((a,b)=>a.shortName.localeCompare(b.shortName,'th'));
@@ -2215,9 +2230,9 @@ function openPermanentMembersEditor(committee){
 document.addEventListener('keydown',e=>{
     if(e.ctrlKey||e.metaKey){
         if(e.key==='s'){e.preventDefault();saveCurrentPart();saveCurrentSession();}
-        else if(e.key==='z'&&!e.shiftKey){e.preventDefault();document.getElementById('undo-btn').click();}
-        else if(e.key==='z'&&e.shiftKey){e.preventDefault();document.getElementById('redo-btn').click();}
-        else if(e.key==='t'){e.preventDefault();document.getElementById('timestamp-btn').click();}
+        else if(e.key==='z'&&!e.shiftKey){e.preventDefault();document.getElementById('undo-btn')?.click();}
+        else if(e.key==='z'&&e.shiftKey){e.preventDefault();document.getElementById('redo-btn')?.click();}
+        else if(e.key==='t'){e.preventDefault();document.getElementById('timestamp-btn')?.click();}
     }
     if(e.key==='Escape'){
         if(isDragMode){isDragMode=false;seatingPanel.classList.remove('drag-mode');renderSeatingPanel();toast('ออกจากโหมดลาก','info');return;}
