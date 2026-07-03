@@ -1112,7 +1112,6 @@ function attachSeatEvents(el,key){
         document.addEventListener('pointercancel',onCancel);
     });
 
-    // ── Click (non-drag mode) ──
 // ── Click (non-drag mode) ──
     el.addEventListener('click',()=>{
         if(isDragMode) return; // drag handled by pointerup
@@ -1132,7 +1131,7 @@ function attachSeatEvents(el,key){
             setTimeout(()=>{ document.getElementById('edit-name-input').focus(); showAutocomplete(); }, 80);
         }
     });
-
+}
 // ── Participants ──
 function renderParticipants(){
     const grid=document.getElementById('participants-grid');
