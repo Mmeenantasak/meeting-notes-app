@@ -1177,6 +1177,7 @@ function attachSeatEvents(el,key){
             //  เพราะทำให้คนที่เพิ่งเลือกไว้ "ติดตาม" มาลงที่นั่งใหม่โดยไม่ตั้งใจ
             //  การย้ายคนระหว่างที่นั่งให้ใช้โหมดลาก (DRAG) แทน)
             editingParticipantId = 'seat:' + key;
+            autocompleteContext = 'seat';
             document.getElementById('edit-name-input').value = '';
             document.getElementById('autocomplete-list').style.display = 'none';
             openModal('edit-name-modal');
@@ -1295,8 +1296,10 @@ function deleteParticipant(id){
 
 // ── Edit Name ──
 let editingParticipantId=null;
+let autocompleteContext=null; // 'seat' = เปิดจากการคลิกที่นั่งว่างในโหมด Seating, null = เปิดจากที่อื่น (เช่นแก้ไขชื่อการ์ด)
 function openEditName(id,name){
     editingParticipantId=id;
+    autocompleteContext=null;
     document.getElementById('edit-name-input').value=name||'';
     openModal('edit-name-modal');
     setTimeout(()=>document.getElementById('edit-name-input').focus(),100);
@@ -1305,13 +1308,22 @@ function showAutocomplete(){
     const val=document.getElementById('edit-name-input').value.trim().toLowerCase();
     const list=document.getElementById('autocomplete-list');
     list.innerHTML='';
-    if(!allNamesCache.length){list.style.display='none';return;}
     let matches = [];
-    if(!val) {
-        matches = allNamesCache.slice(0,15); // Show first 15 if empty
+
+    if(!val){
+        // ยังไม่พิมพ์อะไร: ถ้าเปิดมาจากการคลิกที่นั่งว่าง ให้โชว์คนที่เพิ่มไว้ในที่ประชุมครั้งนี้ก่อน
+        if(autocompleteContext === 'seat'){
+            matches = participants.map(p=>p.name).sort((a,b)=>a.localeCompare(b,'th')).slice(0,15);
+        } else {
+            matches = allNamesCache.slice(0,15);
+        }
     } else {
-        matches = allNamesCache.filter(n=>n.toLowerCase().includes(val)).slice(0,10);
+        // พิมพ์ค้นหา: เอาคนในที่ประชุมครั้งนี้ที่ตรงคำค้นขึ้นก่อน แล้วตามด้วยฐานข้อมูลรวม (กันชื่อซ้ำ)
+        const inMeeting = participants.map(p=>p.name).filter(n=>n.toLowerCase().includes(val));
+        const inDb = allNamesCache.filter(n=>n.toLowerCase().includes(val) && !inMeeting.some(m=>m.toLowerCase()===n.toLowerCase()));
+        matches = [...inMeeting, ...inDb].slice(0,10);
     }
+
     if(!matches.length){list.style.display='none';return;}
     matches.forEach(n=>{
         const item=document.createElement('div');item.className='ac-item';item.textContent=n;
