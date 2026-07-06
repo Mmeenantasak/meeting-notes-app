@@ -36,10 +36,10 @@
             --card-shadow:0 2px 8px rgba(0,0,0,0.4);
             --card-shadow-hover:0 6px 20px rgba(0,0,0,0.6);
         }
-        html,body { height:100%; height:100dvh; overflow:hidden; touch-action:manipulation; overscroll-behavior:none; }
+      html,body { height:100%; height:100dvh; overflow:hidden; touch-action:manipulation; overscroll-behavior:none; }
         body { font-family:'Sarabun',sans-serif; font-weight:400; font-size:15px; letter-spacing:0.01em; background:var(--bg-gradient-start); color:var(--text-primary); }
         #app-container {
-            height:100dvh; max-height:100dvh;
+            height:var(--app-vh, 100dvh); max-height:var(--app-vh, 100dvh);
             padding-top:max(0.4rem,env(safe-area-inset-top));
             padding-bottom:max(0.4rem,env(safe-area-inset-bottom));
             padding-left:max(0.4rem,env(safe-area-inset-left));
@@ -167,7 +167,7 @@
         #app-container.seating-mode #resizer { display:none !important; }
 
         /* ── Seating Plan ── */
-        #seating-panel { display:none; flex-direction:column; padding:0.6rem 0.75rem; background:var(--bg-panel-solid); border:1px solid var(--border-color); border-radius:16px; overflow:hidden; flex-shrink:0; touch-action:none; zoom:var(--list-scale); }
+        #seating-panel { display:none; flex-direction:column; padding:0.6rem 0.75rem; background:var(--bg-panel-solid); border:1px solid var(--border-color); border-radius:16px; overflow:hidden; flex-shrink:0; touch-action:pan-y; zoom:var(--list-scale); }
         .seating-controls { display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem; }
         .seating-control-group { display:flex; align-items:center; gap:0.35rem; font-family:'DM Mono',monospace; font-size:0.68rem; color:var(--text-secondary); }
         .seating-ctrl-btn { width:24px; height:24px; border-radius:6px; border:1px solid var(--border-color); background:transparent; color:var(--text-secondary); font-size:0.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:border-color 0.15s,color 0.15s; }
@@ -199,7 +199,7 @@
         /* ── Main Layout ── */
         #main-container { display:flex; flex:1; min-height:0; gap:0.4rem; padding:0 0.25rem 0.25rem; }
         #left-panel { display:flex; flex-direction:column; gap:0.4rem; overflow-y:auto; padding-right:0.25rem; flex-basis:32%; min-width:220px; zoom:var(--list-scale); }
-        #participants-card { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:16px; padding:0.875rem; flex-shrink:0; }
+        #participants-card { background:var(--bg-panel); border:1px solid var(--border-color); border-radius:16px; padding:0.875rem; flex-shrink:0; contain:layout style; }
         #participants-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.65rem; }
         #participants-label { font-size:0.72rem; font-family:'DM Mono',monospace; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.1em; font-weight:600; }
         #participants-controls { display:flex; align-items:center; gap:0.25rem; }
@@ -804,13 +804,10 @@ layoutBtn.addEventListener('click',async()=>{
         appContainer.classList.add('seating-mode');
         layoutBtn.textContent='SEATING';layoutBtn.style.color='var(--accent-color)';layoutBtn.style.borderColor='var(--accent-color)';
         resetSeatingPanelHeight();
-        // Auto-seat participants
-        let changed=false;
-        Object.keys(seatingLayout.seats).forEach(key=>{ if(!participants.find(p=>p.id===seatingLayout.seats[key])){ delete seatingLayout.seats[key]; changed=true; } });
-        const allKeys=['chairman'];
-        for(let r=0;r<seatingLayout.rowsTop;r++) for(let c=0;c<seatingLayout.seatsPerRow;c++) allKeys.push(`top-${r}-${c}`);
-        for(let r=0;r<seatingLayout.rowsBottom;r++) for(let c=0;c<seatingLayout.seatsPerRow;c++) allKeys.push(`bottom-${r}-${c}`);
-        participants.forEach(p=>{ if(!Object.values(seatingLayout.seats).includes(p.id)){ const k=allKeys.find(k=>!seatingLayout.seats[k]); if(k){seatingLayout.seats[k]=p.id;changed=true;} } });
+        // เคลียร์เฉพาะที่นั่งของคนที่ถูกลบออกจากรายชื่อไปแล้ว (กันที่นั่งค้างชื่อคนที่ไม่มีอยู่จริง)
+        // ไม่ auto-seat คนใหม่เข้าที่นั่งว่างอีกต่อไป — ผู้ใช้ต้องกดจัดที่นั่งเองทุกคน
+        // ตำแหน่งที่นั่งจะถูกบันทึกผูกกับ session/คณะนั้นๆ อยู่แล้วผ่าน saveCurrentSession()
+        Object.keys(seatingLayout.seats).forEach(key=>{ if(!participants.find(p=>p.id===seatingLayout.seats[key])){ delete seatingLayout.seats[key]; } });
         renderSeatingPanel();toast('โหมดที่นั่ง','info');
     }
     localStorage.setItem('layoutMode',layoutModeIndex);
@@ -892,9 +889,23 @@ document.getElementById('copy-text-btn')?.addEventListener('click', async () => 
 function setupResizer(el, onMove){
     if(!el) return;
     let active=false;
+    let rafScheduled=false;
+    let latestEvent=null;
     el.addEventListener('mousedown',e=>{e.preventDefault();active=true;el.classList.add('resizing');document.addEventListener('mousemove',move);document.addEventListener('mouseup',stop);});
     el.addEventListener('touchstart',e=>{e.preventDefault();active=true;el.classList.add('resizing');document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',stop);},{passive:false});
-    function move(e){if(!active) return; const ev=e.touches?e.touches[0]:e; onMove(ev);}
+    function move(e){
+        if(!active) return;
+        latestEvent = e.touches?e.touches[0]:e;
+        // จำกัดให้คำนวณ layout แค่ 1 ครั้งต่อเฟรม (แทนที่จะคำนวณทุกพิกเซลที่ลาก)
+        // ลดภาระ reflow เวลามีการ์ดเยอะ ทำให้ลากลื่นขึ้นชัดเจน
+        if(!rafScheduled){
+            rafScheduled=true;
+            requestAnimationFrame(()=>{
+                onMove(latestEvent);
+                rafScheduled=false;
+            });
+        }
+    }
     function stop(){active=false;el.classList.remove('resizing');document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',stop);document.removeEventListener('touchmove',move);document.removeEventListener('touchend',stop);}
 }
 const mainContainer=document.getElementById('main-container');
@@ -915,6 +926,28 @@ setupResizer(document.getElementById('seating-resizer'),ev=>{
     seatingPanel.style.maxHeight='none';seatingPanel.style.height=h+'px';seatingPanel.style.flexBasis=h+'px';
 });
 function resetSeatingPanelHeight(){if(seatingPanel){seatingPanel.style.height='';seatingPanel.style.flexBasis='';seatingPanel.style.maxHeight='';}}
+
+// ── Shift seat column indices (ใช้ตอนประธานอยู่ฝั่งขวา เพื่อให้ที่นั่งใหม่/ที่ถูกลบ อยู่ฝั่งไกลจากประธานเสมอ) ──
+// delta=1: เลื่อนทุกคนไปทางขวา 1 คอลัมน์ (เปิดที่ว่างคอลัมน์ 0 ซึ่งเป็นฝั่งไกลประธานเมื่อประธานอยู่ขวา)
+// delta=-1: ลบคอลัมน์ 0 (ฝั่งไกลประธาน) แล้วเลื่อนคนที่เหลือมาทางซ้าย 1 คอลัมน์
+function shiftSeatingColumns(delta){
+    const newSeats = {};
+    const droppedNames = [];
+    Object.keys(seatingLayout.seats).forEach(key=>{
+        if(key === 'chairman'){ newSeats[key] = seatingLayout.seats[key]; return; }
+        const [zone, rowIdx, cStr] = key.split('-');
+        const c = parseInt(cStr, 10);
+        const newC = c + delta;
+        if(newC < 0){
+            const p = participants.find(x=>x.id===seatingLayout.seats[key]);
+            if(p) droppedNames.push(p.name);
+            return;
+        }
+        newSeats[`${zone}-${rowIdx}-${newC}`] = seatingLayout.seats[key];
+    });
+    seatingLayout.seats = newSeats;
+    return droppedNames;
+}
 
 // ── Seating Plan ──
 function renderSeatingPanel(){
@@ -957,8 +990,27 @@ function renderSeatingPanel(){
         seatingLayout.rowsBottom++;
         resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();
     });
-    seatG.querySelector('#seat-minus').addEventListener('click',()=>{ if(seatingLayout.seatsPerRow>2){seatingLayout.seatsPerRow--;resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();} });
-    seatG.querySelector('#seat-plus').addEventListener('click',()=>{ if(seatingLayout.seatsPerRow<20){seatingLayout.seatsPerRow++;resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();} });
+    seatG.querySelector('#seat-minus').addEventListener('click',()=>{
+        if(seatingLayout.seatsPerRow<=2) return;
+        if(seatingLayout.chairmanSide==='right'){
+            // ประธานอยู่ขวา: ฝั่งไกลประธานคือคอลัมน์ 0 (ซ้ายสุด) ต้องลบตรงนั้นก่อน แล้วเลื่อนคนที่เหลือมาซ้าย 1 ช่อง
+            const dropped = shiftSeatingColumns(-1);
+            if(dropped.length) toast(`ที่นั่งฝั่งไกลประธานถูกลบ (${dropped.join(', ')})`, 'info');
+        }
+        // ประธานอยู่ซ้าย: ฝั่งไกลประธานคือคอลัมน์เลขมากสุดอยู่แล้ว ลด seatsPerRow ตรงๆ ได้เลย
+        seatingLayout.seatsPerRow--;
+        resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();
+    });
+    seatG.querySelector('#seat-plus').addEventListener('click',()=>{
+        if(seatingLayout.seatsPerRow>=20) return;
+        if(seatingLayout.chairmanSide==='right'){
+            // ประธานอยู่ขวา: เปิดที่ว่างใหม่ที่คอลัมน์ 0 (ฝั่งไกลประธาน) โดยเลื่อนคนที่นั่งอยู่แล้วไปทางขวา 1 ช่องก่อน
+            shiftSeatingColumns(1);
+        }
+        // ประธานอยู่ซ้าย: ที่นั่งใหม่จะเพิ่มที่คอลัมน์เลขมากสุด ซึ่งไกลประธานอยู่แล้วโดยธรรมชาติ ไม่ต้องเลื่อนอะไรเพิ่ม
+        seatingLayout.seatsPerRow++;
+        resetSeatingPanelHeight();renderSeatingPanel();debouncedSaveSession();
+    });
 
     const wrapper=document.createElement('div');
     wrapper.style.cssText='display:flex;flex-direction:row;align-items:stretch;gap:6px;flex:1;min-width:0;overflow-x:auto;margin-top:0.4rem;';
@@ -1298,7 +1350,7 @@ document.getElementById('edit-name-save').addEventListener('click',()=>{
 document.getElementById('edit-name-input').addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('edit-name-save').click();});
 
 // ── Column Controls ──
-document.getElementById('increase-cols-btn').addEventListener('click',()=>{if(columnCount<10){updateColumnLayout(columnCount+1);debouncedSaveSession();}});
+document.getElementById('increase-cols-btn').addEventListener('click',()=>{if(columnCount<20){updateColumnLayout(columnCount+1);debouncedSaveSession();}});
 document.getElementById('decrease-cols-btn').addEventListener('click',()=>{if(columnCount>1){updateColumnLayout(columnCount-1);debouncedSaveSession();}});
 
 // ── Edit Cards Mode ──
@@ -2275,8 +2327,20 @@ window.addEventListener('beforeunload', e=>{
 });
 
 // ── iOS fix ──
+// ── iOS fix ──
 const isIOS=/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
 if(isIOS){document.querySelectorAll('input,textarea,select').forEach(el=>el.addEventListener('blur',()=>window.scrollTo(0,Math.max(0,document.body.scrollTop||document.documentElement.scrollTop))));}
+
+// ── Android keyboard fix: ปรับความสูงแอปให้ตรงกับพื้นที่ที่มองเห็นจริง (หดเมื่อคีย์บอร์ดขึ้น) ──
+// (100dvh บนบางเบราว์เซอร์ Android ไม่หดตามคีย์บอร์ด ต่างจาก iOS Safari ที่จัดการให้อัตโนมัติแล้ว
+//  ใช้ visualViewport API แทน เพราะมันรายงานพื้นที่ที่มองเห็นจริงหลังหักคีย์บอร์ดออกแล้ว)
+if (window.visualViewport) {
+    const updateAppHeight = () => {
+        document.documentElement.style.setProperty('--app-vh', window.visualViewport.height + 'px');
+    };
+    window.visualViewport.addEventListener('resize', updateAppHeight);
+    updateAppHeight();
+}
 
 // ── Service Worker for PWA ──
 if ('serviceWorker' in navigator) {
