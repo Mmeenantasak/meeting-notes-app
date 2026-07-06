@@ -886,45 +886,76 @@ document.getElementById('copy-text-btn')?.addEventListener('click', async () => 
 });
 
 // ── Resizer ──
-function setupResizer(el, onMove){
+// กลยุทธ์ "ghost line": ระหว่างลาก จะขยับแค่เส้นบางๆ (ghost) ที่ไม่กระทบ layout ของ textarea/participants-grid เลย
+// แล้วค่อยสั่ง resize จริง (onMove) แค่ครั้งเดียวตอนปล่อยนิ้ว/เมาส์เท่านั้น
+// วิธีนี้ตัดปัญหา text reflow ของ <textarea> ที่มีเนื้อหาเยอะๆ ระหว่างลากไปเลย เพราะไม่มีการ resize จริงจนกว่าจะปล่อยมือ
+function setupResizer(el, onMove, axis){ // axis: 'x' = เส้นแนวตั้ง (ลากซ้าย-ขวา), 'y' = เส้นแนวนอน (ลากบน-ล่าง)
     if(!el) return;
     let active=false;
-    let rafScheduled=false;
+    let ghost=null;
     let latestEvent=null;
-    el.addEventListener('mousedown',e=>{e.preventDefault();active=true;el.classList.add('resizing');document.addEventListener('mousemove',move);document.addEventListener('mouseup',stop);});
-    el.addEventListener('touchstart',e=>{e.preventDefault();active=true;el.classList.add('resizing');document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',stop);},{passive:false});
+
+    function createGhost(){
+        ghost=document.createElement('div');
+        ghost.style.position='fixed';
+        ghost.style.background='var(--accent-color, #3b82f6)';
+        ghost.style.opacity='0.65';
+        ghost.style.zIndex='9999';
+        ghost.style.pointerEvents='none';
+        ghost.style.boxShadow='0 0 8px rgba(0,0,0,0.4)';
+        if(axis==='x'){ ghost.style.top='0'; ghost.style.bottom='0'; ghost.style.width='3px'; }
+        else { ghost.style.left='0'; ghost.style.right='0'; ghost.style.height='3px'; }
+        document.body.appendChild(ghost);
+    }
+    function updateGhost(ev){
+        if(!ghost) return;
+        if(axis==='x') ghost.style.left=ev.clientX+'px';
+        else ghost.style.top=ev.clientY+'px';
+    }
+    function removeGhost(){ if(ghost){ ghost.remove(); ghost=null; } }
+
+    el.addEventListener('mousedown',e=>{
+        e.preventDefault();active=true;el.classList.add('resizing');
+        createGhost();updateGhost(e);
+        document.addEventListener('mousemove',move);document.addEventListener('mouseup',stop);
+    });
+    el.addEventListener('touchstart',e=>{
+        e.preventDefault();active=true;el.classList.add('resizing');
+        createGhost();updateGhost(e.touches[0]);
+        document.addEventListener('touchmove',move,{passive:false});document.addEventListener('touchend',stop);
+    },{passive:false});
+
     function move(e){
         if(!active) return;
         latestEvent = e.touches?e.touches[0]:e;
-        // จำกัดให้คำนวณ layout แค่ 1 ครั้งต่อเฟรม (แทนที่จะคำนวณทุกพิกเซลที่ลาก)
-        // ลดภาระ reflow เวลามีการ์ดเยอะ ทำให้ลากลื่นขึ้นชัดเจน
-        if(!rafScheduled){
-            rafScheduled=true;
-            requestAnimationFrame(()=>{
-                onMove(latestEvent);
-                rafScheduled=false;
-            });
-        }
+        updateGhost(latestEvent); // ขยับแค่เส้นบางๆ เท่านั้น ไม่แตะ textarea/grid เลย จึงไม่มี reflow ระหว่างลาก
     }
-    function stop(){active=false;el.classList.remove('resizing');document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',stop);document.removeEventListener('touchmove',move);document.removeEventListener('touchend',stop);}
+    function stop(){
+        active=false;
+        el.classList.remove('resizing');
+        removeGhost();
+        if(latestEvent) onMove(latestEvent); // resize จริงแค่ครั้งเดียวตอนปล่อยมือ
+        document.removeEventListener('mousemove',move);document.removeEventListener('mouseup',stop);
+        document.removeEventListener('touchmove',move);document.removeEventListener('touchend',stop);
+    }
 }
 const mainContainer=document.getElementById('main-container');
 setupResizer(document.getElementById('resizer'),ev=>{
     let w=ev.clientX-mainContainer.getBoundingClientRect().left;
     w=Math.max(120,Math.min(w,mainContainer.getBoundingClientRect().width-120));
     leftPanel.style.flexBasis=w+'px';leftPanel.style.flexGrow='0';leftPanel.style.flexShrink='0';
-});
+},'x');
 setupResizer(document.getElementById('horizontal-resizer'),ev=>{
     let h=ev.clientY-mainContainer.getBoundingClientRect().top;
     h=Math.max(80,Math.min(h,mainContainer.getBoundingClientRect().height-120));
     leftPanel.style.height=h+'px';leftPanel.style.flexBasis=h+'px';leftPanel.style.flexGrow='0';leftPanel.style.flexShrink='0';
-});
+},'y');
 const seatingPanel=document.getElementById('seating-panel');
 setupResizer(document.getElementById('seating-resizer'),ev=>{
     let h=ev.clientY-seatingPanel.getBoundingClientRect().top;
     h=Math.max(100,Math.min(h,window.innerHeight*0.75));
     seatingPanel.style.maxHeight='none';seatingPanel.style.height=h+'px';seatingPanel.style.flexBasis=h+'px';
-});
+},'y');
 function resetSeatingPanelHeight(){if(seatingPanel){seatingPanel.style.height='';seatingPanel.style.flexBasis='';seatingPanel.style.maxHeight='';}}
 
 // ── Shift seat column indices (ใช้ตอนประธานอยู่ฝั่งขวา เพื่อให้ที่นั่งใหม่/ที่ถูกลบ อยู่ฝั่งไกลจากประธานเสมอ) ──
