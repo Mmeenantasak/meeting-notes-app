@@ -595,7 +595,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, setDoc, onSnapshot, collection, getDocs, deleteDoc, addDoc, updateDoc, serverTimestamp, query, orderBy, getDoc, writeBatch, where, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // ── Firebase Config ──
@@ -1599,10 +1599,31 @@ document.getElementById('load-list-btn')?.addEventListener('click',async()=>{
 });
 
 // ── Auth ──
+// ── Auth ──
 const provider=new GoogleAuthProvider();
+// ตรวจสอบว่าเปิดแอปแบบ standalone (จากหน้าจอโฮม) หรือเปิดผ่านเบราว์เซอร์ปกติ
+// standalone mode บน iOS Safari ไม่รองรับ signInWithPopup (ป็อปอัพเปิดไม่ได้/สื่อสารกลับไม่ได้ ค้างเงียบๆ ไม่มี error)
+// ต้องใช้ signInWithRedirect แทน ซึ่งทำงานผ่านการเปลี่ยนหน้าเต็มจอ ไม่พึ่งป็อปอัพ
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 document.getElementById('login-btn').addEventListener('click',async()=>{
     if(isOffline){enterApp(null);return;}
-    try{await signInWithPopup(auth,provider);}catch(e){document.getElementById('login-error').textContent='เข้าสู่ระบบไม่สำเร็จ';document.getElementById('login-error').style.display='block';}
+    try{
+        if(isStandalone){
+            await signInWithRedirect(auth,provider);
+        } else {
+            await signInWithPopup(auth,provider);
+        }
+    }catch(e){
+        console.error('Login error:',e);
+        document.getElementById('login-error').textContent='เข้าสู่ระบบไม่สำเร็จ';
+        document.getElementById('login-error').style.display='block';
+    }
+});
+// รับผลลัพธ์หลังถูกเปลี่ยนหน้ากลับมาจาก Google (กรณีใช้ signInWithRedirect)
+getRedirectResult(auth).catch(e=>{
+    console.error('Redirect login error:',e);
+    document.getElementById('login-error').textContent='เข้าสู่ระบบไม่สำเร็จ';
+    document.getElementById('login-error').style.display='block';
 });
 document.getElementById('login-guest-btn').addEventListener('click',async()=>{
     if(isOffline){enterApp(null);return;}
