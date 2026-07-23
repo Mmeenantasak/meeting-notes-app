@@ -1316,7 +1316,24 @@ function selectParticipant(id){
     const ta=document.getElementById('transcript-textarea');
     const cur=ta.value, ins=`\n${p.name}  :  `;
     ta.value=(cur.length>0&&!cur.endsWith('\n'))?cur+ins:cur+ins.trimStart();
-    ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);ta.scrollTop=ta.scrollHeight;
+
+    // จำตำแหน่ง scroll ของ main-container ไว้ก่อนโฟกัส textarea
+    // ป้องกันปัญหา: พอโฟกัส+คีย์บอร์ดเปิด เบราว์เซอร์ (โดยเฉพาะ iOS) auto-scroll ทั้งหน้าให้เห็น cursor
+    // ซึ่งถ้าข้อความยาว จะเลื่อนจนบัง participants grid ไปเลย (ต้องการให้ล็อกไว้เหมือนก่อนกด)
+    const mainC = document.getElementById('main-container');
+    const savedScroll = mainC ? mainC.scrollTop : 0;
+
+    ta.focus({preventScroll:true}); // preventScroll กัน browser auto-scroll จาก focus() ตรงๆ
+    ta.setSelectionRange(ta.value.length,ta.value.length);
+    ta.scrollTop=ta.scrollHeight; // เลื่อนไปบรรทัดล่างสุด "ภายในกล่อง textarea เอง" เท่านั้น ไม่กระทบหน้าเว็บ
+
+    // คีย์บอร์ดมือถือใช้เวลาแสดงผล/เลื่อนจอเองสักครู่ (นอกเหนือการควบคุมของ preventScroll)
+    // จึง "ดึงตำแหน่ง scroll กลับ" อีกรอบหลังจากคีย์บอร์ดเปิดเสร็จสมบูรณ์
+    if(mainC){
+        requestAnimationFrame(()=>{ mainC.scrollTop = savedScroll; });
+        setTimeout(()=>{ mainC.scrollTop = savedScroll; }, 350);
+    }
+
     markUnsaved();debouncedSavePart();
 }
 
@@ -2398,11 +2415,21 @@ if(isIOS){document.querySelectorAll('input,textarea,select').forEach(el=>el.addE
 // ── Android keyboard fix: ปรับความสูงแอปให้ตรงกับพื้นที่ที่มองเห็นจริง (หดเมื่อคีย์บอร์ดขึ้น) ──
 // (100dvh บนบางเบราว์เซอร์ Android ไม่หดตามคีย์บอร์ด ต่างจาก iOS Safari ที่จัดการให้อัตโนมัติแล้ว
 //  ใช้ visualViewport API แทน เพราะมันรายงานพื้นที่ที่มองเห็นจริงหลังหักคีย์บอร์ดออกแล้ว)
+//
+// บั๊กที่พบเพิ่ม: iOS Safari รายงานค่า visualViewport.height ผิดพลาดชั่วคราวระหว่างแอนิเมชันพลิกจอ
+// (portrait <-> landscape) แล้ว event 'resize' ของ visualViewport ไม่ยิงซ้ำอีกครั้งหลังพลิกจอเสร็จสมบูรณ์
+// ทำให้ --app-vh ค้างค่าผิดถาวรจนกว่าจะรีเฟรชหน้า (ซึ่งรันโค้ดนี้ใหม่ได้ค่าถูกต้อง)
+// แก้โดยฟัง 'orientationchange' เพิ่ม แล้วคำนวณซ้ำอีกครั้งหลังหน่วงเวลาสั้นๆ ให้แอนิเมชันพลิกจอนิ่งก่อน
 if (window.visualViewport) {
     const updateAppHeight = () => {
         document.documentElement.style.setProperty('--app-vh', window.visualViewport.height + 'px');
     };
     window.visualViewport.addEventListener('resize', updateAppHeight);
+    window.addEventListener('orientationchange', () => {
+        // รอให้ Safari หมุนจอเสร็จสมบูรณ์และรายงานขนาดจริงก่อนค่อยคำนวณซ้ำ
+        setTimeout(updateAppHeight, 300);
+        setTimeout(updateAppHeight, 600); // เผื่อเครื่อง/เวอร์ชันที่แอนิเมชันช้ากว่าปกติ
+    });
     updateAppHeight();
 }
 
