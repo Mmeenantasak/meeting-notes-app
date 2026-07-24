@@ -283,11 +283,15 @@
 
         /* ── Mobile ── */
         @media (max-width:1024px) {
-            #main-container { flex-direction:column; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-            #left-panel { flex-basis:auto; min-width:unset; padding-right:0; flex-shrink:0; }
-            #right-panel { min-height:50vh; flex-shrink:0; }
-            #resizer { display:none; }
-        }
+    /* เดิมบังคับ #right-panel สูงขั้นต่ำ 50vh เสมอ ทำให้ตอนคีย์บอร์ดเปิด (พื้นที่จอเหลือน้อยลง)
+       พื้นที่ที่เหลือให้ #left-panel (รายชื่อ) ถูกบีบจนเห็นแค่ 1-2 การ์ด
+       เปลี่ยนใหม่: #left-panel สูงได้ตามเนื้อหาจริง แต่ไม่เกิน max-height ที่กำหนด (เลื่อนดูเองได้ถ้าคนเยอะ)
+       #right-panel (กล่องข้อความ) ขยายเต็มพื้นที่ที่เหลือเสมอ ไม่บังคับความสูงขั้นต่ำตายตัวอีกต่อไป */
+    #main-container { flex-direction: column; overflow:hidden; }
+    #left-panel { flex-basis:auto; min-width:unset; padding-right:0; flex-shrink:0; max-height:45vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+    #right-panel { flex:1 1 auto; min-height:0; }
+    #resizer { display:none; }
+}
         @supports (-webkit-touch-callout:none) {
             .modal-box { animation:none !important; }
             .participant-box,.seat-card { transition:border-color 0.1s ease-out !important; transform:none !important; }
